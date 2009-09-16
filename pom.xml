@@ -1,0 +1,54 @@
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
+	<modelVersion>4.0.0</modelVersion>
+	<parent>
+		<groupId>org.jvnet.hudson.plugins</groupId>
+		<artifactId>plugin</artifactId>
+		<version>1.318</version>
+		<relativePath>../pom.xml</relativePath>
+	</parent>
+
+	<artifactId>instant-messaging</artifactId>
+	<name>Hudson instant-messaging plugin</name>
+	<version>1.0-SNAPSHOT</version>
+	<packaging>hpi</packaging>
+	<developers>
+		<developer>
+			<id>kutzi</id>
+			<name>Christoph Kutzinski</name>
+			<email>kutzi@gmx.de</email>
+			<timezone>1</timezone>
+		</developer>
+	</developers>
+	
+	<build>
+        <plugins>
+            <plugin>
+                <groupId>org.jvnet.hudson.tools</groupId>
+                <artifactId>maven-hpi-plugin</artifactId>
+                <version>1.43</version>
+                <extensions>true</extensions>
+            </plugin>
+            <!-- Make sure that we don't use any Java 1.6 dependencies -->
+            <plugin>
+                <groupId>org.jvnet</groupId>
+                <artifactId>animal-sniffer</artifactId>
+                <version>1.2</version>
+                <executions>
+                    <execution>
+                        <goals>
+                            <goal>check</goal>
+                        </goals>
+                        <configuration>
+                            <signature>
+                                <groupId>org.jvnet.animal-sniffer</groupId>
+                                <artifactId>java1.5</artifactId>
+                                <version>1.0</version>
+                            </signature>
+                        </configuration>
+                    </execution>
+                </executions>
+            </plugin>
+        </plugins>
+    </build>
+</project>
