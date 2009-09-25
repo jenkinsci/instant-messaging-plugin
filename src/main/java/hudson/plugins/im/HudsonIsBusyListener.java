@@ -10,6 +10,9 @@ import hudson.model.listeners.RunListener;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.concurrent.Executors;
+import java.util.concurrent.ScheduledExecutorService;
+import java.util.concurrent.TimeUnit;
 import java.util.logging.Logger;
 
 @SuppressWarnings("unchecked")
@@ -17,6 +20,8 @@ public class HudsonIsBusyListener extends RunListener {
 	
 	private static final Logger LOGGER = Logger.getLogger(HudsonIsBusyListener.class.getName());
 	private transient final List<IMConnectionProvider> connectionProviders = new ArrayList<IMConnectionProvider>();
+	
+	private transient final ScheduledExecutorService executor = Executors.newSingleThreadScheduledExecutor();
 	
 	public HudsonIsBusyListener() {
         super(Run.class);
@@ -72,13 +77,20 @@ public class HudsonIsBusyListener extends RunListener {
         updateIMStatus(null);
     }
     
-    private void updateIMStatus(Run<?, ?> run) {
-        int totalExecutors = getTotalExecutors();
-        int busyExecutors = getBusyExecutors(run);
-        
-        for (IMConnectionProvider provider : this.connectionProviders) {
-        	setStatus(provider, busyExecutors, totalExecutors);
-        }
+    private void updateIMStatus(final Run<?, ?> run) {
+    	// schedule update 1 second into the future
+    	// otherwise calculation is often incorrect
+    	this.executor.schedule(new Runnable() {
+			@Override
+			public void run() {
+				int totalExecutors = getTotalExecutors();
+		        int busyExecutors = getBusyExecutors(run);
+		        
+		        for (IMConnectionProvider provider : connectionProviders) {
+		        	setStatus(provider, busyExecutors, totalExecutors);
+		        }
+			}
+		}, 1L, TimeUnit.SECONDS);
     }
     
     private void setStatus(IMConnectionProvider provider, int busyExecutors, int totalExecutors) {
@@ -122,13 +134,15 @@ public class HudsonIsBusyListener extends RunListener {
         }
         
         if ( run != null && !stillRunningExecutorFound) {
-        	LOGGER.warning("Didn't find executor for run " + run + " among the list of busy executors.");
+        	LOGGER.info("Didn't find executor for run " + run + " among the list of busy executors.");
         	// Decrease anyway.
         	// Otherwise count would be wrong. See [HUDSON-4337]
         	// Don't know why the detection doesn't work reliably
-        	if (busyExecutors > 0) {
-        		busyExecutors--;
-        	}
+        	
+        	// this works even less reliably, as count is to low most of the time
+//        	if (busyExecutors > 0) {
+//        		busyExecutors--;
+//        	}
         }
         
         return busyExecutors;
