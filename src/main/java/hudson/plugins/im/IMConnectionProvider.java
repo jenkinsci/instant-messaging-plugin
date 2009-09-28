@@ -31,9 +31,6 @@ public abstract class IMConnectionProvider implements IMConnectionListener {
 	
 	public abstract IMConnection createConnection() throws IMException;
 
-    /**
-     * @throws IMException on any underlying communication Exception
-     */
     public synchronized IMConnection currentConnection() {
     	if (this.imConnection == null) {
     		try {

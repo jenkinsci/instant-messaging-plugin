@@ -10,9 +10,6 @@ public class IMPlugin {
     	this.provider = provider;
     }
     
-	/**
-     * {@inheritDoc}
-     */
     public void start() throws Exception {
     	this.busyListener = new HudsonIsBusyListener();
     	// registration via @Extension doesn't seem to work!?
@@ -20,9 +17,6 @@ public class IMPlugin {
     	this.busyListener.addConnectionProvider(this.provider);
     }
 
-    /**
-     * {@inheritDoc}
-     */
     public void stop() throws Exception {
     	this.busyListener.unregister();
     	this.provider.releaseConnection();
