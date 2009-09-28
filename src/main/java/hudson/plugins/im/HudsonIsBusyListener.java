@@ -3,7 +3,6 @@ package hudson.plugins.im;
 import hudson.model.Computer;
 import hudson.model.Executor;
 import hudson.model.Hudson;
-import hudson.model.Queue;
 import hudson.model.Run;
 import hudson.model.TaskListener;
 import hudson.model.listeners.RunListener;
@@ -20,31 +19,27 @@ public class HudsonIsBusyListener extends RunListener {
 	
 	private static final Logger LOGGER = Logger.getLogger(HudsonIsBusyListener.class.getName());
 	private transient final List<IMConnectionProvider> connectionProviders = new ArrayList<IMConnectionProvider>();
-	
 	private transient final ScheduledExecutorService executor = Executors.newSingleThreadScheduledExecutor();
+	
+	private transient int lastBusyExecutors = -1;
+	private transient int lastTotalExecutors = -1;
+	
+	private final Runnable updateRunner = new Runnable() {
+        @Override
+        public void run() {
+            updateIMStatus();
+        }
+    };
 	
 	public HudsonIsBusyListener() {
         super(Run.class);
+        this.executor.scheduleAtFixedRate(this.updateRunner, 10, 60, TimeUnit.SECONDS);
         LOGGER.info("Executor busy listener created");
     }
 	
 	public void addConnectionProvider(IMConnectionProvider provider) {
 		this.connectionProviders.add(provider);
 		LOGGER.fine("Added connection provider: " + provider);
-
-		// update status with some delay as it usually takes some time
-		// until the connection is established
-		new Thread() {
-			@Override
-			public void run() {
-				try {
-					Thread.sleep(1500L);
-				} catch (InterruptedException e) {
-					// ignore
-				}
-				updateIMStatus();
-			}
-		}.start();
 	}
 	
 	public void removeConnectionProvider(IMConnectionProvider provider) {
@@ -54,43 +49,41 @@ public class HudsonIsBusyListener extends RunListener {
 
     @Override
     public void onCompleted(Run r, TaskListener listener) {
-        // the executor of 'r' is still busy, we have to take that into account!
-        updateIMStatus(r);
+        updateLater();
     }
     
 	@Override
-	public void onFinalized(Run r) {
-		updateIMStatus(r);
-	}
-
-	@Override
     public void onDeleted(Run r) {
-        updateIMStatus(null);
+	    updateLater();
     }
 
     @Override
     public void onStarted(Run r, TaskListener listener) {
-        updateIMStatus(null);
+        updateLater();
     }
     
-    protected void updateIMStatus() {
-        updateIMStatus(null);
+    private void updateLater() {
+        // schedule update 1 second into the future
+        // otherwise calculation is often incorrect
+        this.executor.schedule(new Runnable() {
+            @Override
+            public void run() {
+                updateIMStatus();
+            }
+        }, 1L, TimeUnit.SECONDS);
     }
     
-    private void updateIMStatus(final Run<?, ?> run) {
-    	// schedule update 1 second into the future
-    	// otherwise calculation is often incorrect
-    	this.executor.schedule(new Runnable() {
-			@Override
-			public void run() {
-				int totalExecutors = getTotalExecutors();
-		        int busyExecutors = getBusyExecutors(run);
-		        
-		        for (IMConnectionProvider provider : connectionProviders) {
-		        	setStatus(provider, busyExecutors, totalExecutors);
-		        }
-			}
-		}, 1L, TimeUnit.SECONDS);
+    private synchronized void updateIMStatus() {
+		int totalExecutors = getTotalExecutors();
+        int busyExecutors = getBusyExecutors();
+        
+        if (totalExecutors != this.lastTotalExecutors || busyExecutors != this.lastBusyExecutors) {
+	        for (IMConnectionProvider provider : connectionProviders) {
+	        	setStatus(provider, busyExecutors, totalExecutors);
+	        }
+        }
+        this.lastTotalExecutors = totalExecutors;
+        this.lastBusyExecutors = busyExecutors;
     }
     
     private void setStatus(IMConnectionProvider provider, int busyExecutors, int totalExecutors) {
@@ -116,33 +109,17 @@ public class HudsonIsBusyListener extends RunListener {
         }
     }
     
-    private int getBusyExecutors(Run<?, ?> run) {
+    private int getBusyExecutors() {
         int busyExecutors = 0;
-        boolean stillRunningExecutorFound = false;
+        //boolean stillRunningExecutorFound = false;
         Computer[] computers = Hudson.getInstance().getComputers();
         for (Computer compi : computers) {
             
             for (Executor executor : compi.getExecutors()) {
                 if (executor.isBusy()) {
-                    if (isNotEqual(executor.getCurrentExecutable(), run)) {
-                        busyExecutors++;
-                    } else {
-                    	stillRunningExecutorFound = true;
-                    }
+                    busyExecutors++;
                 }
             }
-        }
-        
-        if ( run != null && !stillRunningExecutorFound) {
-        	LOGGER.info("Didn't find executor for run " + run + " among the list of busy executors.");
-        	// Decrease anyway.
-        	// Otherwise count would be wrong. See [HUDSON-4337]
-        	// Don't know why the detection doesn't work reliably
-        	
-        	// this works even less reliably, as count is to low most of the time
-//        	if (busyExecutors > 0) {
-//        		busyExecutors--;
-//        	}
         }
         
         return busyExecutors;
@@ -156,18 +133,4 @@ public class HudsonIsBusyListener extends RunListener {
         }
         return totalExecutors;
     }
-        
-    private static boolean isNotEqual(Queue.Executable executable, Run<?, ?> run) {
-        if (run == null) {
-            return true;
-        }
-        
-        if (executable instanceof Run<?, ?>) {
-        	return !((Run<?, ?>)executable).getId().equals(run.getId());
-        } else {
-        	// can never be equal
-        	return false;
-        }
-    }
-
 }
