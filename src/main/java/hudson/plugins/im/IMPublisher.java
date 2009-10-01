@@ -1,7 +1,6 @@
 package hudson.plugins.im;
 
 import hudson.Launcher;
-import hudson.Util;
 import hudson.model.AbstractBuild;
 import hudson.model.BuildListener;
 import hudson.model.Result;
@@ -9,7 +8,6 @@ import hudson.model.User;
 import hudson.plugins.im.tools.Assert;
 import hudson.plugins.im.tools.BuildHelper;
 import hudson.plugins.im.tools.MessageHelper;
-import hudson.plugins.im.GroupChatIMMessageTarget;
 import hudson.scm.ChangeLogSet;
 import hudson.scm.ChangeLogSet.Entry;
 import hudson.tasks.BuildStep;
@@ -48,14 +46,19 @@ public abstract class IMPublisher extends Notifier implements BuildStep
     private final boolean notifySuspects;
     private final boolean notifyCulprits;
     private final boolean notifyFixers;
-    private final String defaultIdSuffix;
+    
+    /**
+     * @deprecated Only for deserializing old instances
+     */
+    @SuppressWarnings("unused")
+    @Deprecated
+    private transient String defaultIdSuffix;
 
     protected IMPublisher(final String targetsAsString, final String notificationStrategyString,
     		final boolean notifyGroupChatsOnBuildStart,
     		final boolean notifySuspects,
     		final boolean notifyCulprits,
-    		final boolean notifyFixers,
-    		String defaultIdSuffix) throws IMMessageTargetConversionException
+    		final boolean notifyFixers) throws IMMessageTargetConversionException
     {
         Assert.isNotNull(targetsAsString, "Parameter 'targetsAsString' must not be null.");
         final String[] split = targetsAsString.split("\\s");
@@ -80,7 +83,6 @@ public abstract class IMPublisher extends Notifier implements BuildStep
         this.notifySuspects = notifySuspects;
         this.notifyCulprits = notifyCulprits;
         this.notifyFixers = notifyFixers;
-        this.defaultIdSuffix = Util.fixEmptyAndTrim(defaultIdSuffix);
     }
     
     /**
@@ -153,32 +155,49 @@ public abstract class IMPublisher extends Notifier implements BuildStep
             notifyChats(build, buildListener);
         }
 
-        if (this.notifySuspects && BuildHelper.isFailureOrUnstable(build)) {
-        	log(buildListener, "Notifying suspects");
-        	final String message = "Oh no! You're suspected of having broken " + build.getProject().getName() + ": " + MessageHelper.getBuildURL(build);
-        	
-        	for (IMMessageTarget target : calculateIMTargets(getCommitters(build), buildListener)) {
-        		try {
-        			log(buildListener, "Sending notification to suspect: " + target.toString());
-        			getIMConnection().send(target, message);
-        		} catch (final Throwable e) {
-        			log(buildListener, "There was an error sending suspect notification to: " + target.toString());
-        		}
-        	}
-        }
-        
-        if (this.notifyCulprits && BuildHelper.isFailureOrUnstable(build)) {
-        	log(buildListener, "Notifying culprits");
-        	final String message = "You're still being suspected of having broken " + build.getProject().getName() + ": " + MessageHelper.getBuildURL(build);
-        	
-        	for (IMMessageTarget target : calculateIMTargets(getCulpritsOnly(build), buildListener)) {
-        		try {
-        			log(buildListener, "Sending notification to culprit: " + target.toString());
-        			getIMConnection().send(target, message);
-        		} catch (final Throwable e) {
-        			log(buildListener, "There was an error sending suspect notification to: " + target.toString());
-        		}
-        	}
+        if (BuildHelper.isStillFailureOrUnstable(build)) {
+            if (this.notifySuspects) {
+            	log(buildListener, "Notifying suspects");
+            	final String message = "Build " + build.getProject().getName() +
+            	    " is " + BuildHelper.getResultDescription(build) + ": " + MessageHelper.getBuildURL(build);
+            	
+            	for (IMMessageTarget target : calculateIMTargets(getCommitters(build), buildListener)) {
+            		try {
+            			log(buildListener, "Sending notification to suspect: " + target.toString());
+            			getIMConnection().send(target, message);
+            		} catch (final Throwable e) {
+            			log(buildListener, "There was an error sending suspect notification to: " + target.toString());
+            		}
+            	}
+            }
+            
+            if (this.notifyCulprits) {
+            	log(buildListener, "Notifying culprits");
+            	final String message = "You're still being suspected of having broken " + build.getProject().getName() + ": " + MessageHelper.getBuildURL(build);
+            	
+            	for (IMMessageTarget target : calculateIMTargets(getCulpritsOnly(build), buildListener)) {
+            		try {
+            			log(buildListener, "Sending notification to culprit: " + target.toString());
+            			getIMConnection().send(target, message);
+            		} catch (final Throwable e) {
+            			log(buildListener, "There was an error sending culprit notification to: " + target.toString());
+            		}
+            	}
+            }
+        } else if (BuildHelper.isFailureOrUnstable(build)) {
+            if (this.notifySuspects) {
+                log(buildListener, "Notifying suspects");
+                final String message = "Oh no! You're suspected of having broken " + build.getProject().getName() + ": " + MessageHelper.getBuildURL(build);
+                
+                for (IMMessageTarget target : calculateIMTargets(getCommitters(build), buildListener)) {
+                    try {
+                        log(buildListener, "Sending notification to suspect: " + target.toString());
+                        getIMConnection().send(target, message);
+                    } catch (final Throwable e) {
+                        log(buildListener, "There was an error sending suspect notification to: " + target.toString());
+                    }
+                }
+            }
         }
         
         if (this.notifyFixers && BuildHelper.isFix(build)) {
@@ -299,23 +318,24 @@ public abstract class IMPublisher extends Notifier implements BuildStep
 	private Collection<IMMessageTarget> calculateIMTargets(Set<User> targets, BuildListener listener) {
 		Set<IMMessageTarget> suspects = new HashSet<IMMessageTarget>();
 		
+		String defaultIdSuffix = ((IMPublisherDescriptor)getDescriptor()).getDefaultIdSuffix();
 		LOGGER.fine("Default Suffix: " + defaultIdSuffix);
 		
 		for (User target : targets) {
 			LOGGER.fine("Possible target: " + target.getId());
-            String jabberId = getConfiguredIMId(target);
-			if (jabberId == null && this.defaultIdSuffix != null) {
-                jabberId = target.getId() + defaultIdSuffix;
+            String imId = getConfiguredIMId(target);
+			if (imId == null && defaultIdSuffix != null) {
+                imId = target.getId() + defaultIdSuffix;
             }
 
-            if (jabberId != null) {
+            if (imId != null) {
                 try {
-                    suspects.add(CONVERTER.fromString(jabberId));
+                    suspects.add(CONVERTER.fromString(imId));
                 } catch (final IMMessageTargetConversionException e) {
-                    log(listener, "Invalid Jabber ID: " + jabberId);
+                    log(listener, "Invalid IM ID: " + imId);
                 }
             } else {
-            	log(listener, "No Jabber ID found for: " + target.getId());
+            	log(listener, "No IM ID found for: " + target.getId());
             }
 		}
 		return suspects;

@@ -27,5 +27,6 @@ public interface IMPublisherDescriptor {
     String getPassword();
     
     String getCommandPrefix();
-    
+ 
+    String getDefaultIdSuffix();
 }

@@ -9,6 +9,32 @@ import hudson.model.Result;
  * @author kutzi
  */
 public class BuildHelper {
+    
+    /**
+     * Extended result description of a build.
+     *
+     * @author kutzi
+     */
+    public static enum ExtResult {
+        FIXED, SUCCESS, STILL_UNSTABLE("STILL UNSTABLE"), UNSTABLE,
+        STILL_FAILING("STILL FAILING"), FAILURE,
+        ABORTED, NOT_BUILT("NOT BUILT");
+        
+        private final String description;
+
+        private ExtResult() {
+            this.description = null;
+        }
+        
+        private ExtResult(String description) {
+            this.description = description;
+        }
+        
+        @Override
+        public String toString() {
+            return this.description != null ? this.description : super.toString();
+        }
+    }
 
     private BuildHelper() {
         // no instances
@@ -39,6 +65,11 @@ public class BuildHelper {
     	return build.getResult() == Result.FAILURE
     		|| build.getResult() == Result.UNSTABLE;
     }
+    
+    public static boolean isStillFailureOrUnstable(AbstractBuild<?, ?> build) {
+        ExtResult result = getExtendedResult(build);
+        return result == ExtResult.STILL_FAILING || result == ExtResult.STILL_UNSTABLE;
+    }
 
     /**
      * Returns the previous 'not aborted' build (i.e. ignores ABORTED and NOT_BUILT builds)
@@ -62,26 +93,45 @@ public class BuildHelper {
      * E.g. reports 'fixes' and 'still failing/unstable' builds.
      */
     public static String getResultDescription(AbstractBuild<?, ?> build) {
+        ExtResult result = getExtendedResult(build);
+        return result.toString();
+    }
+    
+    /**
+     * Returns the extended result description of a build.
+     */
+    public static ExtResult getExtendedResult(AbstractBuild<?, ?> build) {
         Result result = build.getResult();
-        if (result == Result.ABORTED || result == Result.NOT_BUILT) {
-            return result.toString();
+        
+        if (result == Result.ABORTED) {
+            return ExtResult.ABORTED;
+        } else if (result == Result.NOT_BUILT) {
+            return ExtResult.NOT_BUILT;
         }
         
-        if (isFix(build)) {
-            return "FIXED";
+        if (result == Result.SUCCESS) {
+            if (isFix(build)) {
+                return ExtResult.FIXED;
+            } else {
+                return ExtResult.SUCCESS;
+            }
         }
         
         AbstractBuild<?, ?> previousBuild = getPreviousNonAbortedBuild(build);
         if (result == Result.UNSTABLE) {
             if (previousBuild != null && previousBuild.getResult() == Result.UNSTABLE) {
-                return "STILL UNSTABLE";
+                return ExtResult.STILL_UNSTABLE;
+            } else {
+                return ExtResult.UNSTABLE;
             }
         } else if (result == Result.FAILURE) {
             if (previousBuild != null && previousBuild.getResult() == Result.FAILURE) {
-                return "STILL FAILING";
+                return ExtResult.STILL_FAILING;
+            } else {
+                return ExtResult.FAILURE;
             }
         }
         
-        return result.toString();
+        throw new IllegalArgumentException("Unknown result: '" + result + "' for build: " + build);
     }
 }
