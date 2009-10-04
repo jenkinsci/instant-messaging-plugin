@@ -81,19 +81,19 @@ public class Bot implements IMMessageListener {
 
 	private final IMChat chat;
 	private final String nick;
-	private final String jabberServer;
+	private final String imServer;
 	private final String commandPrefix;
 	private String helpCache = null;
 
-	public Bot(final IMChat chat, final String nick, final String jabberServer,
+	public Bot(final IMChat chat, final String nick, final String imServer,
 			final String commandPrefix) {
 		this.chat = chat;
 		this.nick = nick;
-		this.jabberServer = jabberServer;
+		this.imServer = imServer;
 		this.commandPrefix = commandPrefix;
 		
 		this.cmdsAndAliases.putAll(COMMAND_MAP);
-		BuildCommand buildCommand  = new BuildCommand(this.nick + "@" + this.jabberServer);
+		BuildCommand buildCommand  = new BuildCommand(this.nick + "@" + this.imServer);
 		this.cmdsAndAliases.put("build", buildCommand);
 		this.cmdsAndAliases.put("schedule", buildCommand);
 		this.cmdsAndAliases.put("help", new HelpCommand());

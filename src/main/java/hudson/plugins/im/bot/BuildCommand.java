@@ -7,6 +7,7 @@ import hudson.model.AbstractProject;
 import hudson.model.Cause;
 import hudson.model.Hudson;
 import hudson.model.Queue;
+import hudson.plugins.im.IMCause;
 import hudson.plugins.im.IMChat;
 import hudson.plugins.im.IMException;
 import hudson.plugins.im.IMMessage;
@@ -15,8 +16,10 @@ import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
 /**
- * Build command for the Jabber bot.
+ * Build command for the instant messaging bot.
+ * 
  * @author Pascal Bleser
+ * @author kutzi
  */
 public class BuildCommand implements BotCommand {
 	
@@ -24,14 +27,19 @@ public class BuildCommand implements BotCommand {
 	private static final String SYNTAX = " <job> [now|<delay[s|m|h]>]";
 	private static final String HELP = SYNTAX + " - schedule a job build, with standard, custom or no quiet period";
 	
-	private final String jabberId;
+	private final String imId;
 	
-	public BuildCommand(final String jabberId) {
-		this.jabberId = jabberId;
+	/**
+	 * 
+	 * @param imId An identifier describing the Im account used to send the build command.
+	 *   E.g. the Jabber ID of the Bot.
+	 */
+	public BuildCommand(final String imId) {
+		this.imId = imId;
 	}
 
 	private boolean scheduleBuild(AbstractProject<?, ?> project, int delaySeconds, String sender) {
-		Cause cause = new Cause.RemoteCause(this.jabberId, "on request of '" + sender + "'");
+		Cause cause = new IMCause("Started by " + this.imId + " on request of '" + sender + "'");
         return project.scheduleBuild(delaySeconds, cause);
 	}
 	
