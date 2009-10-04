@@ -12,6 +12,7 @@
 	<name>Hudson instant-messaging plugin</name>
 	<version>1.0-SNAPSHOT</version>
 	<packaging>hpi</packaging>
+	<url>http://wiki.hudson-ci.org/display/HUDSON/Instant+Messaging+Plugin</url>
 	<developers>
 		<developer>
 			<id>kutzi</id>
@@ -26,7 +27,7 @@
             <plugin>
                 <groupId>org.jvnet.hudson.tools</groupId>
                 <artifactId>maven-hpi-plugin</artifactId>
-                <version>1.43</version>
+                <version>1.45</version>
                 <extensions>true</extensions>
             </plugin>
             <!-- Make sure that we don't use any Java 1.6 dependencies -->
