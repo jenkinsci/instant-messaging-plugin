@@ -18,9 +18,10 @@ public class AbortCommand extends AbstractSingleJobCommand {
 	}
 
     @Override
-    protected CharSequence getMessageForJob(AbstractProject<?, ?> project, String sender) {
+    protected CharSequence getMessageForJob(AbstractProject<?, ?> project, String sender, String[] args) throws CommandException {
         if ( (project.isInQueue() == false) && (project.isBuilding() == false) ) {
-            return sender + ": how do you intend a build that isn't building?";
+            throw new CommandException(
+                    sender + ": how do you intend to abort a build that isn't building?");
         }
         
         boolean aborted = false;
@@ -32,8 +33,9 @@ public class AbortCommand extends AbstractSingleJobCommand {
             // must be already building
             AbstractBuild<?, ?> build = project.getLastBuild();
             if (build == null) {
-                // No builds? lolwut?
-                return sender + ": it appears this job has never been built";
+                // No builds?
+                throw new CommandException(
+                        sender + ": it appears this job has never been built");
             }   
 
             Executor ex = build.getExecutor();
@@ -47,7 +49,8 @@ public class AbortCommand extends AbstractSingleJobCommand {
         if (aborted) {
             return project.getName() + " aborted, I hope you're happy!";
         } else {
-            return sender + ": " + " couldn't abort " + project.getName() + ". I don't know why this happened.";
+            throw new CommandException(
+                    sender + ": " + " couldn't abort " + project.getName() + ". I don't know why this happened.");
         }
     }
 

@@ -20,6 +20,15 @@
 			<timezone>1</timezone>
 		</developer>
 	</developers>
+    
+    <dependencies>
+        <dependency>
+            <groupId>org.mockito</groupId>
+            <artifactId>mockito-all</artifactId>
+            <version>1.7</version>
+            <scope>test</scope>
+        </dependency>
+    </dependencies>
 	
 	<build>
         <plugins>

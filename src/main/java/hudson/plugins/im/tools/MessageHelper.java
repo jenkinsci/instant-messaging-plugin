@@ -79,7 +79,31 @@ public class MessageHelper {
 	}
 	
 	/**
-	 * Unfortunately in Java 5 there is no Arrays.copyOfRange.
+	 * Copies the specified range of the specified array into a new array.
+     * The initial index of the range (<tt>from</tt>) must lie between zero
+     * and <tt>original.length</tt>, inclusive.  The value at
+     * <tt>original[from]</tt> is placed into the initial element of the copy
+     * (unless <tt>from == original.length</tt> or <tt>from == to</tt>).
+     * Values from subsequent elements in the original array are placed into
+     * subsequent elements in the copy.  The final index of the range
+     * (<tt>to</tt>), which must be greater than or equal to <tt>from</tt>,
+     * may be greater than <tt>original.length</tt>, in which case
+     * <tt>(byte)0</tt> is placed in all elements of the copy whose index is
+     * greater than or equal to <tt>original.length - from</tt>.  The length
+     * of the returned array will be <tt>to - from</tt>.
+     *
+     * @param original the array from which a range is to be copied
+     * @param from the initial index of the range to be copied, inclusive
+     * @param to the final index of the range to be copied, exclusive.
+     *     (This index may lie outside the array.)
+     * @return a new array containing the specified range from the original array,
+     *     truncated or padded with zeros to obtain the required length
+     * @throws ArrayIndexOutOfBoundsException if <tt>from &lt; 0</tt>
+     *     or <tt>from &gt; original.length()</tt>
+     * @throws IllegalArgumentException if <tt>from &gt; to</tt>
+     * @throws NullPointerException if <tt>original</tt> is null
+	 * 
+	 * Note: Unfortunately in Java 5 there is no Arrays#copyOfRange, yet.
 	 * So we have to implement it ourself.
 	 */
 	@SuppressWarnings("unchecked")
@@ -88,7 +112,7 @@ public class MessageHelper {
         if (newLength < 0)
             throw new IllegalArgumentException(from + " > " + to);
         Class type = original.getClass();
-        T[] copy = ((Object)type == (Object)Object[].class)
+        T[] copy = (type == Object[].class)
             ? (T[]) new Object[newLength]
             : (T[]) Array.newInstance(type.getComponentType(), newLength);
         System.arraycopy(original, from, copy, 0,
@@ -116,7 +140,7 @@ public class MessageHelper {
 	@SuppressWarnings("unchecked")
     public static <T> T[] copyOf(T[] original, int newLength) {
 		Class type = original.getClass();
-        T[] copy = ((Object)type == (Object)Object[].class)
+        T[] copy = (type == Object[].class)
             ? (T[]) new Object[newLength]
             : (T[]) Array.newInstance(type.getComponentType(), newLength);
         System.arraycopy(original, 0, copy, 0,

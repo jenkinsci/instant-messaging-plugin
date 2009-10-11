@@ -28,13 +28,6 @@ public class Bot implements IMMessageListener {
 
 	private static final Logger LOGGER = Logger.getLogger(Bot.class.getName());
 
-	private static final BotCommand STATUS_COMMAND = new StatusCommand();
-    private static final BotCommand HEALTH_COMMAND = new HealthCommand();
-	private static final BotCommand QUEUE_COMMAND = new QueueCommand();
-	private static final BotCommand SNACK_COMMAND = new SnackCommand();
-	private static final BotCommand TESTRESULTS_COMMAND =  new TestResultCommand();
-	private static final BotCommand ABORT_COMMAND = new AbortCommand();
-
 	private class HelpCommand implements BotCommand {
 
 		public void executeCommand(IMChat groupChat, IMMessage message,
@@ -61,20 +54,21 @@ public class Bot implements IMMessageListener {
 
 	};
 
-	private static final Map<String, BotCommand> COMMAND_MAP;
+	private static final Map<String, BotCommand> STATIC_COMMANDS_MAP;
 
 	static {
-		COMMAND_MAP = new HashMap<String, BotCommand>();
-		COMMAND_MAP.put("status", STATUS_COMMAND);
-		COMMAND_MAP.put("s", STATUS_COMMAND);
-        COMMAND_MAP.put("health", HEALTH_COMMAND);
-        COMMAND_MAP.put("h", HEALTH_COMMAND);
-		COMMAND_MAP.put("jobs", STATUS_COMMAND);
-		COMMAND_MAP.put("queue", QUEUE_COMMAND);
-		COMMAND_MAP.put("q", QUEUE_COMMAND);
-		COMMAND_MAP.put("testresult", TESTRESULTS_COMMAND);
-		COMMAND_MAP.put("abort", ABORT_COMMAND);
-		COMMAND_MAP.put("botsnack", SNACK_COMMAND);
+		STATIC_COMMANDS_MAP = new HashMap<String, BotCommand>();
+		STATIC_COMMANDS_MAP.put("status", new StatusCommand());
+		STATIC_COMMANDS_MAP.put("s", new StatusCommand());
+        STATIC_COMMANDS_MAP.put("health", new HealthCommand());
+        STATIC_COMMANDS_MAP.put("h", new HealthCommand());
+		STATIC_COMMANDS_MAP.put("jobs", new StatusCommand());
+		STATIC_COMMANDS_MAP.put("queue", new QueueCommand());
+		STATIC_COMMANDS_MAP.put("q", new QueueCommand());
+		STATIC_COMMANDS_MAP.put("testresult", new TestResultCommand());
+		STATIC_COMMANDS_MAP.put("abort", new AbortCommand());
+		STATIC_COMMANDS_MAP.put("comment", new CommentCommand());
+		STATIC_COMMANDS_MAP.put("botsnack", new SnackCommand());
 	}
 	
 	private final SortedMap<String, BotCommand> cmdsAndAliases = new TreeMap<String, BotCommand>();
@@ -92,7 +86,7 @@ public class Bot implements IMMessageListener {
 		this.imServer = imServer;
 		this.commandPrefix = commandPrefix;
 		
-		this.cmdsAndAliases.putAll(COMMAND_MAP);
+		this.cmdsAndAliases.putAll(STATIC_COMMANDS_MAP);
 		BuildCommand buildCommand  = new BuildCommand(this.nick + "@" + this.imServer);
 		this.cmdsAndAliases.put("build", buildCommand);
 		this.cmdsAndAliases.put("schedule", buildCommand);
