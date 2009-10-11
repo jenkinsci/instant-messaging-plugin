@@ -23,8 +23,13 @@ public class MessageHelper {
 	
 	public static String getBuildURL(AbstractBuild<?, ?> lastBuild) {
 		// The hudson's base url
-		StringBuilder builder = new StringBuilder(
+	    final StringBuilder builder;
+	    if (Hudson.getInstance() != null) {
+	        builder = new StringBuilder(
 				String.valueOf(Hudson.getInstance().getRootUrl()));
+	    } else {
+	        builder = new StringBuilder("null");
+	    }
 
 		// The build's url, escaped for project with space or other specials
 		// characters

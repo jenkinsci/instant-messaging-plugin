@@ -1,14 +1,13 @@
 package hudson.plugins.im.bot;
 
 import hudson.model.AbstractProject;
-import hudson.model.Hudson;
 import hudson.model.TopLevelItem;
 import hudson.model.View;
 import hudson.plugins.im.tools.MessageHelper;
+import hudson.plugins.im.tools.Pair;
 
 import java.util.ArrayList;
 import java.util.Collection;
-
 
 /**
  * Abstract command which returns a result message for one or several jobs.
@@ -20,6 +19,8 @@ abstract class AbstractMultipleJobCommand extends AbstractTextSendingCommand {
 	static final String UNKNOWN_JOB_STR = "unknown job";
 	static final String UNKNOWN_VIEW_STR = "unknown view";
 
+	private JobProvider jobProvider = new DefaultJobProvider();
+	
 	/**
 	 * Returns the message to return for this job.
 	 * Note that {@link AbstractMultipleJobCommand} already inserts one newline after each job's
@@ -38,7 +39,7 @@ abstract class AbstractMultipleJobCommand extends AbstractTextSendingCommand {
      */
     protected abstract String getCommandShortName();
     
-    private enum Mode {
+    enum Mode {
     	SINGLE, VIEW, ALL;
     }
 
@@ -46,45 +47,17 @@ abstract class AbstractMultipleJobCommand extends AbstractTextSendingCommand {
 	protected String getReply(String sender, String[] args) {
         Collection<AbstractProject<?, ?>> projects = new ArrayList<AbstractProject<?, ?>>();
 
-        final Mode mode;
-        String view = null;
+        final Pair<Mode, String> pair;
         try {
-            if (args.length >= 2) {
-                if ("-v".equals(args[1])) {
-                	mode = Mode.VIEW;
-                	view = MessageHelper.getJoinedName(args, 2);
-                    getProjectsForView(projects, view);
-                } else {
-                	mode = Mode.SINGLE;
-                    String jobName = MessageHelper.getJoinedName(args, 1);
-
-                    AbstractProject<?, ?> project = Hudson.getInstance().getItemByFullName(jobName, AbstractProject.class);
-                    if (project != null) {
-                        projects.add(project);
-                    } else {
-                    	return sender + ": " + UNKNOWN_JOB_STR + " " + jobName;
-                    }
-                }
-            } else if (args.length == 1) {
-            	mode = Mode.ALL;
-                for (AbstractProject<?, ?> project : Hudson.getInstance().getAllItems(AbstractProject.class)) {
-                    // add only top level project
-                    // sub project are accessible by their name but are not shown for visibility
-                    if (Hudson.getInstance().equals(project.getParent())) {
-                        projects.add(project);
-                    }
-                }
-            } else {
-            	throw new IllegalArgumentException("'args' must not be empty!");
-            }
-        } catch (IllegalArgumentException e) {
-            return sender + ": error: " + e.getMessage();
+            pair = getProjects(sender, args, projects);
+        } catch (CommandException e) {
+            return getErrorReply(sender, e);
         }
 
         if (!projects.isEmpty()) {
             StringBuilder msg = new StringBuilder();
                 
-            switch(mode) {
+            switch(pair.getHead()) {
             	case SINGLE : break;
             	case ALL:
             		msg.append(getCommandShortName())
@@ -92,7 +65,7 @@ abstract class AbstractMultipleJobCommand extends AbstractTextSendingCommand {
             		break;
             	case VIEW:
             		msg.append(getCommandShortName())
-        				.append(" of projects in view " + view + ":\n");
+        				.append(" of projects in view " + pair.getTail() + ":\n");
             		break;
             }
 
@@ -111,6 +84,48 @@ abstract class AbstractMultipleJobCommand extends AbstractTextSendingCommand {
             return sender + ": no job found";
         }
 	}
+    
+    /**
+     * Returns a list of projects for the given arguments.
+     * 
+     * @param projects the list to which the projects are added
+     * @return a pair of Mode (single job, jobs from view or all) and view name -
+     * where view name will be null if mode != VIEW
+     */
+    Pair<Mode, String> getProjects(String sender, String[] args, Collection<AbstractProject<?, ?>> projects)
+        throws CommandException {
+        final Mode mode;
+        String view = null;
+        if (args.length >= 2) {
+            if ("-v".equals(args[1])) {
+                mode = Mode.VIEW;
+                view = MessageHelper.getJoinedName(args, 2);
+                getProjectsForView(projects, view);
+            } else {
+                mode = Mode.SINGLE;
+                String jobName = MessageHelper.getJoinedName(args, 1);
+
+                AbstractProject<?, ?> project = this.jobProvider.getJobByName(jobName);
+                if (project != null) {
+                    projects.add(project);
+                } else {
+                    throw new CommandException(sender + ": " + UNKNOWN_JOB_STR + " " + jobName);
+                }
+            }
+        } else if (args.length == 1) {
+            mode = Mode.ALL;
+            for (AbstractProject<?, ?> project : this.jobProvider.getAllJobs()) {
+                // add only top level project
+                // sub project are accessible by their name but are not shown for visibility
+                if (this.jobProvider.isTopLevelJob(project)) {
+                    projects.add(project);
+                }
+            }
+        } else {
+            throw new CommandException(sender + ": 'args' must not be empty!");
+        }
+        return Pair.create(mode, view);
+    }
 
 	public String getHelp() {
         return " [<job>|-v <view>] - show the "
@@ -119,7 +134,7 @@ abstract class AbstractMultipleJobCommand extends AbstractTextSendingCommand {
     }
 
     private void getProjectsForView(Collection<AbstractProject<?, ?>> toAddTo, String viewName) {
-        View view = Hudson.getInstance().getView(viewName);
+        View view = this.jobProvider.getView(viewName);
 
         if (view != null) {
             Collection<TopLevelItem> items = view.getItems();
@@ -131,5 +146,10 @@ abstract class AbstractMultipleJobCommand extends AbstractTextSendingCommand {
         } else {
             throw new IllegalArgumentException(UNKNOWN_VIEW_STR + ": " + viewName);
         }
+    }
+    
+    // for testing
+    void setJobProvider(JobProvider jobProvider) {
+        this.jobProvider = jobProvider;
     }
 }

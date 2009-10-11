@@ -1,7 +1,6 @@
 package hudson.plugins.im.bot;
 
 import hudson.model.AbstractProject;
-import hudson.plugins.im.tools.ExceptionHelper;
 import hudson.plugins.im.tools.MessageHelper;
 
 /**
@@ -74,19 +73,6 @@ abstract class AbstractSingleJobCommand extends AbstractTextSendingCommand {
         }
     }
     
-    private String getErrorReply(String sender, CommandException e) {
-        final StringBuilder reply;
-        if(e.getReplyMessage() != null) {
-            reply = new StringBuilder(e.getReplyMessage()).append("\n");
-        } else {
-            reply = new StringBuilder(sender).append(": command couldn't be executed. Error:\n");
-        }
-        if(e.getCause() != null) {
-            reply.append("Cause: ").append(ExceptionHelper.dump(e.getCause()));
-        }
-        return reply.toString();
-    }
-
     // for testing
     void setJobProvider(JobProvider jobProvider) {
         this.jobProvider = jobProvider;
