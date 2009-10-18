@@ -1,11 +1,19 @@
 package hudson.plugins.im;
 
+import hudson.model.Hudson;
 import hudson.plugins.im.tools.ExceptionHelper;
 import hudson.util.TimeUnit2;
 
 import java.util.concurrent.Semaphore;
 import java.util.concurrent.TimeUnit;
 import java.util.logging.Logger;
+
+import org.acegisecurity.Authentication;
+import org.acegisecurity.AuthenticationException;
+import org.acegisecurity.GrantedAuthority;
+import org.acegisecurity.GrantedAuthorityImpl;
+import org.acegisecurity.providers.UsernamePasswordAuthenticationToken;
+import org.acegisecurity.providers.anonymous.AnonymousAuthenticationToken;
 
 /**
  * Abstract implementation of a provider of {@link IMConnection}s.
@@ -20,6 +28,8 @@ public abstract class IMConnectionProvider implements IMConnectionListener {
 
 	protected IMPublisherDescriptor descriptor;
 	private IMConnection imConnection;
+	
+	private Authentication authentication = new AnonymousAuthenticationToken("anonymous", "anonymous", new GrantedAuthority[] { new GrantedAuthorityImpl("anonymous") });
 	
 	private final ConnectorRunnable connector = new ConnectorRunnable();
     
@@ -70,6 +80,16 @@ public abstract class IMConnectionProvider implements IMConnectionListener {
 
 	public void setDescriptor(IMPublisherDescriptor desc) {
 		this.descriptor = desc;
+		
+		if (desc.getHudsonUserName() != null) {
+			try {
+				Authentication tmp = new UsernamePasswordAuthenticationToken(desc.getHudsonUserName(),
+						desc.getPassword());
+				this.authentication = Hudson.getInstance().getSecurityRealm().getSecurityComponents().manager.authenticate(tmp);
+			} catch (AuthenticationException e) {
+				// ignore
+			}
+		}
 	}
 	
     @Override
@@ -80,6 +100,10 @@ public abstract class IMConnectionProvider implements IMConnectionListener {
     private void tryReconnect() {
     	this.connector.semaphore.release();
     }
+
+	public Authentication getAuthentication() {
+		return authentication;
+	}
 
 	private final class ConnectorRunnable implements Runnable {
 

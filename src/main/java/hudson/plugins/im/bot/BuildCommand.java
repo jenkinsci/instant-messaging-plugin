@@ -11,7 +11,6 @@ import hudson.plugins.im.IMCause;
 import hudson.plugins.im.IMChat;
 import hudson.plugins.im.IMException;
 import hudson.plugins.im.IMMessage;
-
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
@@ -42,7 +41,8 @@ public class BuildCommand implements BotCommand {
 		Cause cause = new IMCause("Started by " + this.imId + " on request of '" + sender + "'");
         return project.scheduleBuild(delaySeconds, cause);
 	}
-	
+
+	@Override
 	public void executeCommand(final IMChat chat, final IMMessage message, String sender,
 			final String[] args) throws IMException {
 		if (args.length >= 2) {
@@ -51,6 +51,7 @@ public class BuildCommand implements BotCommand {
 			
     		AbstractProject<?, ?> project = Hudson.getInstance().getItemByFullName(jobName, AbstractProject.class);
 			if (project != null) {
+				
     				if (project.isInQueue()) {
     					Queue.Item queueItem = project.getQueueItem();
 						chat.sendMessage(sender + ": job " + jobName + " is already in the build queue (" + queueItem.getWhy() + ")");

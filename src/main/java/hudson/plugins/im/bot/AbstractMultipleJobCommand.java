@@ -1,10 +1,13 @@
 package hudson.plugins.im.bot;
 
 import hudson.model.AbstractProject;
+import hudson.model.Hudson;
 import hudson.model.TopLevelItem;
 import hudson.model.View;
 import hudson.plugins.im.tools.MessageHelper;
 import hudson.plugins.im.tools.Pair;
+import hudson.security.AuthorizationStrategy;
+import hudson.security.Permission;
 
 import java.util.ArrayList;
 import java.util.Collection;
@@ -45,6 +48,11 @@ abstract class AbstractMultipleJobCommand extends AbstractTextSendingCommand {
 
     @Override
 	protected String getReply(String sender, String[] args) {
+    	
+    	if (!authorizationCheck()) {
+    		return "Sorry, can't do that!";
+    	}
+
         Collection<AbstractProject<?, ?>> projects = new ArrayList<AbstractProject<?, ?>>();
 
         final Pair<Mode, String> pair;
@@ -83,6 +91,15 @@ abstract class AbstractMultipleJobCommand extends AbstractTextSendingCommand {
         } else {
             return sender + ": no job found";
         }
+	}
+    
+	private boolean authorizationCheck() {
+		if (Hudson.getInstance() == null) {
+			// for testing
+			return true;
+		}
+		AuthorizationStrategy strategy = Hudson.getInstance().getAuthorizationStrategy();
+		return strategy.getACL(Hudson.getInstance()).hasPermission(Permission.READ);
 	}
     
     /**

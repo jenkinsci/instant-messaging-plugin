@@ -22,11 +22,27 @@ public interface IMPublisherDescriptor {
     
     int getPort();
     
+    /**
+     * Returns the user name needed to login into the IM network.
+     */
     String getUserName();
     
+    /**
+     * Returns the password needed to login into the IM network.
+     */
     String getPassword();
     
     String getCommandPrefix();
  
     String getDefaultIdSuffix();
+    
+    /**
+     * Returns the user name needed to login into Hudson.
+     */
+    String getHudsonUserName();
+    
+    /**
+     * Returns the password needed to login into Hudson.
+     */
+    String getHudsonPassword();
 }

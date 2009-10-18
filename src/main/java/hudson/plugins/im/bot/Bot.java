@@ -18,6 +18,9 @@ import java.util.TreeMap;
 import java.util.Map.Entry;
 import java.util.logging.Logger;
 
+import org.acegisecurity.Authentication;
+import org.acegisecurity.context.SecurityContextHolder;
+
 /**
  * Instant messaging bot.
  * 
@@ -79,12 +82,16 @@ public class Bot implements IMMessageListener {
 	private final String commandPrefix;
 	private String helpCache = null;
 
-	public Bot(final IMChat chat, final String nick, final String imServer,
-			final String commandPrefix) {
+	private final Authentication authentication;
+
+	public Bot(IMChat chat, String nick, String imServer,
+			String commandPrefix, Authentication authentication
+			) {
 		this.chat = chat;
 		this.nick = nick;
 		this.imServer = imServer;
 		this.commandPrefix = commandPrefix;
+		this.authentication = authentication;
 		
 		this.cmdsAndAliases.putAll(STATIC_COMMANDS_MAP);
 		BuildCommand buildCommand  = new BuildCommand(this.nick + "@" + this.imServer);
@@ -113,9 +120,15 @@ public class Bot implements IMMessageListener {
                 try {
                 	BotCommand command = this.cmdsAndAliases.get(cmd);
                     if (command != null) {
-                    	command.executeCommand(
-                                this.chat, msg, sender,
-                                args);
+                    	Authentication oldAuthentication = SecurityContextHolder.getContext().getAuthentication();
+                    	try {
+	                    	SecurityContextHolder.getContext().setAuthentication(this.authentication);
+	                    	command.executeCommand(
+	                                this.chat, msg, sender,
+	                                args);
+                    	} finally {
+                    		SecurityContextHolder.getContext().setAuthentication(oldAuthentication);
+                    	}
                         
                     } else {
                         this.chat.sendMessage(sender + " did you mean me? Unknown command '" + cmd
