@@ -122,14 +122,17 @@ public class Bot implements IMMessageListener {
                     if (command != null) {
                     	Authentication oldAuthentication = SecurityContextHolder.getContext().getAuthentication();
                     	try {
-	                    	SecurityContextHolder.getContext().setAuthentication(this.authentication);
+                    	    if (this.authentication != null) {
+                    	        SecurityContextHolder.getContext().setAuthentication(this.authentication);
+                    	    }
 	                    	command.executeCommand(
 	                                this.chat, msg, sender,
 	                                args);
                     	} finally {
-                    		SecurityContextHolder.getContext().setAuthentication(oldAuthentication);
-                    	}
-                        
+                    	    if (this.authentication != null) {
+                    	        SecurityContextHolder.getContext().setAuthentication(oldAuthentication);
+                    	    }
+                	    }
                     } else {
                         this.chat.sendMessage(sender + " did you mean me? Unknown command '" + cmd
                                 + "'\nUse " + this.commandPrefix + "help to get help!");

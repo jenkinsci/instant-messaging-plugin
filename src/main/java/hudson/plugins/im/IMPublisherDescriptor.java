@@ -7,8 +7,20 @@ public interface IMPublisherDescriptor {
 	 */
 	boolean isEnabled();
 	
+	/**
+	 * Returns an informal, short description of the concrete plugin.
+	 */
+	String getPluginDescription();
+	
+	/**
+	 * Returns if the plugin should expose its presence on the IM network.
+	 * I.e. if it should report as 'available' or that like.
+	 */
     boolean isExposePresence();
     
+    /**
+     * Returns the hostname of the IM network. I.e. the host to which the plugin should connect.
+     */
     String getHost();
     
     /**
@@ -20,6 +32,9 @@ public interface IMPublisherDescriptor {
     @Deprecated
     String getHostname();
     
+    /**
+     * Returns the port of the IM network..
+     */
     int getPort();
     
     /**

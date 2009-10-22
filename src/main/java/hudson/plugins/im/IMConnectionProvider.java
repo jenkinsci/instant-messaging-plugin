@@ -10,10 +10,7 @@ import java.util.logging.Logger;
 
 import org.acegisecurity.Authentication;
 import org.acegisecurity.AuthenticationException;
-import org.acegisecurity.GrantedAuthority;
-import org.acegisecurity.GrantedAuthorityImpl;
 import org.acegisecurity.providers.UsernamePasswordAuthenticationToken;
-import org.acegisecurity.providers.anonymous.AnonymousAuthenticationToken;
 
 /**
  * Abstract implementation of a provider of {@link IMConnection}s.
@@ -29,7 +26,7 @@ public abstract class IMConnectionProvider implements IMConnectionListener {
 	protected IMPublisherDescriptor descriptor;
 	private IMConnection imConnection;
 	
-	private Authentication authentication = new AnonymousAuthenticationToken("anonymous", "anonymous", new GrantedAuthority[] { new GrantedAuthorityImpl("anonymous") });
+	private Authentication authentication = null;
 	
 	private final ConnectorRunnable connector = new ConnectorRunnable();
     
@@ -84,10 +81,11 @@ public abstract class IMConnectionProvider implements IMConnectionListener {
 		if (desc.getHudsonUserName() != null) {
 			try {
 				Authentication tmp = new UsernamePasswordAuthenticationToken(desc.getHudsonUserName(),
-						desc.getPassword());
+						desc.getHudsonPassword());
 				this.authentication = Hudson.getInstance().getSecurityRealm().getSecurityComponents().manager.authenticate(tmp);
 			} catch (AuthenticationException e) {
-				// ignore
+			    LOGGER.warning(this.descriptor.getPluginDescription() 
+			            + " couldn't authenticate against Hudson: " + e);
 			}
 		}
 	}
@@ -102,7 +100,7 @@ public abstract class IMConnectionProvider implements IMConnectionListener {
     }
 
 	public Authentication getAuthentication() {
-		return authentication;
+		return this.authentication;
 	}
 
 	private final class ConnectorRunnable implements Runnable {

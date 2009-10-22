@@ -49,9 +49,9 @@ abstract class AbstractMultipleJobCommand extends AbstractTextSendingCommand {
     @Override
 	protected String getReply(String sender, String[] args) {
     	
-    	if (!authorizationCheck()) {
-    		return "Sorry, can't do that!";
-    	}
+//    	if (!authorizationCheck()) {
+//    		return "Sorry, can't do that!";
+//    	}
 
         Collection<AbstractProject<?, ?>> projects = new ArrayList<AbstractProject<?, ?>>();
 
