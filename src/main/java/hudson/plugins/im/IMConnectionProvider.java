@@ -78,7 +78,7 @@ public abstract class IMConnectionProvider implements IMConnectionListener {
 	public void setDescriptor(IMPublisherDescriptor desc) {
 		this.descriptor = desc;
 		
-		if (desc.getHudsonUserName() != null) {
+		if (desc != null && desc.getHudsonUserName() != null) {
 			try {
 				Authentication tmp = new UsernamePasswordAuthenticationToken(desc.getHudsonUserName(),
 						desc.getHudsonPassword());
