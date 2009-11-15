@@ -35,7 +35,7 @@ public abstract class IMPublisher extends Notifier implements BuildStep
 	
     private static final IMMessageTargetConverter CONVERTER = new DefaultIMMessageTargetConverter();
     
-    private final List<IMMessageTarget> targets = new LinkedList<IMMessageTarget>();
+    private List<IMMessageTarget> targets = new LinkedList<IMMessageTarget>();
     
     /**
      * @deprecated only left here to deserialize old configs
@@ -106,21 +106,22 @@ public abstract class IMPublisher extends Notifier implements BuildStep
      *
      * Returns an empty string if no targets are set.
      */
-    public final String getTargets()
-    {
+    public String getTargets() {
+    	if (this.targets == null) {
+    		return "";
+    	}
+
         final StringBuilder sb = new StringBuilder();
-        for (final IMMessageTarget t : this.targets)
-        {
-        	if ((t instanceof GroupChatIMMessageTarget) && (! t.toString().contains("@conference."))) {
-        		sb.append("*");
-        	}
-            sb.append(t.toString());
+        for (final IMMessageTarget t : this.targets) {
+            sb.append(getIMMessageTargetConverter().toString(t));
             sb.append(" ");
         }
         return sb.toString().trim();
     }
 	
     protected void setTargets(String targetsAsString) throws IMMessageTargetConversionException {
+    	this.targets = new LinkedList<IMMessageTarget>();
+    	
         final String[] split = targetsAsString.split("\\s");
         final IMMessageTargetConverter conv = getIMMessageTargetConverter();
         for (final String fragment : split)
