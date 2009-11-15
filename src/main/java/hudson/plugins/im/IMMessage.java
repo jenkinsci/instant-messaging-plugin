@@ -6,6 +6,13 @@ public class IMMessage {
     private final String to;
     private final String body;
 
+    /**
+     * Constructor.
+     *
+     * @param from The sender of the message
+     * @param to The receiver of the message - this can e.g. be a 'user' or a 'chat room'
+     * @param body The message body
+     */
     public IMMessage(String from, String to, String body) {
         this.from = from;
         this.to = to;

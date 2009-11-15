@@ -73,11 +73,22 @@ public enum NotificationStrategy {
 		}
 	};
 
-        private final String displayName;
-
-        private NotificationStrategy(String displayName) {
-            this.displayName = displayName;
+	private static final String[] DISPLAY_NAMES;
+	
+	static {
+		DISPLAY_NAMES = new String[NotificationStrategy.values().length];
+        int i = 0;
+        for (NotificationStrategy strategy : NotificationStrategy.values()) {
+        	DISPLAY_NAMES[i++] = strategy.getDisplayName();
         }
+	}
+	
+    private final String displayName;
+
+    private NotificationStrategy(String displayName) {
+        this.displayName = displayName;
+    }
+
 	/**
 	 * Signals if the given build qualifies to send a notification according to
 	 * the current strategy.
@@ -90,27 +101,31 @@ public enum NotificationStrategy {
 	 */
 	public abstract boolean notificationWanted(AbstractBuild<?, ?> build);
 
-        /**
-         * Returns the name of the strategy to display in dialogs etc.
-         *
-         * @return the display name
-         */
-        public String getDisplayName() {
-            return this.displayName;
-        }
+    /**
+     * Returns the name of the strategy to display in dialogs etc.
+     *
+     * @return the display name
+     */
+    public String getDisplayName() {
+        return this.displayName;
+    }
 
-        /**
-         * Returns the notification strategy with the given display name.
-         *
-         * @param displayName the display name
-         * @return the notification strategy or null
-         */
-        public static NotificationStrategy forDisplayName(String displayName) {
-            for (NotificationStrategy strategy : values()) {
-                if (strategy.getDisplayName().equals(displayName)) {
-                    return strategy;
-                }
+    /**
+     * Returns the notification strategy with the given display name.
+     *
+     * @param displayName the display name
+     * @return the notification strategy or null
+     */
+    public static NotificationStrategy forDisplayName(String displayName) {
+        for (NotificationStrategy strategy : values()) {
+            if (strategy.getDisplayName().equals(displayName)) {
+                return strategy;
             }
-            return null;
         }
+        return null;
+    }
+    
+    public static String[] getDisplayNames() {
+        return DISPLAY_NAMES;
+    }
 }

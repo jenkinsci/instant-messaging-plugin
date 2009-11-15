@@ -13,14 +13,16 @@ package hudson.plugins.im;
 public interface IMMessageTargetConverter
 {
     /**
-     * creates a IMMessageTarget from the given String.
+     * Creates an {@link IMMessageTarget} from the given String.
+     *
      * @param targetAsString can be null 
      * @return might return null, if input was null or an empty String 
      */
     IMMessageTarget fromString(String targetAsString) throws IMMessageTargetConversionException;
 
     /**
-     * Turns given IMMessageTarget into a String for GUI-Display.
+     * Turns given {@link IMMessageTarget} into a String for GUI-Display.
+     *
      * @param target must not be null
      * @return String representation of the target
      */

@@ -7,6 +7,7 @@ import hudson.model.Result;
 import hudson.model.User;
 import hudson.plugins.im.tools.Assert;
 import hudson.plugins.im.tools.BuildHelper;
+import hudson.plugins.im.tools.ExceptionHelper;
 import hudson.plugins.im.tools.MessageHelper;
 import hudson.scm.ChangeLogSet;
 import hudson.scm.ChangeLogSet.Entry;
@@ -39,7 +40,8 @@ public abstract class IMPublisher extends Notifier implements BuildStep
     /**
      * @deprecated only left here to deserialize old configs
      */
-    private hudson.plugins.jabber.NotificationStrategy notificationStrategy;
+    @Deprecated
+	private hudson.plugins.jabber.NotificationStrategy notificationStrategy;
     
     private NotificationStrategy strategy;
     private final boolean notifyOnBuildStart;
@@ -61,17 +63,7 @@ public abstract class IMPublisher extends Notifier implements BuildStep
     		final boolean notifyFixers) throws IMMessageTargetConversionException
     {
         Assert.isNotNull(targetsAsString, "Parameter 'targetsAsString' must not be null.");
-        final String[] split = targetsAsString.split("\\s");
-        final IMMessageTargetConverter conv = getIMMessageTargetConverter();
-        for (final String fragment : split)
-        {
-            IMMessageTarget createIMMessageTarget;
-            createIMMessageTarget = conv.fromString(fragment);
-            if (createIMMessageTarget != null)
-            {
-                this.targets.add(createIMMessageTarget);
-            }
-        }
+        setTargets(targetsAsString);
 
         NotificationStrategy strategy = NotificationStrategy.forDisplayName(notificationStrategyString);
         if (strategy == null) {
@@ -92,21 +84,28 @@ public abstract class IMPublisher extends Notifier implements BuildStep
     
     protected abstract IMConnection getIMConnection() throws IMException;
 
-    protected IMMessageTargetConverter getIMMessageTargetConverter()
-    {
+    protected IMMessageTargetConverter getIMMessageTargetConverter() {
         return IMPublisher.CONVERTER;
     }
 
-    protected NotificationStrategy getNotificationStrategy()
-    {
+    protected NotificationStrategy getNotificationStrategy() {
         return strategy;
     }
+    
+    protected void setNotificationStrategy(NotificationStrategy strategy) {
+    	this.strategy = strategy;
+    }
 
-    private List<IMMessageTarget> getNotificationTargets()
-    {
+    protected List<IMMessageTarget> getNotificationTargets() {
         return this.targets;
     }
 
+    /**
+     * Returns the notification targets as a string suitable for
+     * display in the settings page.
+     *
+     * Returns an empty string if no targets are set.
+     */
     public final String getTargets()
     {
         final StringBuilder sb = new StringBuilder();
@@ -120,6 +119,20 @@ public abstract class IMPublisher extends Notifier implements BuildStep
         }
         return sb.toString().trim();
     }
+	
+    protected void setTargets(String targetsAsString) throws IMMessageTargetConversionException {
+        final String[] split = targetsAsString.split("\\s");
+        final IMMessageTargetConverter conv = getIMMessageTargetConverter();
+        for (final String fragment : split)
+        {
+            IMMessageTarget createIMMessageTarget;
+            createIMMessageTarget = conv.fromString(fragment);
+            if (createIMMessageTarget != null)
+            {
+                this.targets.add(createIMMessageTarget);
+            }
+        }
+	}
     
     public final String getStrategy() {
         return getNotificationStrategy().getDisplayName();
@@ -248,14 +261,11 @@ public abstract class IMPublisher extends Notifier implements BuildStep
 
 		for (IMMessageTarget target : getNotificationTargets())
 		{
-		    try
-		    {
+		    try {
 		        log(buildListener, "Sending notification to: " + target.toString());
 		        getIMConnection().send(target, msg);
-		    }
-		    catch (final Throwable e)
-		    {
-		        log(buildListener, "There was an error sending notification to: " + target.toString());
+		    } catch (final Throwable t) {
+		        log(buildListener, "There was an error sending notification to: " + target.toString() + "\n" + ExceptionHelper.dump(t));
 		    }
 		}
 	}
@@ -269,12 +279,18 @@ public abstract class IMPublisher extends Notifier implements BuildStep
 			if (notifyOnBuildStart) {
 				final StringBuilder sb = new StringBuilder("Starting build ").append(build.getNumber())
 					.append(" for job ").append(build.getProject().getName());
+
 				if (build.getPreviousBuild() != null) {
-					sb.append(" (previous build: ").append(build.getPreviousBuild().getResult().toString().toLowerCase());
+					sb.append(" (previous build: ")
+						.append(build.getPreviousBuild().getResult().toString().toLowerCase());
+
 					if (build.getPreviousBuild().getResult().isWorseThan(Result.SUCCESS)) {
-						sb.append(" -- last ").append(build.getPreviousNotFailedBuild().getResult().toString().toLowerCase())
-						.append(" #").append(build.getPreviousNotFailedBuild().getNumber())
-						.append(" ").append(build.getPreviousNotFailedBuild().getTimestampString()).append(" ago");
+						AbstractBuild<?, ?> lastSuccessfulBuild = build.getPreviousNotFailedBuild();
+						if (lastSuccessfulBuild != null) {
+							sb.append(" -- last ").append(lastSuccessfulBuild.getResult().toString().toLowerCase())
+								.append(" #").append(lastSuccessfulBuild.getNumber())	
+								.append(" ").append(lastSuccessfulBuild.getTimestampString()).append(" ago");
+						}
 					}
 					sb.append(")");
 				}
@@ -292,7 +308,7 @@ public abstract class IMPublisher extends Notifier implements BuildStep
 			}
 		} catch (Throwable t) {
 			// ignore: never, ever cancel a build because a notification fails
-            log(buildListener, "There was an error in the Jabber plugin: " + t.toString());
+            log(buildListener, "There was an error in the IM plugin: " + ExceptionHelper.dump(t));
 		}
 		return true;
 	}
@@ -344,7 +360,7 @@ public abstract class IMPublisher extends Notifier implements BuildStep
     @Override
     public abstract BuildStepDescriptor<Publisher> getDescriptor();
 	
-    
+    // migrate old JabberPublisher instances
     private Object readResolve() {
     	if (this.strategy == null && this.notificationStrategy != null) {
     		this.strategy = NotificationStrategy.valueOf(this.notificationStrategy.name());
