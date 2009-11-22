@@ -18,6 +18,9 @@ import java.util.logging.Logger;
 public class HudsonIsBusyListener extends RunListener {
 	
 	private static final Logger LOGGER = Logger.getLogger(HudsonIsBusyListener.class.getName());
+	
+	private static HudsonIsBusyListener INSTANCE;
+	
 	private transient final List<IMConnectionProvider> connectionProviders = new ArrayList<IMConnectionProvider>();
 	private transient final ScheduledExecutorService executor = Executors.newSingleThreadScheduledExecutor();
 	
@@ -30,21 +33,37 @@ public class HudsonIsBusyListener extends RunListener {
             updateIMStatus();
         }
     };
+    
+    public static synchronized HudsonIsBusyListener getInstance() {
+    	if (INSTANCE == null) {
+    		INSTANCE = new HudsonIsBusyListener();
+        	// registration via @Extension didn't seem to work!
+        	// Have to retry it sometime.
+        	INSTANCE.register();
+    	}
+    	return INSTANCE;
+    }
 	
-	public HudsonIsBusyListener() {
+	private HudsonIsBusyListener() {
         super(Run.class);
         this.executor.scheduleAtFixedRate(this.updateRunner, 10, 60, TimeUnit.SECONDS);
         LOGGER.info("Executor busy listener created");
     }
 	
-	public void addConnectionProvider(IMConnectionProvider provider) {
+	public synchronized void addConnectionProvider(IMConnectionProvider provider) {
 		this.connectionProviders.add(provider);
 		LOGGER.fine("Added connection provider: " + provider);
 	}
 	
-	public void removeConnectionProvider(IMConnectionProvider provider) {
+	public synchronized void removeConnectionProvider(IMConnectionProvider provider) {
 		this.connectionProviders.remove(provider);
 		LOGGER.fine("Removed connection provider: " + provider);
+		
+		if (this.connectionProviders.isEmpty()) {
+			LOGGER.info("Last connection provider removed. Unregistering this instance.");
+			unregister();
+			INSTANCE = null;
+		}
 	}
 
     @Override

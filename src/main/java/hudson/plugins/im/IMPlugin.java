@@ -11,14 +11,12 @@ public class IMPlugin {
     }
     
     public void start() throws Exception {
-    	this.busyListener = new HudsonIsBusyListener();
-    	// registration via @Extension doesn't seem to work!?
-    	this.busyListener.register();
+    	this.busyListener = HudsonIsBusyListener.getInstance();
     	this.busyListener.addConnectionProvider(this.provider);
     }
 
     public void stop() throws Exception {
-    	this.busyListener.unregister();
+    	this.busyListener.removeConnectionProvider(this.provider);
     	this.provider.releaseConnection();
     }
 }
