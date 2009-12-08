@@ -17,9 +17,15 @@ public interface IMChat {
     
     /**
      * Translates the sender into a nickname which can be used to address the sender.
+     * 
+     * @param senderId the fully qualified IM id of the sender (e.g. for Jabber the user, the server domain and optional resource part)
      */
     public String getNickName(String senderId);
     
+    /**
+     * Returns true if the chat is a multi-user chat (a Jabber conference room, an IRC chatroom)
+     * as opposed to a single user chat (IRC private message exchange).
+     */
     public boolean isMultiUserChat();
     
     /**

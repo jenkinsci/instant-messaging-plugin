@@ -20,7 +20,7 @@ public interface BotCommand {
 	 * 
 	 * @param chat the {@link IMChat} object, may be used to send reply messages
 	 * @param message the original {@link IMMessage}
-	 * @param sender the room nickname of the command sender
+	 * @param sender the room nickname of the command sender // FIXME ckutz: replace with the FQ sender id!
 	 * @param args arguments passed to the command, where <code>args[0]</code> is the command name itself
 	 * @throws IMException
 	 */
