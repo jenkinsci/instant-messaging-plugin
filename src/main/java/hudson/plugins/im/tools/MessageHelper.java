@@ -21,7 +21,7 @@ public class MessageHelper {
 	private final static Pattern SPACE_PATTERN = Pattern.compile("\\s");
 	private final static String QUOTE = "\"";
 	
-	public static String getBuildURL(AbstractBuild<?, ?> lastBuild) {
+	public static String getBuildURL(AbstractBuild<?, ?> build) {
 		// The hudson's base url
 	    final StringBuilder builder;
 	    if (Hudson.getInstance() != null) {
@@ -33,7 +33,7 @@ public class MessageHelper {
 
 		// The build's url, escaped for project with space or other specials
 		// characters
-		builder.append(Util.encode(lastBuild.getUrl()));
+		builder.append(Util.encode(build.getUrl()));
 
 		return builder.toString();
 

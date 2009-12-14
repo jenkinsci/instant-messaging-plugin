@@ -2,6 +2,7 @@ package hudson.plugins.im;
 
 import hudson.Launcher;
 import hudson.model.AbstractBuild;
+import hudson.model.AbstractProject;
 import hudson.model.BuildListener;
 import hudson.model.Result;
 import hudson.model.User;
@@ -21,6 +22,7 @@ import java.util.Collection;
 import java.util.HashSet;
 import java.util.LinkedList;
 import java.util.List;
+import java.util.Map;
 import java.util.Set;
 import java.util.logging.Logger;
 
@@ -48,6 +50,7 @@ public abstract class IMPublisher extends Notifier implements BuildStep
     private final boolean notifySuspects;
     private final boolean notifyCulprits;
     private final boolean notifyFixers;
+    private final boolean notifyUpstreamCommitters;
     
     /**
      * @deprecated Only for deserializing old instances
@@ -60,7 +63,8 @@ public abstract class IMPublisher extends Notifier implements BuildStep
     		final boolean notifyGroupChatsOnBuildStart,
     		final boolean notifySuspects,
     		final boolean notifyCulprits,
-    		final boolean notifyFixers) throws IMMessageTargetConversionException
+    		final boolean notifyFixers,
+    		final boolean notifyUpstreamCommitters) throws IMMessageTargetConversionException
     {
         Assert.isNotNull(targetsAsString, "Parameter 'targetsAsString' must not be null.");
         setTargets(targetsAsString);
@@ -75,6 +79,17 @@ public abstract class IMPublisher extends Notifier implements BuildStep
         this.notifySuspects = notifySuspects;
         this.notifyCulprits = notifyCulprits;
         this.notifyFixers = notifyFixers;
+        this.notifyUpstreamCommitters = notifyUpstreamCommitters;
+    }
+    
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    public boolean needsToRunAfterFinalized() {
+        // notifyUpstreamCommitters needs the fingerprints to be generated
+        // which seems to happen quite late in the build
+        return this.notifyUpstreamCommitters;
     }
     
     /**
@@ -155,6 +170,10 @@ public abstract class IMPublisher extends Notifier implements BuildStep
     	return notifyFixers;
     }
     
+    public final boolean getNotifyUpstreamCommitters() {
+        return notifyUpstreamCommitters;
+    }
+    
     protected void log(BuildListener listener, String message) {
     	listener.getLogger().append(getPluginName()).append(": ").append(message).append("\n");
     }
@@ -199,18 +218,47 @@ public abstract class IMPublisher extends Notifier implements BuildStep
             	}
             }
         } else if (BuildHelper.isFailureOrUnstable(build)) {
+            boolean committerNotified = false;
             if (this.notifySuspects) {
                 log(buildListener, "Notifying suspects");
-                final String message = "Oh no! You're suspected of having broken " + build.getProject().getName() + ": " + MessageHelper.getBuildURL(build);
+                String message = "Oh no! You're suspected of having broken " + build.getProject().getName() + ": " + MessageHelper.getBuildURL(build);
                 
                 for (IMMessageTarget target : calculateIMTargets(getCommitters(build), buildListener)) {
                     try {
                         log(buildListener, "Sending notification to suspect: " + target.toString());
                         getIMConnection().send(target, message);
+                        committerNotified = true;
                     } catch (final Throwable e) {
                         log(buildListener, "There was an error sending suspect notification to: " + target.toString());
                     }
                 }
+            }
+            
+            if (this.notifyUpstreamCommitters && !committerNotified) {
+                Map<AbstractProject, Integer> upstreamBuilds = build.getUpstreamBuilds();
+                for (Map.Entry<AbstractProject, Integer> entry : upstreamBuilds.entrySet()) {
+                    AbstractBuild<?, ?> upstreamBuild = (AbstractBuild<?, ?>) entry.getKey().getBuildByNumber(entry.getValue());
+                    Set<User> committers = getCommitters(upstreamBuild);
+                    
+                    
+                    String message = "Attention! Your change in " + upstreamBuild.getProject().getName()
+                    + ": " + MessageHelper.getBuildURL(upstreamBuild)
+                    + " *might* having broken " + build.getProject().getName() + ": " + MessageHelper.getBuildURL(build)
+                    + "\nPlease have a look!";
+                    
+                    for (IMMessageTarget target : calculateIMTargets(committers, buildListener)) {
+                        try {
+                            log(buildListener, "Sending notification to upstream committer: " + target.toString());
+                            getIMConnection().send(target, message);
+                            committerNotified = true;
+                        } catch (final Throwable e) {
+                            log(buildListener, "There was an error sending upstream committer notification to: " + target.toString());
+                        }
+                    }
+                }
+                
+                // TODO: add support for multiple levels of upstream projects!
+                // i.e. if no committer is found on 1st level then notify those on 2nd level
             }
         }
         
