@@ -19,6 +19,7 @@ import hudson.tasks.Publisher;
 
 import java.io.IOException;
 import java.util.Collection;
+import java.util.HashMap;
 import java.util.HashSet;
 import java.util.LinkedList;
 import java.util.List;
@@ -235,30 +236,7 @@ public abstract class IMPublisher extends Notifier implements BuildStep
             }
             
             if (this.notifyUpstreamCommitters && !committerNotified) {
-                Map<AbstractProject, Integer> upstreamBuilds = build.getUpstreamBuilds();
-                for (Map.Entry<AbstractProject, Integer> entry : upstreamBuilds.entrySet()) {
-                    AbstractBuild<?, ?> upstreamBuild = (AbstractBuild<?, ?>) entry.getKey().getBuildByNumber(entry.getValue());
-                    Set<User> committers = getCommitters(upstreamBuild);
-                    
-                    
-                    String message = "Attention! Your change in " + upstreamBuild.getProject().getName()
-                    + ": " + MessageHelper.getBuildURL(upstreamBuild)
-                    + " *might* having broken " + build.getProject().getName() + ": " + MessageHelper.getBuildURL(build)
-                    + "\nPlease have a look!";
-                    
-                    for (IMMessageTarget target : calculateIMTargets(committers, buildListener)) {
-                        try {
-                            log(buildListener, "Sending notification to upstream committer: " + target.toString());
-                            getIMConnection().send(target, message);
-                            committerNotified = true;
-                        } catch (final Throwable e) {
-                            log(buildListener, "There was an error sending upstream committer notification to: " + target.toString());
-                        }
-                    }
-                }
-                
-                // TODO: add support for multiple levels of upstream projects!
-                // i.e. if no committer is found on 1st level then notify those on 2nd level
+                notifyUpstreamCommitters(build, buildListener);
             }
         }
         
@@ -278,6 +256,48 @@ public abstract class IMPublisher extends Notifier implements BuildStep
         
         return true;
     }
+
+    /**
+     * Looks for committers in the direct upstream builds and notifies them.
+     * If no committers are found in the next higher level, look one level higher.
+     * Repeat if necessary. 
+     */
+    @SuppressWarnings("unchecked")
+	private void notifyUpstreamCommitters(final AbstractBuild<?, ?> build,
+			final BuildListener buildListener) {
+		boolean committerNotified = false;
+		Map<AbstractProject, Integer> upstreamBuilds = build.getUpstreamBuilds();
+		
+		while (!committerNotified && !upstreamBuilds.isEmpty()) {
+			Map<AbstractProject, Integer> currentLevel = upstreamBuilds;
+			// new map for the builds one level higher up:
+			upstreamBuilds = new HashMap<AbstractProject, Integer>();
+			
+		    for (Map.Entry<AbstractProject, Integer> entry : currentLevel.entrySet()) {
+		        AbstractBuild<?, ?> upstreamBuild = (AbstractBuild<?, ?>) entry.getKey().getBuildByNumber(entry.getValue());
+		        Set<User> committers = getCommitters(upstreamBuild);
+		        
+		        String message = "Attention! Your change in " + upstreamBuild.getProject().getName()
+		        + ": " + MessageHelper.getBuildURL(upstreamBuild)
+		        + " *might* have broken the downstream job " + build.getProject().getName() + ": " + MessageHelper.getBuildURL(build)
+		        + "\nPlease have a look!";
+		        
+		        for (IMMessageTarget target : calculateIMTargets(committers, buildListener)) {
+		            try {
+		                log(buildListener, "Sending notification to upstream committer: " + target.toString());
+		                getIMConnection().send(target, message);
+		                committerNotified = true;
+		            } catch (final Throwable e) {
+		                log(buildListener, "There was an error sending upstream committer notification to: " + target.toString());
+		            }
+		        }
+		        
+		        if (!committerNotified) {
+		        	upstreamBuilds.putAll(upstreamBuild.getUpstreamBuilds());
+		        }
+		    }
+		}
+	}
 
     /**
      * Notify all registered chats about the build result.
