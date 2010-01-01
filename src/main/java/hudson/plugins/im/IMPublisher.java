@@ -6,6 +6,7 @@ import hudson.model.AbstractProject;
 import hudson.model.BuildListener;
 import hudson.model.Result;
 import hudson.model.User;
+import hudson.model.UserProperty;
 import hudson.plugins.im.tools.Assert;
 import hudson.plugins.im.tools.BuildHelper;
 import hudson.plugins.im.tools.ExceptionHelper;
@@ -29,8 +30,9 @@ import java.util.logging.Logger;
 
 /**
  * The actual Publisher that sends notification-Messages out to the clients.
+ * 
  * @author Uwe Schaefer
- *
+ * @author Christoph Kutzinski
  */
 public abstract class IMPublisher extends Notifier implements BuildStep
 {
@@ -151,30 +153,57 @@ public abstract class IMPublisher extends Notifier implements BuildStep
         }
 	}
     
+    /**
+     * Returns the selected notification strategy as a string
+     * suitable for display.
+     */
     public final String getStrategy() {
         return getNotificationStrategy().getDisplayName();
     }
     
+    /**
+     * Specifies if the starting of builds should be notified to
+     * the registered chat rooms.
+     */
     public final boolean getNotifyOnStart() {
     	return notifyOnBuildStart;
     }
     
+    /**
+     * Specifies if committers to failed builds should be informed about
+     * build failures.
+     */
     public final boolean getNotifySuspects() {
     	return notifySuspects;
     }
     
+    /**
+     * Specifies if culprits - i.e. committers to previous already failing
+     * builds - should be informed about subsequent build failures.
+     */
     public final boolean getNotifyCulprits() {
     	return notifyCulprits;
     }
 
+    /**
+     * Specifies if 'fixers' should be informed about
+     * fixed builds.
+     */
     public final boolean getNotifyFixers() {
     	return notifyFixers;
     }
     
+    /**
+     * Specifies if upstream committers should be informed about
+     * build failures.
+     */
     public final boolean getNotifyUpstreamCommitters() {
         return notifyUpstreamCommitters;
     }
     
+    /**
+     * Logs message to the build listener's logger.
+     */
     protected void log(BuildListener listener, String message) {
     	listener.getLogger().append(getPluginName()).append(": ").append(message).append("\n");
     }
@@ -339,8 +368,8 @@ public abstract class IMPublisher extends Notifier implements BuildStep
 		}
 	}
 
-	/* (non-Javadoc)
-	 * @see hudson.tasks.Publisher#prebuild(hudson.model.Build, hudson.model.BuildListener)
+	/**
+	 * {@inheritDoc}
 	 */
 	@Override
 	public boolean prebuild(AbstractBuild<?, ?> build, BuildListener buildListener) {
@@ -415,7 +444,7 @@ public abstract class IMPublisher extends Notifier implements BuildStep
 
             if (imId != null) {
                 try {
-                    suspects.add(CONVERTER.fromString(imId));
+                    suspects.add(getIMMessageTargetConverter().fromString(imId));
                 } catch (final IMMessageTargetConversionException e) {
                     log(listener, "Invalid IM ID: " + imId);
                 }
@@ -426,6 +455,9 @@ public abstract class IMPublisher extends Notifier implements BuildStep
 		return suspects;
 	}
 
+	/**
+	 * {@inheritDoc}
+	 */
     @Override
     public abstract BuildStepDescriptor<Publisher> getDescriptor();
 	
@@ -438,5 +470,10 @@ public abstract class IMPublisher extends Notifier implements BuildStep
     	return this;
     }
     
+    /**
+     * Returns the instant-messaging ID which is configured for a Hudson user
+     * (e.g. via a {@link UserProperty}) or null if there's nothing configured for
+     * him/her.
+     */
     protected abstract String getConfiguredIMId(User user);
 }
