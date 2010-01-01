@@ -29,7 +29,7 @@
         <dependency>
             <groupId>org.mockito</groupId>
             <artifactId>mockito-all</artifactId>
-            <version>1.8.0</version>
+            <version>1.8.2</version>
             <scope>test</scope>
         </dependency>
     </dependencies>
@@ -39,11 +39,8 @@
             <plugin>
                 <groupId>org.jvnet.hudson.tools</groupId>
                 <artifactId>maven-hpi-plugin</artifactId>
-                <version>1.45</version>
+                <version>1.47</version>
                 <extensions>true</extensions>
-                <configuration>
-                    <disabledTestInjection>true</disabledTestInjection>
-                </configuration>
             </plugin>
             <!-- Make sure that we don't use any Java 1.6 dependencies -->
             <plugin>
