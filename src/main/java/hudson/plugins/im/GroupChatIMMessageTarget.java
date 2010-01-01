@@ -4,8 +4,7 @@ import hudson.plugins.im.IMMessageTarget;
 import hudson.plugins.im.tools.Assert;
 
 /**
- * DefaultIMMessageTarget basically is a String, that represents an Im-Account to send messages to.
- * @author Pascal Bleser
+ * {@link GroupChatIMMessageTarget} represents a 'chat room' or something like that.
  */
 public class GroupChatIMMessageTarget implements IMMessageTarget
 {
