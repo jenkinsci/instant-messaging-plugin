@@ -304,21 +304,24 @@ public abstract class IMPublisher extends Notifier implements BuildStep
 			
 		    for (Map.Entry<AbstractProject, Integer> entry : currentLevel.entrySet()) {
 		        AbstractBuild<?, ?> upstreamBuild = (AbstractBuild<?, ?>) entry.getKey().getBuildByNumber(entry.getValue());
-		        Set<User> committers = getCommitters(upstreamBuild);
 		        
-		        String message = "Attention! Your change in " + upstreamBuild.getProject().getName()
-		        + ": " + MessageHelper.getBuildURL(upstreamBuild)
-		        + " *might* have broken the downstream job " + build.getProject().getName() + ": " + MessageHelper.getBuildURL(build)
-		        + "\nPlease have a look!";
-		        
-		        for (IMMessageTarget target : calculateIMTargets(committers, buildListener)) {
-		            try {
-		                log(buildListener, "Sending notification to upstream committer: " + target.toString());
-		                getIMConnection().send(target, message);
-		                committerNotified = true;
-		            } catch (final Throwable e) {
-		                log(buildListener, "There was an error sending upstream committer notification to: " + target.toString());
-		            }
+		        if (upstreamBuild != null) {
+			        Set<User> committers = getCommitters(upstreamBuild);
+			        
+			        String message = "Attention! Your change in " + upstreamBuild.getProject().getName()
+			        + ": " + MessageHelper.getBuildURL(upstreamBuild)
+			        + " *might* have broken the downstream job " + build.getProject().getName() + ": " + MessageHelper.getBuildURL(build)
+			        + "\nPlease have a look!";
+			        
+			        for (IMMessageTarget target : calculateIMTargets(committers, buildListener)) {
+			            try {
+			                log(buildListener, "Sending notification to upstream committer: " + target.toString());
+			                getIMConnection().send(target, message);
+			                committerNotified = true;
+			            } catch (final Throwable e) {
+			                log(buildListener, "There was an error sending upstream committer notification to: " + target.toString());
+			            }
+			        }
 		        }
 		        
 		        if (!committerNotified) {
