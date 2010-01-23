@@ -1,5 +1,7 @@
 package hudson.plugins.im;
 
+import java.util.List;
+
 public interface IMPublisherDescriptor {
 
 	/**
@@ -60,4 +62,13 @@ public interface IMPublisherDescriptor {
      * Returns the password needed to login into Hudson.
      */
     String getHudsonPassword();
+    
+    /**
+     * Returns the default targets which should be used for build notification.
+     * 
+     * This can be overwritten on a per job basis.
+     */
+    List<IMMessageTarget> getDefaultTargets();
+    
+    IMMessageTargetConverter getIMMessageTargetConverter();
 }

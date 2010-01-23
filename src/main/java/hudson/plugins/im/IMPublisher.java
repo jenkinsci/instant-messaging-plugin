@@ -20,6 +20,7 @@ import hudson.tasks.Publisher;
 
 import java.io.IOException;
 import java.util.Collection;
+import java.util.Collections;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.LinkedList;
@@ -38,9 +39,7 @@ public abstract class IMPublisher extends Notifier implements BuildStep
 {
 	private static final Logger LOGGER = Logger.getLogger(IMPublisher.class.getName());
 	
-    private static final IMMessageTargetConverter CONVERTER = new DefaultIMMessageTargetConverter();
-    
-    private List<IMMessageTarget> targets = new LinkedList<IMMessageTarget>();
+    private List<IMMessageTarget> targets;
     
     /**
      * @deprecated only left here to deserialize old configs
@@ -62,16 +61,20 @@ public abstract class IMPublisher extends Notifier implements BuildStep
     @Deprecated
     private transient String defaultIdSuffix;
 
-    protected IMPublisher(final String targetsAsString, final String notificationStrategyString,
-    		final boolean notifyGroupChatsOnBuildStart,
-    		final boolean notifySuspects,
-    		final boolean notifyCulprits,
-    		final boolean notifyFixers,
-    		final boolean notifyUpstreamCommitters) throws IMMessageTargetConversionException
+    protected IMPublisher(List<IMMessageTarget> defaultTargets,
+    		String notificationStrategyString,
+    		boolean notifyGroupChatsOnBuildStart,
+    		boolean notifySuspects,
+    		boolean notifyCulprits,
+    		boolean notifyFixers,
+    		boolean notifyUpstreamCommitters)
     {
-        Assert.isNotNull(targetsAsString, "Parameter 'targetsAsString' must not be null.");
-        setTargets(targetsAsString);
-
+    	if (defaultTargets != null) {
+    		this.targets = defaultTargets;
+    	} else {
+    		this.targets = Collections.emptyList();
+    	}
+    	
         NotificationStrategy strategy = NotificationStrategy.forDisplayName(notificationStrategyString);
         if (strategy == null) {
         	strategy = NotificationStrategy.STATECHANGE_ONLY;
@@ -102,10 +105,6 @@ public abstract class IMPublisher extends Notifier implements BuildStep
     
     protected abstract IMConnection getIMConnection() throws IMException;
 
-    protected IMMessageTargetConverter getIMMessageTargetConverter() {
-        return IMPublisher.CONVERTER;
-    }
-
     protected NotificationStrategy getNotificationStrategy() {
         return strategy;
     }
@@ -114,8 +113,27 @@ public abstract class IMPublisher extends Notifier implements BuildStep
     	this.strategy = strategy;
     }
 
-    protected List<IMMessageTarget> getNotificationTargets() {
+    /**
+     * Returns the notification targets configured on a per-job basis.
+     * 
+     * @see #calculateIMTargets(Set, BuildListener)
+     */
+    public List<IMMessageTarget> getNotificationTargets() {
         return this.targets;
+    }
+    
+    /**
+     * Returns the notification target which should actually be used for notification.
+     * 
+     * Differs from {@link #getNotificationStrategy()} because it also takes
+     * {@link IMPublisherDescriptor#getDefaultTargets()} into account!
+     */
+    protected List<IMMessageTarget> calculateTargets() {
+    	if (getNotificationTargets() != null && getNotificationTargets().size() > 0) {
+    		return getNotificationTargets();
+    	}
+    	
+    	return ((IMPublisherDescriptor)getDescriptor()).getDefaultTargets();
     }
 
     /**
@@ -131,17 +149,18 @@ public abstract class IMPublisher extends Notifier implements BuildStep
 
         final StringBuilder sb = new StringBuilder();
         for (final IMMessageTarget t : this.targets) {
-            sb.append(getIMMessageTargetConverter().toString(t));
+            sb.append(getIMDescriptor().getIMMessageTargetConverter().toString(t));
             sb.append(" ");
         }
         return sb.toString().trim();
     }
 	
+    @Deprecated
     protected void setTargets(String targetsAsString) throws IMMessageTargetConversionException {
     	this.targets = new LinkedList<IMMessageTarget>();
     	
         final String[] split = targetsAsString.split("\\s");
-        final IMMessageTargetConverter conv = getIMMessageTargetConverter();
+        final IMMessageTargetConverter conv = getIMDescriptor().getIMMessageTargetConverter();
         for (final String fragment : split)
         {
             IMMessageTarget createIMMessageTarget;
@@ -152,6 +171,18 @@ public abstract class IMPublisher extends Notifier implements BuildStep
             }
         }
 	}
+    
+    /**
+     * @deprecated Should only be used to deserialize old instances
+     */
+    @Deprecated
+	protected void setNotificationTargets(List<IMMessageTarget> targets) {
+    	if (targets != null) {
+    		this.targets = targets;
+    	} else {
+    		this.targets = Collections.emptyList();
+    	}
+    }
     
     /**
      * Returns the selected notification strategy as a string
@@ -360,7 +391,7 @@ public abstract class IMPublisher extends Notifier implements BuildStep
 		}
 		final String msg = sb.toString();
 
-		for (IMMessageTarget target : getNotificationTargets())
+		for (IMMessageTarget target : calculateTargets())
 		{
 		    try {
 		        log(buildListener, "Sending notification to: " + target.toString());
@@ -396,7 +427,7 @@ public abstract class IMPublisher extends Notifier implements BuildStep
 					sb.append(")");
 				}
 				final String msg = sb.toString();
-				for (final IMMessageTarget target : getNotificationTargets()) {
+				for (final IMMessageTarget target : calculateTargets()) {
 					// only notify group chats
 					if (target instanceof GroupChatIMMessageTarget) {
 		                try {
@@ -447,7 +478,7 @@ public abstract class IMPublisher extends Notifier implements BuildStep
 
             if (imId != null) {
                 try {
-                    suspects.add(getIMMessageTargetConverter().fromString(imId));
+                    suspects.add(getIMDescriptor().getIMMessageTargetConverter().fromString(imId));
                 } catch (final IMMessageTargetConversionException e) {
                     log(listener, "Invalid IM ID: " + imId);
                 }
@@ -471,6 +502,10 @@ public abstract class IMPublisher extends Notifier implements BuildStep
     		this.notificationStrategy = null;
     	}
     	return this;
+    }
+    
+    protected final IMPublisherDescriptor getIMDescriptor() {
+    	return (IMPublisherDescriptor) getDescriptor();
     }
     
     /**

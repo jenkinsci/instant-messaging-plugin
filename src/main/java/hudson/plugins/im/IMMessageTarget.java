@@ -10,7 +10,6 @@ import java.io.Serializable;
  * 
  * @author Uwe Schaefer
  */
-// TODO: merge IMMessageTarget and IMChat interfaces - I doubt that we really need both
 public interface IMMessageTarget extends Serializable
 {
 
