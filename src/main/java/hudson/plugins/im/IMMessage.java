@@ -5,6 +5,7 @@ public class IMMessage {
     private final String from;
     private final String to;
     private final String body;
+	private boolean authorized;
 
     /**
      * Constructor.
@@ -14,9 +15,14 @@ public class IMMessage {
      * @param body The message body
      */
     public IMMessage(String from, String to, String body) {
+        this(from, to, body, true);
+    }
+    
+    public IMMessage(String from, String to, String body, boolean authorized) {
         this.from = from;
         this.to = to;
         this.body = body;
+        this.authorized = authorized;
     }
     
     /**
@@ -41,5 +47,9 @@ public class IMMessage {
      */
     public String getBody() {
         return this.body;
+    }
+    
+    public boolean isAuthorized() {
+    	return this.authorized ;
     }
 }

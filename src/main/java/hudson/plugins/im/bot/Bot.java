@@ -108,12 +108,21 @@ public class Bot implements IMMessageListener {
         // is it a command for me ? (returns null if not, the payload if so)
         String payload = retrieveMessagePayLoad(msg.getBody());
         if (payload != null) {
+        	String sender = msg.getFrom();
+        	if (!msg.isAuthorized()) {
+        		try {
+					this.chat.sendMessage(sender + " you're not a buddy of me. I won't take any commands from you.");
+				} catch (IMException e) {
+					LOGGER.warning(ExceptionHelper.dump(e));
+				}
+				return;
+        	}
+        	
             // split words
             String[] args = MessageHelper.extractCommandLine(payload);
             if (args.length > 0) {
                 // first word is the command name
                 String cmd = args[0];
-                String sender = msg.getFrom();
                 if (sender != null) {
                     sender = this.chat.getNickName(sender);
                 }
