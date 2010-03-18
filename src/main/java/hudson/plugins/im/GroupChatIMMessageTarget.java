@@ -9,6 +9,13 @@ import hudson.plugins.im.tools.Assert;
  */
 public class GroupChatIMMessageTarget implements IMMessageTarget {
     private static final long serialVersionUID = 1L;
+    
+    /**
+     * @deprecated replaced by name
+     */
+    @Deprecated
+	private transient String value;
+    
     private String name;
 	private String password;
 
@@ -70,4 +77,15 @@ public class GroupChatIMMessageTarget implements IMMessageTarget {
     public String toString() {
         return this.name;
     }
+	
+	/**
+	 * Deserialize old instances.
+	 */
+	private Object readResolve() {
+		if (this.value != null && this.name == null) {
+			this.name = this.value;
+		}
+		this.value = null;
+		return this;
+	}
 }
