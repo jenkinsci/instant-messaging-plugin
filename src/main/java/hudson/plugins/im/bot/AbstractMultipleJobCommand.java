@@ -1,14 +1,10 @@
 package hudson.plugins.im.bot;
 
 import hudson.model.AbstractProject;
-import hudson.model.Hudson;
 import hudson.model.TopLevelItem;
 import hudson.model.View;
 import hudson.plugins.im.tools.MessageHelper;
 import hudson.plugins.im.tools.Pair;
-import hudson.security.AuthorizationStrategy;
-import hudson.security.Permission;
-
 import java.util.ArrayList;
 import java.util.Collection;
 
@@ -22,8 +18,6 @@ abstract class AbstractMultipleJobCommand extends AbstractTextSendingCommand {
 	static final String UNKNOWN_JOB_STR = "unknown job";
 	static final String UNKNOWN_VIEW_STR = "unknown view";
 
-	private JobProvider jobProvider = new DefaultJobProvider();
-	
 	/**
 	 * Returns the message to return for this job.
 	 * Note that {@link AbstractMultipleJobCommand} already inserts one newline after each job's
@@ -93,15 +87,6 @@ abstract class AbstractMultipleJobCommand extends AbstractTextSendingCommand {
         }
 	}
     
-	private boolean authorizationCheck() {
-		if (Hudson.getInstance() == null) {
-			// for testing
-			return true;
-		}
-		AuthorizationStrategy strategy = Hudson.getInstance().getAuthorizationStrategy();
-		return strategy.getACL(Hudson.getInstance()).hasPermission(Permission.READ);
-	}
-    
     /**
      * Returns a list of projects for the given arguments.
      * 
@@ -122,7 +107,7 @@ abstract class AbstractMultipleJobCommand extends AbstractTextSendingCommand {
                 mode = Mode.SINGLE;
                 String jobName = MessageHelper.getJoinedName(args, 1);
 
-                AbstractProject<?, ?> project = this.jobProvider.getJobByName(jobName);
+                AbstractProject<?, ?> project = getJobProvider().getJobByName(jobName);
                 if (project != null) {
                     projects.add(project);
                 } else {
@@ -131,10 +116,10 @@ abstract class AbstractMultipleJobCommand extends AbstractTextSendingCommand {
             }
         } else if (args.length == 1) {
             mode = Mode.ALL;
-            for (AbstractProject<?, ?> project : this.jobProvider.getAllJobs()) {
+            for (AbstractProject<?, ?> project : getJobProvider().getAllJobs()) {
                 // add only top level project
                 // sub project are accessible by their name but are not shown for visibility
-                if (this.jobProvider.isTopLevelJob(project)) {
+                if (getJobProvider().isTopLevelJob(project)) {
                     projects.add(project);
                 }
             }
@@ -151,7 +136,7 @@ abstract class AbstractMultipleJobCommand extends AbstractTextSendingCommand {
     }
 
     private void getProjectsForView(Collection<AbstractProject<?, ?>> toAddTo, String viewName) {
-        View view = this.jobProvider.getView(viewName);
+        View view = getJobProvider().getView(viewName);
 
         if (view != null) {
             Collection<TopLevelItem> items = view.getItems();
@@ -163,10 +148,5 @@ abstract class AbstractMultipleJobCommand extends AbstractTextSendingCommand {
         } else {
             throw new IllegalArgumentException(UNKNOWN_VIEW_STR + ": " + viewName);
         }
-    }
-    
-    // for testing
-    void setJobProvider(JobProvider jobProvider) {
-        this.jobProvider = jobProvider;
     }
 }

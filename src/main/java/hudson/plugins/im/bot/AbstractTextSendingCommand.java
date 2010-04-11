@@ -16,6 +16,18 @@ public abstract class AbstractTextSendingCommand implements BotCommand {
 	
 	private static final Logger LOGGER = Logger.getLogger(AbstractTextSendingCommand.class.getName());
 
+	private JobProvider jobProvider = new DefaultJobProvider();
+	
+	protected JobProvider getJobProvider() {
+	    return this.jobProvider;
+	}
+	
+    
+    // for testing
+    void setJobProvider(JobProvider jobProvider) {
+        this.jobProvider = jobProvider;
+    }
+	
 	/**
 	 * {@inheritDoc}
 	 */

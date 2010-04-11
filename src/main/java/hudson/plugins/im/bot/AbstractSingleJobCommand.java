@@ -12,8 +12,6 @@ abstract class AbstractSingleJobCommand extends AbstractTextSendingCommand {
 
     private final int numberOfArguments;
     
-    private JobProvider jobProvider = new DefaultJobProvider();
-
     protected AbstractSingleJobCommand() {
         this(0);
     }
@@ -53,7 +51,7 @@ abstract class AbstractSingleJobCommand extends AbstractTextSendingCommand {
                 jobName = args[1].replace("\"", "");
                 remainingArgs = MessageHelper.copyOfRange(args, 2, args.length);
             }
-            AbstractProject<?, ?> job = this.jobProvider.getJobByName(jobName);
+            AbstractProject<?, ?> job = getJobProvider().getJobByName(jobName);
             if (job != null) {
                 try {
                     return getMessageForJob(job, sender, remainingArgs).toString();
@@ -71,10 +69,5 @@ abstract class AbstractSingleJobCommand extends AbstractTextSendingCommand {
                  " additional arguments";
             }
         }
-    }
-    
-    // for testing
-    void setJobProvider(JobProvider jobProvider) {
-        this.jobProvider = jobProvider;
     }
 }
