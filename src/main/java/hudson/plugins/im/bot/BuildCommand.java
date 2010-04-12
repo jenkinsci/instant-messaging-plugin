@@ -25,7 +25,7 @@ import java.util.regex.Pattern;
 public class BuildCommand extends AbstractTextSendingCommand {
 	
 	private static final Pattern NUMERIC_EXTRACTION_REGEX = Pattern.compile("^(\\d+)");
-	private static final String SYNTAX = " <job> [now|<delay[s|m|h]>]";
+	private static final String SYNTAX = " <job> [now|<delay>[s|m|h]] [<parameterkey>=<value>]*";
 	private static final String HELP = SYNTAX + " - schedule a job build, with standard, custom or no quiet period";
 	
 	private final String imId;
@@ -56,6 +56,7 @@ public class BuildCommand extends AbstractTextSendingCommand {
     		AbstractProject<?, ?> project = getJobProvider().getJobByName(jobName);
 			if (project != null) {
 
+			    String msg = "";
 				if (project.isInQueue()) {
 					Queue.Item queueItem = project.getQueueItem();
 					return sender + ": job " + jobName + " is already in the build queue (" + queueItem.getWhy() + ")";
@@ -91,8 +92,10 @@ public class BuildCommand extends AbstractTextSendingCommand {
     				            
     				            Matcher matcher = NUMERIC_EXTRACTION_REGEX.matcher(delayStr);
                                 if (matcher.find()) {
-                                    int value = Integer.parseInt(matcher.group());
+                                    int value = Integer.parseInt(matcher.group(1));
                                     delay = multiplicator * value;
+                                } else {
+                                    return giveSyntax(sender, args[0]);
                                 }
 				            }
 				        }
@@ -100,6 +103,7 @@ public class BuildCommand extends AbstractTextSendingCommand {
 				        // parse possible parameters:
 				        for (int i=parametersStartIndex; i < args.length; i++) {
 				            String[] split = args[i].split("=");
+				            // TODO: guess ParameterValue type from ParametersDefintion of job?
 				            if (split.length == 2) {
 				                String value = split[1];
 				                if ("true".equals(value) || "false".equals(value)) {
@@ -107,15 +111,22 @@ public class BuildCommand extends AbstractTextSendingCommand {
 				                } else {
 				                    parameters.add(new StringParameterValue(split[0], split[1]));
 				                }
+				            } else {
+				                msg += "Unparseable parameter: " + args[i];
 				            }
 				        }
 				    }
 				    
+				    
+				    if (!parameters.isEmpty() && !project.isParameterized()) {
+				        msg += "Ignoring parameters as project is not parametrized!\n";
+				    }
+				    
 				    if (scheduleBuild(project, delay, sender, parameters)) {
 				        if (delay == 0) {
-				            return sender + ": job " + jobName + " build scheduled now";
+				            return msg + sender + ": job " + jobName + " build scheduled now";
 				        } else {
-				            return sender + ": job " + jobName + " build scheduled with a quiet period of " +
+				            return msg + sender + ": job " + jobName + " build scheduled with a quiet period of " +
                                     delay + " seconds";
 				        }
                     } else {
