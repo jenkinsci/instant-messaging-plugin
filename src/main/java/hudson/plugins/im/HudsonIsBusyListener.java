@@ -148,7 +148,9 @@ public class HudsonIsBusyListener extends RunListener {
         int totalExecutors = 0;
         Computer[] computers = Hudson.getInstance().getComputers();
         for (Computer compi : computers) {
-            totalExecutors += compi.getNumExecutors();
+        	if (compi.isOnline()) {
+        		totalExecutors += compi.getNumExecutors();
+        	}
         }
         return totalExecutors;
     }
