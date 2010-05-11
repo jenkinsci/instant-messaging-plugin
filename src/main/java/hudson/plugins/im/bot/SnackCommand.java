@@ -13,10 +13,10 @@ import org.apache.commons.lang.StringUtils;
  */
 public class SnackCommand extends AbstractTextSendingCommand {
 	
-	private static final String HELP = " [<snack>] - om nom nmo";
+	private static final String HELP = " [<snack>] - om nom nom";
 
 	private static final String[] THANKS = new String[] {
-			"thanks a lot! nom nom nom.",
+			"thanks a lot! om nom nom.",
 			"you're so kind to me!",
 			"yummy!",
 			"great! yum yum." };
