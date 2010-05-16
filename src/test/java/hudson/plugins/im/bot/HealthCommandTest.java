@@ -8,6 +8,7 @@ import static org.mockito.Mockito.when;
 import hudson.model.FreeStyleBuild;
 import hudson.model.FreeStyleProject;
 import hudson.model.HealthReport;
+import hudson.plugins.im.Sender;
 
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
@@ -29,7 +30,7 @@ public class HealthCommandTest {
 		HealthCommand cmd = new HealthCommand();
 		cmd.setJobProvider(jobProvider);
 		
-		String sender = "tester";
+		Sender sender = new Sender("tester");
 		String[] args = {"health"};
 		String reply = cmd.getReply(sender, args);
 		

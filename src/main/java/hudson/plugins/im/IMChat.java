@@ -16,11 +16,23 @@ public interface IMChat {
     public void sendMessage(String message) throws IMException;
     
     /**
-     * Translates the sender into a nickname which can be used to address the sender.
+     * Translates the sender into a nickname which can be used to informally address the sender.
      * 
      * @param senderId the fully qualified IM id of the sender (e.g. for Jabber the user, the server domain and optional resource part)
      */
     public String getNickName(String senderId);
+    
+    /**
+     * Translates the sender into a unique IM id.
+     * 
+     * Under certain circumstances the 'sender id' is not unique.
+     * E.g. in a Jabber chatroom we will only get the 'nick' registered in the room
+     * and not the real Jabber ID.
+     * 
+     * @param senderId
+     * @return the 'real' ID or null if it couldn't be determined (e.g. because the room is anonymous) 
+     */
+    public String getIMId(String senderId);
     
     /**
      * Returns true if the chat is a multi-user chat (a Jabber conference room, an IRC chatroom)

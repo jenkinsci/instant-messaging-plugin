@@ -9,6 +9,7 @@ import hudson.model.Queue.Item;
 import hudson.plugins.im.IMChat;
 import hudson.plugins.im.IMException;
 import hudson.plugins.im.IMMessage;
+import hudson.plugins.im.Sender;
 
 /**
  * Queue command for the jabber bot.
@@ -19,7 +20,7 @@ public class QueueCommand implements BotCommand {
 	private static final String HELP = " - show the state of the build queue";
 
 	public void executeCommand(IMChat chat, IMMessage message,
-			String sender, String[] args) throws IMException {
+			Sender sender, String[] args) throws IMException {
 		Queue queue = Hudson.getInstance().getQueue();
 		Item[] items = queue.getItems();
 		String reply;

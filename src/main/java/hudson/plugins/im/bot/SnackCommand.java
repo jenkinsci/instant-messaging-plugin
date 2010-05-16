@@ -1,5 +1,6 @@
 package hudson.plugins.im.bot;
 
+import hudson.plugins.im.Sender;
 import hudson.plugins.im.tools.MessageHelper;
 
 import java.util.Random;
@@ -30,13 +31,13 @@ public class SnackCommand extends AbstractTextSendingCommand {
     private final Random ran = new Random();
 
 	@Override
-	protected String getReply(String sender, String[] args) {
+	protected String getReply(Sender sender, String[] args) {
         String snack = null;
         if (args.length > 1) {
             snack = StringUtils.join(MessageHelper.copyOfRange(args, 1, args.length), " ");
         }
 
-        StringBuilder msg = new StringBuilder(sender).append(": ");
+        StringBuilder msg = new StringBuilder(sender.getNickname()).append(": ");
         int index = ran.nextInt(THANKS.length);
         msg.append(THANKS[index]);
 

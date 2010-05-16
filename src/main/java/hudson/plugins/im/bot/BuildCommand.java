@@ -11,6 +11,8 @@ import hudson.model.ParametersAction;
 import hudson.model.Queue;
 import hudson.model.StringParameterValue;
 import hudson.plugins.im.IMCause;
+import hudson.plugins.im.Sender;
+
 import java.util.ArrayList;
 import java.util.List;
 import java.util.regex.Matcher;
@@ -39,8 +41,14 @@ public class BuildCommand extends AbstractTextSendingCommand {
 		this.imId = imId;
 	}
 
-	private boolean scheduleBuild(AbstractProject<?, ?> project, int delaySeconds, String sender, List<ParameterValue> parameters) {
-		Cause cause = new IMCause("Started by " + this.imId + " on request of '" + sender + "'");
+	private boolean scheduleBuild(AbstractProject<?, ?> project, int delaySeconds, Sender sender, List<ParameterValue> parameters) {
+	    
+	    String senderId = sender.getId();
+	    if (senderId == null) {
+	        senderId = sender.getNickname();
+	    }
+	    
+		Cause cause = new IMCause("Started by " + this.imId + " on request of '" + senderId + "'");
 		if (parameters.isEmpty()) {
 		    return project.scheduleBuild(delaySeconds, cause);
 		} else {
@@ -49,7 +57,7 @@ public class BuildCommand extends AbstractTextSendingCommand {
 	}
 
 	@Override
-	public String getReply(String sender, String args[]) {
+	public String getReply(Sender sender, String args[]) {
 		if (args.length >= 2) {
 			String jobName = args[1];
 			jobName = jobName.replaceAll("\"", "");
@@ -59,9 +67,9 @@ public class BuildCommand extends AbstractTextSendingCommand {
 			    String msg = "";
 				if (project.isInQueue()) {
 					Queue.Item queueItem = project.getQueueItem();
-					return sender + ": job " + jobName + " is already in the build queue (" + queueItem.getWhy() + ")";
+					return sender.getNickname() + ": job " + jobName + " is already in the build queue (" + queueItem.getWhy() + ")";
     			} else if (project.isDisabled()) {
-					return sender + ": job " + jobName + " is disabled";
+					return sender.getNickname() + ": job " + jobName + " is disabled";
 				} else {
 				    
 				    int delay = project.getQuietPeriod();
@@ -86,7 +94,7 @@ public class BuildCommand extends AbstractTextSendingCommand {
                                 } else {
                                     char c = delayStr.charAt(delayStr.length() - 1);
                                     if (! (c == 's' || Character.isDigit(c))) {
-                                        return giveSyntax(sender, args[0]);
+                                        return giveSyntax(sender.getNickname(), args[0]);
                                     }
                                 }
     				            
@@ -95,7 +103,7 @@ public class BuildCommand extends AbstractTextSendingCommand {
                                     int value = Integer.parseInt(matcher.group(1));
                                     delay = multiplicator * value;
                                 } else {
-                                    return giveSyntax(sender, args[0]);
+                                    return giveSyntax(sender.getNickname(), args[0]);
                                 }
 				            }
 				        }
@@ -124,20 +132,20 @@ public class BuildCommand extends AbstractTextSendingCommand {
 				    
 				    if (scheduleBuild(project, delay, sender, parameters)) {
 				        if (delay == 0) {
-				            return msg + sender + ": job " + jobName + " build scheduled now";
+				            return msg + sender.getNickname() + ": job " + jobName + " build scheduled now";
 				        } else {
-				            return msg + sender + ": job " + jobName + " build scheduled with a quiet period of " +
+				            return msg + sender.getNickname() + ": job " + jobName + " build scheduled with a quiet period of " +
                                     delay + " seconds";
 				        }
                     } else {
-                        return sender + ": job " + jobName + " scheduling failed or already in build queue";
+                        return sender.getNickname() + ": job " + jobName + " scheduling failed or already in build queue";
                     }
 				}
     		} else {
-    			return giveSyntax(sender, args[0]);
+    			return giveSyntax(sender.getNickname(), args[0]);
     		}
 		} else {
-			return sender + ": Error, syntax is: '" + args[0] +  SYNTAX + "'";
+			return sender.getNickname() + ": Error, syntax is: '" + args[0] +  SYNTAX + "'";
 		}
 	}
 	

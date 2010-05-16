@@ -6,6 +6,7 @@ import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 import hudson.model.AbstractBuild;
 import hudson.model.AbstractProject;
+import hudson.plugins.im.Sender;
 
 import java.io.IOException;
 
@@ -21,7 +22,7 @@ public class CommentCommandTest {
         when(project.getBuildByNumber(4711)).thenReturn(build);
         
         CommentCommand command = new CommentCommand();
-        String result = command.getMessageForJob(project, "kutzi",
+        String result = command.getMessageForJob(project, new Sender("kutzi"),
                 new String[] { "4711", "my comment"}).toString();
         assertEquals("Ok", result);
         
@@ -33,7 +34,7 @@ public class CommentCommandTest {
         AbstractProject<?, ?> project = mock(AbstractProject.class);
         
         CommentCommand command = new CommentCommand();
-        command.getMessageForJob(project, "kutzi",
+        command.getMessageForJob(project, new Sender("kutzi"),
                 new String[] { "abc", "my comment"}).toString();
     }
     
@@ -45,7 +46,7 @@ public class CommentCommandTest {
         when(project.getBuildByNumber(4711)).thenReturn(build);
         
         CommentCommand command = new CommentCommand();
-        command.getMessageForJob(project, "kutzi",
+        command.getMessageForJob(project, new Sender("kutzi"),
                 new String[] { "4712", "my comment"}).toString();
     }
 }

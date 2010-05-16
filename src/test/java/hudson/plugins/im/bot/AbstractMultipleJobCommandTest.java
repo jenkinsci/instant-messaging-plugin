@@ -9,6 +9,7 @@ import hudson.model.AbstractProject;
 import hudson.model.FreeStyleProject;
 import hudson.model.TopLevelItem;
 import hudson.model.View;
+import hudson.plugins.im.Sender;
 import hudson.plugins.im.bot.AbstractMultipleJobCommand.Mode;
 import hudson.plugins.im.tools.Pair;
 
@@ -43,7 +44,7 @@ public class AbstractMultipleJobCommandTest {
         cmd.setJobProvider(jobProvider);
         
         List<AbstractProject<?, ?>> projects = new ArrayList<AbstractProject<?,?>>();
-        Pair<Mode, String> pair = cmd.getProjects("sender", args, projects);
+        Pair<Mode, String> pair = cmd.getProjects(new Sender("sender"), args, projects);
         
         assertEquals(Mode.SINGLE, pair.getHead());
         assertNull(pair.getTail());
@@ -62,7 +63,7 @@ public class AbstractMultipleJobCommandTest {
         cmd.setJobProvider(jobProvider);
         
         List<AbstractProject<?, ?>> projects = new ArrayList<AbstractProject<?,?>>();
-        cmd.getProjects("sender", args, projects);
+        cmd.getProjects(new Sender("sender"), args, projects);
     }
     
     @Test
@@ -84,7 +85,7 @@ public class AbstractMultipleJobCommandTest {
         cmd.setJobProvider(jobProvider);
         
         List<AbstractProject<?, ?>> projects = new ArrayList<AbstractProject<?,?>>();
-        Pair<Mode,String> pair = cmd.getProjects("sender", args, projects);
+        Pair<Mode,String> pair = cmd.getProjects(new Sender("sender"), args, projects);
 
         assertEquals(Mode.VIEW, pair.getHead());
         assertEquals(viewName, pair.getTail());

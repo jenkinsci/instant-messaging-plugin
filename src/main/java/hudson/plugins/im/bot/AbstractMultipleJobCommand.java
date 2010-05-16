@@ -3,8 +3,10 @@ package hudson.plugins.im.bot;
 import hudson.model.AbstractProject;
 import hudson.model.TopLevelItem;
 import hudson.model.View;
+import hudson.plugins.im.Sender;
 import hudson.plugins.im.tools.MessageHelper;
 import hudson.plugins.im.tools.Pair;
+
 import java.util.ArrayList;
 import java.util.Collection;
 
@@ -41,7 +43,7 @@ abstract class AbstractMultipleJobCommand extends AbstractTextSendingCommand {
     }
 
     @Override
-	protected String getReply(String sender, String[] args) {
+	protected String getReply(Sender sender, String[] args) {
     	
 //    	if (!authorizationCheck()) {
 //    		return "Sorry, can't do that!";
@@ -94,7 +96,7 @@ abstract class AbstractMultipleJobCommand extends AbstractTextSendingCommand {
      * @return a pair of Mode (single job, jobs from view or all) and view name -
      * where view name will be null if mode != VIEW
      */
-    Pair<Mode, String> getProjects(String sender, String[] args, Collection<AbstractProject<?, ?>> projects)
+    Pair<Mode, String> getProjects(Sender sender, String[] args, Collection<AbstractProject<?, ?>> projects)
         throws CommandException {
         final Mode mode;
         String view = null;
@@ -111,7 +113,7 @@ abstract class AbstractMultipleJobCommand extends AbstractTextSendingCommand {
                 if (project != null) {
                     projects.add(project);
                 } else {
-                    throw new CommandException(sender + ": " + UNKNOWN_JOB_STR + " " + jobName);
+                    throw new CommandException(sender.getNickname() + ": " + UNKNOWN_JOB_STR + " " + jobName);
                 }
             }
         } else if (args.length == 1) {

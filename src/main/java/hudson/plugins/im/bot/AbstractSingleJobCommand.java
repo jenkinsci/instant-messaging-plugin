@@ -1,6 +1,7 @@
 package hudson.plugins.im.bot;
 
 import hudson.model.AbstractProject;
+import hudson.plugins.im.Sender;
 import hudson.plugins.im.tools.MessageHelper;
 
 /**
@@ -36,11 +37,11 @@ abstract class AbstractSingleJobCommand extends AbstractTextSendingCommand {
      * @return the result message for this job if the command was executed successfully
      * @throws CommandException if the command couldn't be executed for any reason
      */
-    protected abstract CharSequence getMessageForJob(AbstractProject<?, ?> job, String sender,
+    protected abstract CharSequence getMessageForJob(AbstractProject<?, ?> job, Sender sender,
             String[] arguments) throws CommandException;
 
     @Override
-    protected String getReply(String sender, String[] args) {
+    protected String getReply(Sender sender, String[] args) {
         if (args.length > 1 + numberOfArguments) {
             final String jobName;
             final String[] remainingArgs;

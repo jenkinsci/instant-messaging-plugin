@@ -3,6 +3,7 @@ package hudson.plugins.im.bot;
 import hudson.plugins.im.IMChat;
 import hudson.plugins.im.IMException;
 import hudson.plugins.im.IMMessage;
+import hudson.plugins.im.Sender;
 import hudson.plugins.im.tools.ExceptionHelper;
 
 import java.util.logging.Logger;
@@ -32,13 +33,13 @@ public abstract class AbstractTextSendingCommand implements BotCommand {
 	 * {@inheritDoc}
 	 */
 	public final void executeCommand(IMChat chat, IMMessage message,
-			String sender, String[] args) throws IMException {
+			Sender sender, String[] args) throws IMException {
 		String reply;
 		try {
 			reply = getReply(sender, args);
 		} catch (RuntimeException e) {
 			LOGGER.warning(e.toString());
-			reply = sender + ": Error " + e.toString();
+			reply = sender.getNickname() + ": Error " + e.toString();
 		}
 		chat.sendMessage(reply);
 	}
@@ -46,18 +47,18 @@ public abstract class AbstractTextSendingCommand implements BotCommand {
 	/**
 	 * Gets the text reply
 	 * 
-	 * @param sender the room nickname of the command sender
+	 * @param sender the command sender
 	 * @param args arguments passed to the command, where <code>args[0]</code> is the command name itself
 	 * @throws RuntimeException in case of invalid args. This is automatically caught and reported to the sender
 	 */
-	protected abstract String getReply(String sender, String args[]);
+	protected abstract String getReply(Sender sender, String args[]);
 
-    protected String getErrorReply(String sender, CommandException e) {
+    protected String getErrorReply(Sender sender, CommandException e) {
         final StringBuilder reply;
         if(e.getReplyMessage() != null) {
             reply = new StringBuilder(e.getReplyMessage()).append("\n");
         } else {
-            reply = new StringBuilder(sender).append(": command couldn't be executed. Error:\n");
+            reply = new StringBuilder(sender.getNickname()).append(": command couldn't be executed. Error:\n");
         }
         if(e.getCause() != null) {
             reply.append("Cause: ").append(ExceptionHelper.dump(e.getCause()));

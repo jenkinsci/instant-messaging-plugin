@@ -4,6 +4,7 @@ import hudson.model.AbstractBuild;
 import hudson.model.AbstractProject;
 import hudson.model.Executor;
 import hudson.model.Hudson;
+import hudson.plugins.im.Sender;
 
 /**
  * Abort a running job
@@ -18,7 +19,7 @@ public class AbortCommand extends AbstractSingleJobCommand {
 	}
 
     @Override
-    protected CharSequence getMessageForJob(AbstractProject<?, ?> project, String sender, String[] args) throws CommandException {
+    protected CharSequence getMessageForJob(AbstractProject<?, ?> project, Sender sender, String[] args) throws CommandException {
         if ( (project.isInQueue() == false) && (project.isBuilding() == false) ) {
             throw new CommandException(
                     sender + ": how do you intend to abort a build that isn't building?");
@@ -35,7 +36,7 @@ public class AbortCommand extends AbstractSingleJobCommand {
             if (build == null) {
                 // No builds?
                 throw new CommandException(
-                        sender + ": it appears this job has never been built");
+                        sender.getNickname() + ": it appears this job has never been built");
             }   
 
             Executor ex = build.getExecutor();
@@ -50,7 +51,7 @@ public class AbortCommand extends AbstractSingleJobCommand {
             return project.getName() + " aborted, I hope you're happy!";
         } else {
             throw new CommandException(
-                    sender + ": " + " couldn't abort " + project.getName() + ". I don't know why this happened.");
+                    sender.getNickname() + ": " + " couldn't abort " + project.getName() + ". I don't know why this happened.");
         }
     }
 

@@ -3,6 +3,7 @@ package hudson.plugins.im.bot;
 import hudson.plugins.im.IMChat;
 import hudson.plugins.im.IMException;
 import hudson.plugins.im.IMMessage;
+import hudson.plugins.im.Sender;
 import hudson.plugins.im.tools.MessageHelper;
 
 import java.util.Arrays;
@@ -24,7 +25,7 @@ public class SetAliasCommand extends AbstractTextSendingCommand {
 	}
 	
 	@Override
-	protected String getReply(String sender, String[] args) {
+	protected String getReply(Sender sender, String[] args) {
 		if (args.length < 1) {
 			throw new IllegalArgumentException();
 		} else if (args.length == 1) {
@@ -46,14 +47,14 @@ public class SetAliasCommand extends AbstractTextSendingCommand {
 			if (aliasCmd != null) {
 				return "deleted alias: " + alias + aliasCmd.getHelp();
 			} else {
-				return sender + ": don't know an alias called '" + alias + "'";
+				return sender.getNickname() + ": don't know an alias called '" + alias + "'";
 			}
 		} else {
 			String alias = args[1];
 			String cmdName = args[2];
 			BotCommand cmd = this.bot.getCommand(cmdName);
 			if (cmd == null) {
-				return sender + ": sorry don't know a command or alias called '" + cmdName + "'";
+				return sender.getNickname() + ": sorry don't know a command or alias called '" + cmdName + "'";
 			}
 			String[] cmdArguments = ArrayUtils.EMPTY_STRING_ARRAY;
 			if (args.length > 3) {
@@ -64,7 +65,7 @@ public class SetAliasCommand extends AbstractTextSendingCommand {
 			try {
 				this.bot.addAlias(alias, aliasCmd);
 			} catch (IllegalArgumentException e) {
-				return sender + ": " + e.getMessage();
+				return sender.getNickname() + ": " + e.getMessage();
 			}
 			return "created alias: " + alias + aliasCmd.getHelp();
 		}
@@ -90,7 +91,7 @@ public class SetAliasCommand extends AbstractTextSendingCommand {
 		}
 		
 		public void executeCommand(IMChat chat, IMMessage message,
-				String sender, String[] args) throws IMException {
+				Sender sender, String[] args) throws IMException {
 			String[] dynamicArgs = MessageHelper.copyOfRange(args, 1, args.length);
 			
 			String[] allArgs = MessageHelper.concat(new String[] {this.commandName}, this.arguments, dynamicArgs);

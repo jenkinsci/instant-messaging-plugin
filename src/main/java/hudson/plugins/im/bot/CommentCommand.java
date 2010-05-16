@@ -2,6 +2,7 @@ package hudson.plugins.im.bot;
 
 import hudson.model.AbstractProject;
 import hudson.model.Run;
+import hudson.plugins.im.Sender;
 import hudson.plugins.im.tools.MessageHelper;
 
 import java.io.IOException;
@@ -14,7 +15,7 @@ public class CommentCommand extends AbstractSingleJobCommand {
     }
     
     @Override
-    protected CharSequence getMessageForJob(AbstractProject<?, ?> job, String sender,
+    protected CharSequence getMessageForJob(AbstractProject<?, ?> job, Sender sender,
             String[] args) throws CommandException {
         
         try {

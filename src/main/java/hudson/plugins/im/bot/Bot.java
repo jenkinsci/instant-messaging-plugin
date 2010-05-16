@@ -7,6 +7,7 @@ import hudson.plugins.im.IMChat;
 import hudson.plugins.im.IMException;
 import hudson.plugins.im.IMMessage;
 import hudson.plugins.im.IMMessageListener;
+import hudson.plugins.im.Sender;
 import hudson.plugins.im.bot.SetAliasCommand.AliasCommand;
 import hudson.plugins.im.tools.ExceptionHelper;
 import hudson.plugins.im.tools.MessageHelper;
@@ -34,7 +35,7 @@ public class Bot implements IMMessageListener {
 	private class HelpCommand implements BotCommand {
 
 		public void executeCommand(IMChat groupChat, IMMessage message,
-				String sender, String[] args) throws IMException {
+				Sender sender, String[] args) throws IMException {
 			if (helpCache == null) {
 				final StringBuilder msg = new StringBuilder("Available commands:");
 				for (final Entry<String, BotCommand> item : cmdsAndAliases.entrySet()) {
@@ -123,9 +124,16 @@ public class Bot implements IMMessageListener {
             if (args.length > 0) {
                 // first word is the command name
                 String cmd = args[0];
-                if (sender != null) {
-                    sender = this.chat.getNickName(sender);
+                
+                String id = this.chat.getIMId(sender);
+                
+                final Sender s;
+                if (id != null) {
+                    s = new Sender(this.chat.getNickName(sender), id);
+                } else {
+                    s = new Sender(this.chat.getNickName(sender));
                 }
+                
                 try {
                 	BotCommand command = this.cmdsAndAliases.get(cmd);
                     if (command != null) {
@@ -134,9 +142,7 @@ public class Bot implements IMMessageListener {
                     	    if (this.authentication != null) {
                     	        SecurityContextHolder.getContext().setAuthentication(this.authentication);
                     	    }
-	                    	command.executeCommand(
-	                                this.chat, msg, sender,
-	                                args);
+	                    	command.executeCommand(this.chat, msg, s, args);
                     	} finally {
                     	    if (this.authentication != null) {
                     	        SecurityContextHolder.getContext().setAuthentication(oldAuthentication);
