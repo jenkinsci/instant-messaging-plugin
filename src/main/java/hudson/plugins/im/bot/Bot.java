@@ -73,6 +73,7 @@ public class Bot implements IMMessageListener {
 		STATIC_COMMANDS_MAP.put("abort", new AbortCommand());
 		STATIC_COMMANDS_MAP.put("comment", new CommentCommand());
 		STATIC_COMMANDS_MAP.put("botsnack", new SnackCommand());
+		STATIC_COMMANDS_MAP.put("userstat", new UserStatCommand());
 	}
 	
 	private final SortedMap<String, BotCommand> cmdsAndAliases = new TreeMap<String, BotCommand>();

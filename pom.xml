@@ -26,10 +26,23 @@
     </properties>
 
     <dependencies>
+    	<dependency>
+    		<groupId>org.jvnet.hudson.plugins</groupId>
+    		<artifactId>ci-game</artifactId>
+    		<version>1.16</version>
+    		<scope>compile</scope>
+    		<optional>true</optional>
+    	</dependency>
+   	    <dependency>
+	      <groupId>org.jvnet.hudson.plugins</groupId>
+	      <artifactId>analysis-core</artifactId>
+	      <version>1.0</version>
+	      <optional>true</optional>    
+	    </dependency>
         <dependency>
             <groupId>org.mockito</groupId>
             <artifactId>mockito-core</artifactId>
-            <version>1.8.4</version>
+            <version>1.8.5</version>
             <scope>test</scope>
         </dependency>
     </dependencies>
@@ -39,7 +52,7 @@
             <plugin>
                 <groupId>org.jvnet.hudson.tools</groupId>
                 <artifactId>maven-hpi-plugin</artifactId>
-                <version>1.47</version>
+                <version>1.52</version>
                 <extensions>true</extensions>
             </plugin>
             <!-- Make sure that we don't use any Java 1.6 dependencies -->
@@ -61,7 +74,37 @@
                         </configuration>
                     </execution>
                 </executions>
-            </plugin>
+            </plugin>            
+            <!-- <plugin>
+                <groupId>org.codehaus.mojo</groupId>
+                <artifactId>animal-sniffer-maven-plugin</artifactId>
+                <version>1.5</version>
+                <executions>
+                    <execution>
+                        <goals>
+                            <goal>check</goal>
+                        </goals>
+                        <configuration>
+                        	<ignoreDependencies>true</ignoreDependencies>
+                            <signature>
+							    <groupId>org.codehaus.mojo.signature</groupId>
+							    <artifactId>java15</artifactId>
+							    <version>1.0</version>
+							</signature>
+                        </configuration>
+                    </execution>
+                </executions>
+            </plugin>-->
+            <plugin>
+		        <groupId>org.kohsuke.stapler</groupId>
+		        <artifactId>maven-stapler-plugin</artifactId>
+		        <version>1.15</version>
+		    </plugin>
+		    <plugin>
+		        <groupId>org.jvnet.localizer</groupId>
+		        <artifactId>maven-localizer-plugin</artifactId>
+		        <version>1.12</version>
+	        </plugin>
         </plugins>
     </build>
 </project>
