@@ -258,7 +258,7 @@ public abstract class IMPublisher extends Notifier implements BuildStep
             	for (IMMessageTarget target : calculateIMTargets(getCommitters(build), buildListener)) {
             		try {
             			log(buildListener, "Sending notification to suspect: " + target.toString());
-            			getIMConnection().send(target, message);
+            			sendNotification(message, target, buildListener);
             		} catch (final Throwable e) {
             			log(buildListener, "There was an error sending suspect notification to: " + target.toString());
             		}
@@ -272,7 +272,7 @@ public abstract class IMPublisher extends Notifier implements BuildStep
             	for (IMMessageTarget target : calculateIMTargets(getCulpritsOnly(build), buildListener)) {
             		try {
             			log(buildListener, "Sending notification to culprit: " + target.toString());
-            			getIMConnection().send(target, message);
+            			sendNotification(message, target, buildListener);
             		} catch (final Throwable e) {
             			log(buildListener, "There was an error sending culprit notification to: " + target.toString());
             		}
@@ -287,7 +287,7 @@ public abstract class IMPublisher extends Notifier implements BuildStep
                 for (IMMessageTarget target : calculateIMTargets(getCommitters(build), buildListener)) {
                     try {
                         log(buildListener, "Sending notification to suspect: " + target.toString());
-                        getIMConnection().send(target, message);
+                        sendNotification(message, target, buildListener);
                         committerNotified = true;
                     } catch (final Throwable e) {
                         log(buildListener, "There was an error sending suspect notification to: " + target.toString());
@@ -307,7 +307,7 @@ public abstract class IMPublisher extends Notifier implements BuildStep
         	for (IMMessageTarget target : calculateIMTargets(getCommitters(build), buildListener)) {
         		try {
         			log(buildListener, "Sending notification to fixer: " + target.toString());
-        			getIMConnection().send(target, message);
+        			sendNotification(message, target, buildListener);
         		} catch (final Throwable e) {
         			log(buildListener, "There was an error sending fixer notification to: " + target.toString());
         		}
@@ -316,6 +316,17 @@ public abstract class IMPublisher extends Notifier implements BuildStep
         
         return true;
     }
+
+	private void sendNotification(String message, IMMessageTarget target, BuildListener buildListener)
+			throws IMException {
+		IMConnection imConnection = getIMConnection();
+		if (imConnection instanceof DummyConnection) {
+			// quite hacky
+			log(buildListener, "[ERROR] not connected. Cannot send message to '" + target + "'");
+		} else {
+			getIMConnection().send(target, message);
+		}
+	}
 
     /**
      * Looks for committers in the direct upstream builds and notifies them.
@@ -347,7 +358,7 @@ public abstract class IMPublisher extends Notifier implements BuildStep
 			        for (IMMessageTarget target : calculateIMTargets(committers, buildListener)) {
 			            try {
 			                log(buildListener, "Sending notification to upstream committer: " + target.toString());
-			                getIMConnection().send(target, message);
+			                sendNotification(message, target, buildListener);
 			                committerNotified = true;
 			            } catch (final Throwable e) {
 			                log(buildListener, "There was an error sending upstream committer notification to: " + target.toString());
@@ -395,7 +406,7 @@ public abstract class IMPublisher extends Notifier implements BuildStep
 		{
 		    try {
 		        log(buildListener, "Sending notification to: " + target.toString());
-		        getIMConnection().send(target, msg);
+		        sendNotification(msg, target, buildListener);
 		    } catch (final Throwable t) {
 		        log(buildListener, "There was an error sending notification to: " + target.toString() + "\n" + ExceptionHelper.dump(t));
 		    }
@@ -431,7 +442,7 @@ public abstract class IMPublisher extends Notifier implements BuildStep
 					// only notify group chats
 					if (target instanceof GroupChatIMMessageTarget) {
 		                try {
-		                    getIMConnection().send(target, msg);
+		                    sendNotification(msg, target, buildListener);
 		                } catch (final Throwable e) {
 		                    log(buildListener, "There was an error sending notification to: " + target.toString());
 		                }

@@ -24,39 +24,54 @@ public abstract class IMConnectionProvider implements IMConnectionListener {
 	private static final IMConnection NULL_CONNECTION = new DummyConnection();
 
 	protected IMPublisherDescriptor descriptor;
-	private IMConnection imConnection;
+	private IMConnection imConnection = NULL_CONNECTION;
 	
 	private Authentication authentication = null;
 	
 	private final ConnectorRunnable connector = new ConnectorRunnable();
     
 	protected IMConnectionProvider() {
+	}
+	
+	/**
+	 * Must be called once to initialize the provider.
+	 */
+	protected void init() {
 		Thread connectorThread = new Thread(this.connector, "IM-Reconnector-Thread");
 		connectorThread.setDaemon(true);
 		connectorThread.start();
+		tryReconnect();
 	}
 	
+	/**
+	 * Creates a new connection.
+	 * 
+	 * @return the new connection. Never null.
+	 * @throws IMException if the connection couldn't be created for any reason.
+	 * @throws IMException
+	 */
 	public abstract IMConnection createConnection() throws IMException;
 
+	private synchronized boolean create() throws IMException {
+		try {
+			this.imConnection = createConnection();
+			this.imConnection.addConnectionListener(this);
+			return true;
+		} catch (IMException e) {
+			this.imConnection = NULL_CONNECTION;
+			tryReconnect();
+			return false;
+		}
+	}
+	
+	/**
+	 * Return the current connection.
+	 * Returns an instance of {@link DummyConnection} if the plugin
+	 * is currently not connection to a IM network.
+	 * 
+	 * @return the current connection. Never null.
+	 */
     public synchronized IMConnection currentConnection() {
-    	if (this.imConnection == null) {
-    		try {
-				this.imConnection = createConnection();
-			} catch (IMException e) {
-				tryReconnect();
-				return NULL_CONNECTION;
-			}
-    		if (this.imConnection != null) {
-    			this.imConnection.addConnectionListener(this);
-    			return this.imConnection;
-    		} else {
-    			if (this.descriptor != null) {
-    				tryReconnect();
-    			}
-    			return NULL_CONNECTION;
-    		}
-    	}
-    	
         return this.imConnection;
     }
 
@@ -67,7 +82,7 @@ public abstract class IMConnectionProvider implements IMConnectionListener {
         if (this.imConnection != null) {
         	this.imConnection.removeConnectionListener(this);
         	this.imConnection.close();
-            this.imConnection = null;
+            this.imConnection = NULL_CONNECTION;
         }
     }
 
@@ -135,10 +150,7 @@ public abstract class IMConnectionProvider implements IMConnectionListener {
 								}
 							}
 							try {
-								imConnection = createConnection();
-								if (imConnection != null) {
-									success = true;
-								}
+								success = create();
 							} catch (IMException e) {
 								// ignore
 							}
@@ -148,8 +160,10 @@ public abstract class IMConnectionProvider implements IMConnectionListener {
                         if(!success) {
                             LOGGER.info("Reconnect failed. Next connection attempt in " + timeout + " minutes");
                             TimeUnit2.MINUTES.sleep(timeout);
-                            // exponentially increase timeout
-                            timeout = timeout * 2;
+                            // exponentially increase timeout, but longer than 16 minutes
+                            if (timeout < 15) {
+                            	timeout *= 2;
+                            }
                         } else {
                             // remove any permits which came in in the mean time
                             this.semaphore.drainPermits();

@@ -11,10 +11,13 @@ public class IMException extends IOException
 {
     private static final long serialVersionUID = 1L;
 
-    public IMException(final Exception e)
-    {
+    public IMException(final Exception e) {
         super(e.getMessage());
         initCause(e);
+    }
+    
+    public IMException(String msg) {
+    	super(msg);
     }
 
 }
