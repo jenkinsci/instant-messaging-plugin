@@ -23,14 +23,14 @@ public class TestResultCommand extends AbstractMultipleJobCommand {
         AbstractBuild<?, ?> build = job.getLastCompletedBuild();
         if (build == null) {
             // No builds
-            return job.getName() + " has never been built";
+            return job.getFullDisplayName() + " has never been built";
         }   
         AbstractTestResultAction<?> tests = build.getTestResultAction();
         if (tests == null) {
             // no test results associated with this job
-            return job.getName() + ": latest build contains no test results";
+            return job.getFullDisplayName() + ": latest build contains no test results";
         }
-        StringBuilder listing = new StringBuilder(String.format("%s build #%s had %s of %s tests fail\n", job.getName(), build.getNumber(), tests.getFailCount(), tests.getTotalCount()));
+        StringBuilder listing = new StringBuilder(String.format("%s build #%s had %s of %s tests fail\n", job.getFullDisplayName(), build.getNumber(), tests.getFailCount(), tests.getTotalCount()));
         
         listing.append("\n");
         List<CaseResult> failedTests = tests.getFailedTests();

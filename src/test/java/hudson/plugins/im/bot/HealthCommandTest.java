@@ -1,19 +1,21 @@
 package hudson.plugins.im.bot;
 
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
+
+import org.junit.Test;
+
+import hudson.maven.AbstractMavenProject;
+import hudson.model.FreeStyleBuild;
+import hudson.model.HealthReport;
+import hudson.model.ItemGroup;
+import hudson.plugins.im.Sender;
+
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertTrue;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
-import hudson.model.FreeStyleBuild;
-import hudson.model.FreeStyleProject;
-import hudson.model.HealthReport;
-import hudson.plugins.im.Sender;
-
-import java.util.regex.Matcher;
-import java.util.regex.Pattern;
-
-import org.junit.Test;
 
 /**
  * Test case for the 'health' command.
@@ -47,8 +49,11 @@ public class HealthCommandTest {
 		when(healthMock.getDescription()).thenReturn("Fine");
 		when(healthMock.getScore()).thenReturn(100);
 		
-		FreeStyleProject job = mock(FreeStyleProject.class);
-        when(job.getName()).thenReturn("fsProject");
+		AbstractMavenProject job = mock(AbstractMavenProject.class);
+		ItemGroup parent = mock(ItemGroup.class);
+		when(parent.getFullDisplayName()).thenReturn("");
+		when(job.getParent()).thenReturn(parent);
+        when(job.getFullDisplayName()).thenReturn("fsProject");
         when(job.getLastBuild()).thenReturn(build);
         when(job.getBuildHealth()).thenReturn(healthMock);
 		
@@ -72,8 +77,11 @@ public class HealthCommandTest {
         when(healthMock.getDescription()).thenReturn("Cloudy");
         when(healthMock.getScore()).thenReturn(0);
 
-        FreeStyleProject job = mock(FreeStyleProject.class);
-        when(job.getName()).thenReturn("fsProject");
+        AbstractMavenProject job = mock(AbstractMavenProject.class);
+		ItemGroup parent = mock(ItemGroup.class);
+		when(parent.getFullDisplayName()).thenReturn("");
+		when(job.getParent()).thenReturn(parent);
+        when(job.getFullDisplayName()).thenReturn("fsProject");
         when(job.getLastBuild()).thenReturn(build);
         when(job.getBuildHealth()).thenReturn(healthMock);
 	    

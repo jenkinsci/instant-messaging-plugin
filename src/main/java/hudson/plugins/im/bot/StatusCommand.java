@@ -19,7 +19,7 @@ public class StatusCommand extends AbstractMultipleJobCommand {
     @Override
     protected CharSequence getMessageForJob(AbstractProject<?, ?> project) {
         StringBuilder msg = new StringBuilder(32);
-        msg.append(project.getName());
+        msg.append(project.getFullDisplayName());
         if (project.isDisabled()) {
             msg.append("(disabled) ");
         // a project which is building and additionally in queue should be reported as building

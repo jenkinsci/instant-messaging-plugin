@@ -1,5 +1,7 @@
 package hudson.plugins.im;
 
+import static hudson.plugins.im.tools.BuildHelper.getProjectName;
+
 import hudson.Launcher;
 import hudson.model.AbstractBuild;
 import hudson.model.AbstractProject;
@@ -252,7 +254,7 @@ public abstract class IMPublisher extends Notifier implements BuildStep
         if (BuildHelper.isStillFailureOrUnstable(build)) {
             if (this.notifySuspects) {
             	log(buildListener, "Notifying suspects");
-            	final String message = "Build " + build.getProject().getName() +
+            	final String message = "Build " + getProjectName(build) +
             	    " is " + BuildHelper.getResultDescription(build) + ": " + MessageHelper.getBuildURL(build);
             	
             	for (IMMessageTarget target : calculateIMTargets(getCommitters(build), buildListener)) {
@@ -267,7 +269,7 @@ public abstract class IMPublisher extends Notifier implements BuildStep
             
             if (this.notifyCulprits) {
             	log(buildListener, "Notifying culprits");
-            	final String message = "You're still being suspected of having broken " + build.getProject().getName() + ": " + MessageHelper.getBuildURL(build);
+            	final String message = "You're still being suspected of having broken " + getProjectName(build) + ": " + MessageHelper.getBuildURL(build);
             	
             	for (IMMessageTarget target : calculateIMTargets(getCulpritsOnly(build), buildListener)) {
             		try {
@@ -282,7 +284,7 @@ public abstract class IMPublisher extends Notifier implements BuildStep
             boolean committerNotified = false;
             if (this.notifySuspects) {
                 log(buildListener, "Notifying suspects");
-                String message = "Oh no! You're suspected of having broken " + build.getProject().getName() + ": " + MessageHelper.getBuildURL(build);
+                String message = "Oh no! You're suspected of having broken " + getProjectName(build) + ": " + MessageHelper.getBuildURL(build);
                 
                 for (IMMessageTarget target : calculateIMTargets(getCommitters(build), buildListener)) {
                     try {
@@ -302,7 +304,7 @@ public abstract class IMPublisher extends Notifier implements BuildStep
         
         if (this.notifyFixers && BuildHelper.isFix(build)) {
         	buildListener.getLogger().append("Notifying fixers\n");
-        	final String message = "Yippie! Seems you've fixed " + build.getProject().getName() + ": " + MessageHelper.getBuildURL(build);
+        	final String message = "Yippie! Seems you've fixed " + getProjectName(build) + ": " + MessageHelper.getBuildURL(build);
         	
         	for (IMMessageTarget target : calculateIMTargets(getCommitters(build), buildListener)) {
         		try {
@@ -350,9 +352,9 @@ public abstract class IMPublisher extends Notifier implements BuildStep
 		        if (upstreamBuild != null) {
 			        Set<User> committers = getCommitters(upstreamBuild);
 			        
-			        String message = "Attention! Your change in " + upstreamBuild.getProject().getName()
+			        String message = "Attention! Your change in " + getProjectName(upstreamBuild)
 			        + ": " + MessageHelper.getBuildURL(upstreamBuild)
-			        + " *might* have broken the downstream job " + build.getProject().getName() + ": " + MessageHelper.getBuildURL(build)
+			        + " *might* have broken the downstream job " + getProjectName(build) + ": " + MessageHelper.getBuildURL(build)
 			        + "\nPlease have a look!";
 			        
 			        for (IMMessageTarget target : calculateIMTargets(committers, buildListener)) {
@@ -383,7 +385,7 @@ public abstract class IMPublisher extends Notifier implements BuildStep
 		} else {
 			sb = new StringBuilder();
 		}
-		sb.append("Project ").append(build.getProject().getName())
+		sb.append("Project ").append(getProjectName(build))
 			.append(" build (").append(build.getNumber()).append("): ")
 			.append(BuildHelper.getResultDescription(build)).append(" in ")
 			.append(build.getTimestampString())
@@ -421,7 +423,7 @@ public abstract class IMPublisher extends Notifier implements BuildStep
 		try {
 			if (notifyOnBuildStart) {
 				final StringBuilder sb = new StringBuilder("Starting build ").append(build.getNumber())
-					.append(" for job ").append(build.getProject().getName());
+					.append(" for job ").append(getProjectName(build));
 
 				if (build.getPreviousBuild() != null) {
 					sb.append(" (previous build: ")

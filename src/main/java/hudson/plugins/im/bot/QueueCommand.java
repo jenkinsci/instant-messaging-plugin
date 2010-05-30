@@ -29,7 +29,7 @@ public class QueueCommand implements BotCommand {
 			msg.append("Build queue:");
 			for (Item item : queue.getItems()) {
 				msg.append("\n- ")
-				.append(item.task.getName())
+				.append(item.task.getFullDisplayName())
 				.append(": ").append(item.getWhy());
 			}
 			reply = msg.toString();

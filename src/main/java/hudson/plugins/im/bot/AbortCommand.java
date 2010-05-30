@@ -48,10 +48,10 @@ public class AbortCommand extends AbstractSingleJobCommand {
         }
 
         if (aborted) {
-            return project.getName() + " aborted, I hope you're happy!";
+            return project.getFullDisplayName() + " aborted, I hope you're happy!";
         } else {
             throw new CommandException(
-                    sender.getNickname() + ": " + " couldn't abort " + project.getName() + ". I don't know why this happened.");
+                    sender.getNickname() + ": " + " couldn't abort " + project.getFullDisplayName() + ". I don't know why this happened.");
         }
     }
 

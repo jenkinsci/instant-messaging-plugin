@@ -134,4 +134,12 @@ public class BuildHelper {
         
         throw new IllegalArgumentException("Unknown result: '" + result + "' for build: " + build);
     }
+    
+    /**
+     * Returns the name of the project the build belongs to in a human readable
+     * format.
+     */
+    public static String getProjectName(AbstractBuild<?, ?> build) {
+    	return build.getProject().getFullDisplayName();
+    }
 }
