@@ -1,7 +1,6 @@
 package hudson.plugins.im;
 
 import static hudson.plugins.im.tools.BuildHelper.getProjectName;
-
 import hudson.Launcher;
 import hudson.model.AbstractBuild;
 import hudson.model.AbstractProject;
@@ -9,6 +8,7 @@ import hudson.model.BuildListener;
 import hudson.model.Result;
 import hudson.model.User;
 import hudson.model.UserProperty;
+import hudson.model.Fingerprint.RangeSet;
 import hudson.plugins.im.tools.Assert;
 import hudson.plugins.im.tools.BuildHelper;
 import hudson.plugins.im.tools.ExceptionHelper;
@@ -30,6 +30,8 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 import java.util.logging.Logger;
+
+import org.jvnet.hudson.test.Bug;
 
 /**
  * The actual Publisher that sends notification-Messages out to the clients.
@@ -117,8 +119,6 @@ public abstract class IMPublisher extends Notifier implements BuildStep
 
     /**
      * Returns the notification targets configured on a per-job basis.
-     * 
-     * @see #calculateIMTargets(Set, BuildListener)
      */
     public List<IMMessageTarget> getNotificationTargets() {
         return this.targets;
@@ -127,7 +127,7 @@ public abstract class IMPublisher extends Notifier implements BuildStep
     /**
      * Returns the notification target which should actually be used for notification.
      * 
-     * Differs from {@link #getNotificationStrategy()} because it also takes
+     * Differs from {@link #getNotificationTargets()} because it also takes
      * {@link IMPublisherDescriptor#getDefaultTargets()} into account!
      */
     protected List<IMMessageTarget> calculateTargets() {
@@ -350,6 +350,11 @@ public abstract class IMPublisher extends Notifier implements BuildStep
 		        AbstractBuild<?, ?> upstreamBuild = (AbstractBuild<?, ?>) entry.getKey().getBuildByNumber(entry.getValue());
 		        
 		        if (upstreamBuild != null) {
+		            
+		            if (! downstreamIsFirstInRangeTriggeredByUpstream(upstreamBuild, build)) {
+		                continue;
+		            }
+		            
 			        Set<User> committers = getCommitters(upstreamBuild);
 			        
 			        String message = "Attention! Your change in " + getProjectName(upstreamBuild)
@@ -374,6 +379,27 @@ public abstract class IMPublisher extends Notifier implements BuildStep
 		    }
 		}
 	}
+
+    /**
+     * Determines if downstreamBuild is the 1st build of the downstream project
+     * which has a dependency to the upstreamBuild.
+     */
+    @Bug(6712)
+    private boolean downstreamIsFirstInRangeTriggeredByUpstream(
+            AbstractBuild<?, ?> upstreamBuild, AbstractBuild<?, ?> downstreamBuild) {
+        RangeSet rangeSet = upstreamBuild.getDownstreamRelationship(downstreamBuild.getProject());
+        
+        if (rangeSet.isEmpty()) {
+            // should not happen
+            LOGGER.warning("Range set is empty. Upstream " + upstreamBuild + ", downstream " + downstreamBuild);
+            return false;
+        }
+        
+        if (rangeSet.min() == downstreamBuild.getNumber()) {
+            return true;
+        }
+        return false;
+    }
 
     /**
      * Notify all registered chats about the build result.
