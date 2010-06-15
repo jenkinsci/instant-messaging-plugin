@@ -31,8 +31,6 @@ import java.util.Map;
 import java.util.Set;
 import java.util.logging.Logger;
 
-import org.jvnet.hudson.test.Bug;
-
 /**
  * The actual Publisher that sends notification-Messages out to the clients.
  * 
@@ -384,7 +382,7 @@ public abstract class IMPublisher extends Notifier implements BuildStep
      * Determines if downstreamBuild is the 1st build of the downstream project
      * which has a dependency to the upstreamBuild.
      */
-    @Bug(6712)
+    //@Bug(6712)
     private boolean downstreamIsFirstInRangeTriggeredByUpstream(
             AbstractBuild<?, ?> upstreamBuild, AbstractBuild<?, ?> downstreamBuild) {
         RangeSet rangeSet = upstreamBuild.getDownstreamRelationship(downstreamBuild.getProject());
