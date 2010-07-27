@@ -38,7 +38,7 @@ public abstract class AbstractTextSendingCommand implements BotCommand {
 		try {
 			reply = getReply(sender, args);
 		} catch (RuntimeException e) {
-			LOGGER.warning(e.toString());
+			LOGGER.warning(ExceptionHelper.dump(e));
 			reply = sender.getNickname() + ": Error " + e.toString();
 		}
 		chat.sendMessage(reply);
