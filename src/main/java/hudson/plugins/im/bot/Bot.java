@@ -3,6 +3,7 @@
  */
 package hudson.plugins.im.bot;
 
+import hudson.plugins.im.AuthenticationHolder;
 import hudson.plugins.im.IMChat;
 import hudson.plugins.im.IMException;
 import hudson.plugins.im.IMMessage;
@@ -84,10 +85,10 @@ public class Bot implements IMMessageListener {
 	private final String commandPrefix;
 	private String helpCache = null;
 
-	private final Authentication authentication;
+	private final AuthenticationHolder authentication;
 
 	public Bot(IMChat chat, String nick, String imServer,
-			String commandPrefix, Authentication authentication
+			String commandPrefix, AuthenticationHolder authentication
 			) {
 		this.chat = chat;
 		this.nick = nick;
@@ -141,7 +142,7 @@ public class Bot implements IMMessageListener {
                     	Authentication oldAuthentication = SecurityContextHolder.getContext().getAuthentication();
                     	try {
                     	    if (this.authentication != null) {
-                    	        SecurityContextHolder.getContext().setAuthentication(this.authentication);
+                    	        SecurityContextHolder.getContext().setAuthentication(this.authentication.getAuthentication());
                     	    }
 	                    	command.executeCommand(this.chat, msg, s, args);
                     	} finally {

@@ -93,14 +93,7 @@ public abstract class IMConnectionProvider implements IMConnectionListener {
 		this.descriptor = desc;
 		
 		if (desc != null && desc.getHudsonUserName() != null) {
-			try {
-				Authentication tmp = new UsernamePasswordAuthenticationToken(desc.getHudsonUserName(),
-						desc.getHudsonPassword());
-				this.authentication = Hudson.getInstance().getSecurityRealm().getSecurityComponents().manager.authenticate(tmp);
-			} catch (Exception e) {
-			    LOGGER.warning(this.descriptor.getPluginDescription() 
-			            + " couldn't authenticate against Hudson: " + e);
-			}
+
 		}
 		
 		if (desc != null) {
@@ -117,8 +110,32 @@ public abstract class IMConnectionProvider implements IMConnectionListener {
     	this.connector.semaphore.release();
     }
 
-	public Authentication getAuthentication() {
-		return this.authentication;
+    // we need an additional level of indirection to the Authentication entity
+    // to fix HUDSON-5978 and HUDSON-5233
+	public synchronized AuthenticationHolder getAuthenticationHolder() {
+	    if (this.descriptor == null || this.descriptor.getHudsonUserName() == null) {
+	        return null;
+	    }
+	    
+	    return new AuthenticationHolder() {
+            @Override
+            public Authentication getAuthentication() {
+                if (authentication != null) {
+                    return authentication;
+                }
+                
+                try {
+                    Authentication tmp = new UsernamePasswordAuthenticationToken(
+                            descriptor.getHudsonUserName(),
+                            descriptor.getHudsonPassword());
+                    authentication = Hudson.getInstance().getSecurityRealm().getSecurityComponents().manager.authenticate(tmp);
+                } catch (Exception e) {
+                    LOGGER.warning(descriptor.getPluginDescription() 
+                            + " couldn't authenticate against Hudson: " + e);
+                }
+                return authentication;
+            }
+        };
 	}
 
 	private final class ConnectorRunnable implements Runnable {
