@@ -9,7 +9,6 @@ import java.util.concurrent.TimeUnit;
 import java.util.logging.Logger;
 
 import org.acegisecurity.Authentication;
-import org.acegisecurity.AuthenticationException;
 import org.acegisecurity.providers.UsernamePasswordAuthenticationToken;
 
 /**
@@ -98,10 +97,14 @@ public abstract class IMConnectionProvider implements IMConnectionListener {
 				Authentication tmp = new UsernamePasswordAuthenticationToken(desc.getHudsonUserName(),
 						desc.getHudsonPassword());
 				this.authentication = Hudson.getInstance().getSecurityRealm().getSecurityComponents().manager.authenticate(tmp);
-			} catch (AuthenticationException e) {
+			} catch (Exception e) {
 			    LOGGER.warning(this.descriptor.getPluginDescription() 
 			            + " couldn't authenticate against Hudson: " + e);
 			}
+		}
+		
+		if (desc != null) {
+		    tryReconnect();
 		}
 	}
 	
