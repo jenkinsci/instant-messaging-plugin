@@ -81,7 +81,7 @@
             <plugin>
                 <groupId>org.jvnet.hudson.tools</groupId>
                 <artifactId>maven-hpi-plugin</artifactId>
-                <version>1.53</version>
+                <version>1.54</version>
                 <extensions>true</extensions>
             </plugin>
             <!-- Make sure that we don't use any Java 1.6 dependencies -->
