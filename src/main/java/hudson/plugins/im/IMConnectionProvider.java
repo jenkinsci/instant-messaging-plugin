@@ -50,6 +50,12 @@ public abstract class IMConnectionProvider implements IMConnectionListener {
 	public abstract IMConnection createConnection() throws IMException;
 
 	private synchronized boolean create() throws IMException {
+		if (this.descriptor == null || !this.descriptor.isEnabled()) {
+			// plugin is disabled
+			this.imConnection = NULL_CONNECTION;
+			return true;
+		}
+		
 		try {
 			this.imConnection = createConnection();
 			this.imConnection.addConnectionListener(this);
@@ -90,11 +96,7 @@ public abstract class IMConnectionProvider implements IMConnectionListener {
 	public void setDescriptor(IMPublisherDescriptor desc) {
 		this.descriptor = desc;
 		
-		if (desc != null && desc.getHudsonUserName() != null) {
-
-		}
-		
-		if (desc != null) {
+		if (desc != null && desc.isEnabled()) {
 		    tryReconnect();
 		}
 	}

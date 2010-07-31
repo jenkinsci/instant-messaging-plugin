@@ -1,5 +1,6 @@
 package hudson.plugins.im;
 
+import java.util.logging.Level;
 import java.util.logging.Logger;
 
 /**
@@ -27,13 +28,17 @@ class DummyConnection implements IMConnection {
 
 	@Override
 	public void send(IMMessageTarget target, String text) throws IMException {
-		LOGGER.info("Send via dummy connection: '" + target + "' : '" + text + "'" );
+		if (LOGGER.isLoggable(Level.FINE)) {
+			LOGGER.fine("Send via dummy connection: '" + target + "' : '" + text + "'" );
+		}
 	}
 
 	@Override
 	public void setPresence(IMPresence presence, String statusMessage)
 			throws IMException {
-		LOGGER.info("Set presence via dummy connection: '" + presence + "' : '" + statusMessage + "'" );
+		if (LOGGER.isLoggable(Level.FINE)) {
+			LOGGER.fine("Set presence via dummy connection: '" + presence + "' : '" + statusMessage + "'" );
+		}
 	}
 
 	@Override
