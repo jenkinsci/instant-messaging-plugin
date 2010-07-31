@@ -174,9 +174,11 @@ public abstract class IMConnectionProvider implements IMConnectionListener {
 							}
 						}
                         
-                        // make sure to release the lock before sleeping!
+                        // make sure to leave the synchronized block before sleeping!
                         if(!success) {
                             LOGGER.info("Reconnect failed. Next connection attempt in " + timeout + " minutes");
+                            this.semaphore.drainPermits();
+                            
                             // wait up to timeout time OR until semaphore is released again (happens e.g. if global config was changed)
                             this.semaphore.tryAcquire(timeout * 60, TimeUnit.SECONDS);
                             // exponentially increase timeout, but longer than 16 minutes
