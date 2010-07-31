@@ -2,8 +2,6 @@ package hudson.plugins.im;
 
 import hudson.model.Hudson;
 import hudson.plugins.im.tools.ExceptionHelper;
-import hudson.util.TimeUnit2;
-
 import java.util.concurrent.Semaphore;
 import java.util.concurrent.TimeUnit;
 import java.util.logging.Logger;
@@ -179,7 +177,8 @@ public abstract class IMConnectionProvider implements IMConnectionListener {
                         // make sure to release the lock before sleeping!
                         if(!success) {
                             LOGGER.info("Reconnect failed. Next connection attempt in " + timeout + " minutes");
-                            TimeUnit2.MINUTES.sleep(timeout);
+                            // wait up to timeout time OR until semaphore is released again (happens e.g. if global config was changed)
+                            this.semaphore.tryAcquire(timeout * 60, TimeUnit.SECONDS);
                             // exponentially increase timeout, but longer than 16 minutes
                             if (timeout < 15) {
                             	timeout *= 2;
