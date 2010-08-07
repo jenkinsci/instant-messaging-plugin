@@ -20,7 +20,6 @@ import hudson.tasks.BuildStepDescriptor;
 import hudson.tasks.Notifier;
 import hudson.tasks.Publisher;
 
-import java.io.IOException;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.HashMap;
@@ -241,7 +240,7 @@ public abstract class IMPublisher extends Notifier implements BuildStep
 
     @Override
     public boolean perform(final AbstractBuild<?,?> build, final Launcher launcher, final BuildListener buildListener)
-            throws InterruptedException, IOException
+            throws InterruptedException
     {
         Assert.isNotNull(build, "Parameter 'build' must not be null.");
         Assert.isNotNull(buildListener, "Parameter 'buildListener' must not be null.");
