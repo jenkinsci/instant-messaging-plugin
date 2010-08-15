@@ -455,7 +455,7 @@ public abstract class IMPublisher extends Notifier implements BuildStep
 					if (build.getPreviousBuild().getResult().isWorseThan(Result.SUCCESS)) {
 						AbstractBuild<?, ?> lastSuccessfulBuild = BuildHelper.getPreviousSuccessfulBuild(build);
 						if (lastSuccessfulBuild != null) {
-							sb.append(" -- last success #")
+							sb.append(" -- last ").append(Result.SUCCESS).append(" #")
 								.append(lastSuccessfulBuild.getNumber())	
 								.append(" ").append(lastSuccessfulBuild.getTimestampString()).append(" ago");
 						}
