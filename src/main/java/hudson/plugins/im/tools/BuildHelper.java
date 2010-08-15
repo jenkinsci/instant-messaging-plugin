@@ -74,7 +74,7 @@ public class BuildHelper {
     /**
      * Returns the previous 'not aborted' build (i.e. ignores ABORTED and NOT_BUILT builds)
      * or null.
-     */
+    */
     public static AbstractBuild<?, ?> getPreviousNonAbortedBuild(AbstractBuild<?, ?> build) {
         AbstractBuild<?, ?> previousBuild = build.getPreviousBuild();
         while (previousBuild != null) {
@@ -85,6 +85,22 @@ public class BuildHelper {
             }
         }
         return previousBuild;
+    }
+    
+    /**
+     * Returns the previous successful build (i.e. build with result SUCCESS)
+     * or null.
+    */
+    public static AbstractBuild<?, ?> getPreviousSuccessfulBuild(AbstractBuild<?, ?> build) {
+        AbstractBuild<?, ?> previousBuild = build.getPreviousBuild();
+        while (previousBuild != null) {
+            if (previousBuild.getResult() != Result.SUCCESS) {
+                previousBuild = previousBuild.getPreviousBuild();
+            } else {
+                return previousBuild;
+            }
+        }
+        return null;
     }
     
     /**
