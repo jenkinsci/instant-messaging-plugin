@@ -3,18 +3,25 @@
  */
 package hudson.plugins.im.bot;
 
+import hudson.Extension;
 import hudson.model.AbstractBuild;
 import hudson.model.AbstractProject;
 import hudson.plugins.im.tools.MessageHelper;
 
-
+import java.util.Arrays;
+import java.util.Collection;
 
 
 /**
  * Job/project status command for the jabber bot
  * @author Pascal Bleser
  */
+@Extension
 public class StatusCommand extends AbstractMultipleJobCommand {
+    @Override
+    public Collection<String> getCommandNames() {
+        return Arrays.asList("status","s","jobs");
+    }
 
     @Override
     protected CharSequence getMessageForJob(AbstractProject<?, ?> project) {

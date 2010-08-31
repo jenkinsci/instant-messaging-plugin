@@ -1,15 +1,24 @@
 package hudson.plugins.im.bot;
 
+import hudson.Extension;
 import hudson.model.Hudson;
 import hudson.model.User;
 import hudson.plugins.cigame.UserScoreProperty;
 import hudson.plugins.im.Sender;
 import hudson.tasks.Mailer;
 
-public class UserStatCommand extends AbstractTextSendingCommand {
+import java.util.Collection;
+import java.util.Collections;
 
-	@Override
-	protected String getReply(Sender sender, String[] args) {
+@Extension
+public class UserStatCommand extends AbstractTextSendingCommand {
+    @Override
+    public Collection<String> getCommandNames() {
+        return Collections.singleton("userstat");
+    }
+
+    @Override
+	protected String getReply(Bot bot, Sender sender, String[] args) {
 		String userName = args[1];
 		User user = User.get(userName, false);
 		if (user != null) {

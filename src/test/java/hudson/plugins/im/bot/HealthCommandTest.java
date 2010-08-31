@@ -34,7 +34,7 @@ public class HealthCommandTest {
 		
 		Sender sender = new Sender("tester");
 		String[] args = {"health"};
-		String reply = cmd.getReply(sender, args);
+		String reply = cmd.getReply(null, sender, args);
 		
 		assertEquals(sender + ": no job found", reply);
 	}

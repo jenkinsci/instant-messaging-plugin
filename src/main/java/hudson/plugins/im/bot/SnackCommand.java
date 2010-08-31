@@ -1,8 +1,11 @@
 package hudson.plugins.im.bot;
 
+import hudson.Extension;
 import hudson.plugins.im.Sender;
 import hudson.plugins.im.tools.MessageHelper;
 
+import java.util.Collection;
+import java.util.Collections;
 import java.util.Random;
 
 import org.apache.commons.lang.StringUtils;
@@ -12,9 +15,14 @@ import org.apache.commons.lang.StringUtils;
  * (this is really more to familiarize myself with working with Hudson/jabber
  * @author R. Tyler Ballance <tyler@slide.com>
  */
+@Extension
 public class SnackCommand extends AbstractTextSendingCommand {
-	
-	private static final String HELP = " [<snack>] - om nom nom";
+    @Override
+    public Collection<String> getCommandNames() {
+        return Collections.singleton("botsnack");
+    }
+
+    private static final String HELP = " [<snack>] - om nom nom";
 
 	private static final String[] THANKS = new String[] {
 			"thanks a lot! om nom nom.",
@@ -31,7 +39,7 @@ public class SnackCommand extends AbstractTextSendingCommand {
     private final Random ran = new Random();
 
 	@Override
-	protected String getReply(Sender sender, String[] args) {
+	protected String getReply(Bot bot, Sender sender, String[] args) {
         String snack = null;
         if (args.length > 1) {
             snack = StringUtils.join(MessageHelper.copyOfRange(args, 1, args.length), " ");
