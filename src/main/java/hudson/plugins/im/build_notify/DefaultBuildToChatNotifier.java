@@ -6,24 +6,19 @@ import hudson.model.BuildListener;
 import hudson.model.Result;
 import hudson.plugins.im.IMPublisher;
 import hudson.plugins.im.tools.BuildHelper;
-import hudson.plugins.im.tools.MessageHelper;
 import hudson.scm.ChangeLogSet.Entry;
 
 import java.io.IOException;
-
-import static hudson.plugins.im.tools.BuildHelper.*;
 
 /**
  * {@link BuildToChatNotifier} that maintains the traditional behaviour of {@link IMPublisher}.
  *
  * @author Kohsuke Kawaguchi
  */
-public class DefaultBuildToChatNotifier extends BuildToChatNotifier {
-    // TODO: i18n
+public class DefaultBuildToChatNotifier extends SummaryOnlyBuildToChatNotifier {
     @Override
     public String buildStartMessage(IMPublisher publisher, AbstractBuild<?, ?> build, BuildListener listener) throws IOException, InterruptedException {
-        final StringBuilder sb = new StringBuilder("Starting build ").append(build.getNumber())
-            .append(" for job ").append(getProjectName(build));
+        StringBuilder sb = new StringBuilder(super.buildStartMessage(publisher, build, listener));
 
         if (build.getPreviousBuild() != null) {
             sb.append(" (previous build: ")
@@ -39,24 +34,15 @@ public class DefaultBuildToChatNotifier extends BuildToChatNotifier {
             }
             sb.append(")");
         }
+        
         return sb.toString();
     }
 
     @Override
     public String buildCompletionMessage(IMPublisher publisher, AbstractBuild<?, ?> build, BuildListener listener) throws IOException, InterruptedException {
-        final StringBuilder sb;
-        if (BuildHelper.isFix(build)) {
-            sb = new StringBuilder(Messages.DefaultBuildToChatNotifier_BuildIsFixed());
-        } else {
-            sb = new StringBuilder();
-        }
-        sb.append(Messages.DefaultBuildToChatNotifier_Summary(
-                getProjectName(build), build.getNumber(),
-                BuildHelper.getResultDescription(build),
-                build.getTimestampString(),
-                MessageHelper.getBuildURL(build)));
+        StringBuilder sb = new StringBuilder(super.buildCompletionMessage(publisher,build,listener));
 
-        if (! build.getChangeSet().isEmptySet()) {
+        if (!build.getChangeSet().isEmptySet()) {
             boolean hasManyChangeSets = build.getChangeSet().getItems().length > 1;
             for (Entry entry : build.getChangeSet()) {
                 sb.append("\n");
