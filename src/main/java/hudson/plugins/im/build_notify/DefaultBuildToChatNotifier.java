@@ -7,6 +7,7 @@ import hudson.model.Result;
 import hudson.plugins.im.IMPublisher;
 import hudson.plugins.im.tools.BuildHelper;
 import hudson.scm.ChangeLogSet.Entry;
+import org.kohsuke.stapler.DataBoundConstructor;
 
 import java.io.IOException;
 
@@ -16,6 +17,10 @@ import java.io.IOException;
  * @author Kohsuke Kawaguchi
  */
 public class DefaultBuildToChatNotifier extends SummaryOnlyBuildToChatNotifier {
+    @DataBoundConstructor
+    public DefaultBuildToChatNotifier() {
+    }
+
     @Override
     public String buildStartMessage(IMPublisher publisher, AbstractBuild<?, ?> build, BuildListener listener) throws IOException, InterruptedException {
         StringBuilder sb = new StringBuilder(super.buildStartMessage(publisher, build, listener));
@@ -56,7 +61,8 @@ public class DefaultBuildToChatNotifier extends SummaryOnlyBuildToChatNotifier {
         return sb.toString();
     }
 
-    @Extension
+    // set a high ordinal so that this comes in the top, as the default selection
+    @Extension(ordinal=100)
     public static class DescriptorImpl extends BuildToChatNotifierDescriptor {
         public String getDisplayName() {
             return "Summary + changes";

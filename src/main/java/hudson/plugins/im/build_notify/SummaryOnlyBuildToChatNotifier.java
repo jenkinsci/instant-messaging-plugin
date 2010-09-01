@@ -6,6 +6,7 @@ import hudson.model.BuildListener;
 import hudson.plugins.im.IMPublisher;
 import hudson.plugins.im.tools.BuildHelper;
 import hudson.plugins.im.tools.MessageHelper;
+import org.kohsuke.stapler.DataBoundConstructor;
 
 import java.io.IOException;
 
@@ -17,6 +18,10 @@ import static hudson.plugins.im.tools.BuildHelper.*;
  * @author Kohsuke Kawaguchi
  */
 public class SummaryOnlyBuildToChatNotifier extends BuildToChatNotifier {
+    @DataBoundConstructor
+    public SummaryOnlyBuildToChatNotifier() {
+    }
+
     @Override
     public String buildStartMessage(IMPublisher publisher, AbstractBuild<?, ?> build, BuildListener listener) throws IOException, InterruptedException {
         return Messages.SummaryOnlyBuildToChatNotifier_StartMessage(build.getNumber(),getProjectName(build));
