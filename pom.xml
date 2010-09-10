@@ -10,7 +10,7 @@
 	<groupId>org.jvnet.hudson.plugins</groupId>
 	<artifactId>instant-messaging-parent</artifactId>
 	<name>Parent project for all instant-messaging plugins</name>
-	<version>1.10-SNAPSHOT</version>
+	<version>1.9.1-SNAPSHOT</version>
 	<packaging>pom</packaging>
 	<url>http://wiki.hudson-ci.org/display/HUDSON/Instant+Messaging+Plugin</url>
 	<developers>
@@ -24,7 +24,7 @@
     
     <properties>
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
-        <version.instant-messaging.plugin>1.9-SNAPSHOT</version.instant-messaging.plugin>
+        <version.instant-messaging.plugin>1.9</version.instant-messaging.plugin>
     </properties>
 
     <dependencies>
