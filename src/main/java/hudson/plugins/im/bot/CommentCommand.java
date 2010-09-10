@@ -1,27 +1,19 @@
 package hudson.plugins.im.bot;
 
-import hudson.Extension;
 import hudson.model.AbstractProject;
 import hudson.model.Run;
 import hudson.plugins.im.Sender;
 import hudson.plugins.im.tools.MessageHelper;
 
 import java.io.IOException;
-import java.util.Collection;
-import java.util.Collections;
 
-@Extension
+
 public class CommentCommand extends AbstractSingleJobCommand {
 
     public CommentCommand() {
         super(2);
     }
-
-    @Override
-    public Collection<String> getCommandNames() {
-        return Collections.singleton("comment");
-    }
-
+    
     @Override
     protected CharSequence getMessageForJob(AbstractProject<?, ?> job, Sender sender,
             String[] args) throws CommandException {

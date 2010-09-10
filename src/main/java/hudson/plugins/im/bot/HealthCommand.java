@@ -1,13 +1,10 @@
 package hudson.plugins.im.bot;
 
-import hudson.Extension;
 import hudson.model.AbstractBuild;
 import hudson.model.AbstractProject;
 import hudson.model.HealthReport;
 import hudson.plugins.im.tools.MessageHelper;
 
-import java.util.Arrays;
-import java.util.Collection;
 import java.util.Collections;
 import java.util.List;
 
@@ -16,12 +13,7 @@ import java.util.List;
  *
  * @author kutzi
  */
-@Extension
 public class HealthCommand extends AbstractMultipleJobCommand {
-    @Override
-    public Collection<String> getCommandNames() {
-        return Arrays.asList("health","h");
-    }
 
     @Override
     protected CharSequence getMessageForJob(AbstractProject<?, ?> project) {

@@ -5,11 +5,10 @@ import hudson.Launcher;
 import hudson.model.AbstractBuild;
 import hudson.model.AbstractProject;
 import hudson.model.BuildListener;
+import hudson.model.Result;
 import hudson.model.User;
 import hudson.model.UserProperty;
 import hudson.model.Fingerprint.RangeSet;
-import hudson.plugins.im.build_notify.BuildToChatNotifier;
-import hudson.plugins.im.build_notify.DefaultBuildToChatNotifier;
 import hudson.plugins.im.tools.Assert;
 import hudson.plugins.im.tools.BuildHelper;
 import hudson.plugins.im.tools.ExceptionHelper;
@@ -21,7 +20,6 @@ import hudson.tasks.BuildStepDescriptor;
 import hudson.tasks.Notifier;
 import hudson.tasks.Publisher;
 
-import java.io.IOException;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.HashMap;
@@ -56,8 +54,6 @@ public abstract class IMPublisher extends Notifier implements BuildStep
     private final boolean notifyCulprits;
     private final boolean notifyFixers;
     private final boolean notifyUpstreamCommitters;
-
-    private BuildToChatNotifier buildToChatNotifier;
     
     /**
      * @deprecated Only for deserializing old instances
@@ -66,30 +62,13 @@ public abstract class IMPublisher extends Notifier implements BuildStep
     @Deprecated
     private transient String defaultIdSuffix;
 
-    /**
-     * @deprecated
-     *      as of 1.9. Use {@link #IMPublisher(List, String, boolean, boolean, boolean, boolean, boolean, BuildToChatNotifier)}
-     *      instead.
-     */
     protected IMPublisher(List<IMMessageTarget> defaultTargets,
     		String notificationStrategyString,
     		boolean notifyGroupChatsOnBuildStart,
     		boolean notifySuspects,
     		boolean notifyCulprits,
     		boolean notifyFixers,
-    		boolean notifyUpstreamCommitters) {
-        this(defaultTargets,notificationStrategyString,notifyGroupChatsOnBuildStart,notifySuspects,notifyCulprits,
-                notifyFixers,notifyUpstreamCommitters,new DefaultBuildToChatNotifier());
-    }
-
-    protected IMPublisher(List<IMMessageTarget> defaultTargets,
-    		String notificationStrategyString,
-    		boolean notifyGroupChatsOnBuildStart,
-    		boolean notifySuspects,
-    		boolean notifyCulprits,
-    		boolean notifyFixers,
-    		boolean notifyUpstreamCommitters,
-            BuildToChatNotifier buildToChatNotifier)
+    		boolean notifyUpstreamCommitters)
     {
     	if (defaultTargets != null) {
     		this.targets = defaultTargets;
@@ -133,10 +112,6 @@ public abstract class IMPublisher extends Notifier implements BuildStep
     
     protected void setNotificationStrategy(NotificationStrategy strategy) {
     	this.strategy = strategy;
-    }
-
-    public BuildToChatNotifier getBuildToChatNotifier() {
-        return buildToChatNotifier;
     }
 
     /**
@@ -265,7 +240,8 @@ public abstract class IMPublisher extends Notifier implements BuildStep
 
     @Override
     public boolean perform(final AbstractBuild<?,?> build, final Launcher launcher, final BuildListener buildListener)
-            throws InterruptedException, IOException {
+            throws InterruptedException
+    {
         Assert.isNotNull(build, "Parameter 'build' must not be null.");
         Assert.isNotNull(buildListener, "Parameter 'buildListener' must not be null.");
         if (getNotificationStrategy().notificationWanted(build)) {
@@ -425,8 +401,31 @@ public abstract class IMPublisher extends Notifier implements BuildStep
     /**
      * Notify all registered chats about the build result.
      */
-	private void notifyChats(final AbstractBuild<?, ?> build, final BuildListener buildListener) throws IOException, InterruptedException {
-        String msg = buildToChatNotifier.buildCompletionMessage(this,build,buildListener);
+	private void notifyChats(final AbstractBuild<?, ?> build, final BuildListener buildListener) {
+		final StringBuilder sb;
+		if (BuildHelper.isFix(build)) {
+			sb = new StringBuilder("Yippie, build fixed!\n");
+		} else {
+			sb = new StringBuilder();
+		}
+		sb.append("Project ").append(getProjectName(build))
+			.append(" build (").append(build.getNumber()).append("): ")
+			.append(BuildHelper.getResultDescription(build)).append(" in ")
+			.append(build.getTimestampString())
+			.append(": ")
+			.append(MessageHelper.getBuildURL(build));
+		
+		if (! build.getChangeSet().isEmptySet()) {
+			boolean hasManyChangeSets = build.getChangeSet().getItems().length > 1;
+			for (Entry entry : build.getChangeSet()) {
+				sb.append("\n");
+				if (hasManyChangeSets) {
+					sb.append("* ");
+				}
+				sb.append(entry.getAuthor()).append(": ").append(entry.getMsg());
+			}
+		}
+		final String msg = sb.toString();
 
 		for (IMMessageTarget target : calculateTargets())
 		{
@@ -446,7 +445,24 @@ public abstract class IMPublisher extends Notifier implements BuildStep
 	public boolean prebuild(AbstractBuild<?, ?> build, BuildListener buildListener) {
 		try {
 			if (notifyOnBuildStart) {
-                final String msg = buildToChatNotifier.buildStartMessage(this,build,buildListener);
+				final StringBuilder sb = new StringBuilder("Starting build ").append(build.getNumber())
+					.append(" for job ").append(getProjectName(build));
+
+				if (build.getPreviousBuild() != null) {
+					sb.append(" (previous build: ")
+						.append(BuildHelper.getResultDescription(build.getPreviousBuild()));
+
+					if (build.getPreviousBuild().getResult().isWorseThan(Result.SUCCESS)) {
+						AbstractBuild<?, ?> lastSuccessfulBuild = BuildHelper.getPreviousSuccessfulBuild(build);
+						if (lastSuccessfulBuild != null) {
+							sb.append(" -- last ").append(Result.SUCCESS).append(" #")
+								.append(lastSuccessfulBuild.getNumber())	
+								.append(" ").append(lastSuccessfulBuild.getTimestampString()).append(" ago");
+						}
+					}
+					sb.append(")");
+				}
+				final String msg = sb.toString();
 				for (final IMMessageTarget target : calculateTargets()) {
 					// only notify group chats
 					if (target instanceof GroupChatIMMessageTarget) {
@@ -521,8 +537,6 @@ public abstract class IMPublisher extends Notifier implements BuildStep
     		this.strategy = NotificationStrategy.valueOf(this.notificationStrategy.name());
     		this.notificationStrategy = null;
     	}
-        if (buildToChatNotifier==null)
-            buildToChatNotifier = new DefaultBuildToChatNotifier();
     	return this;
     }
     

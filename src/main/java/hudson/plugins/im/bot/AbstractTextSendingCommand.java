@@ -13,7 +13,7 @@ import java.util.logging.Logger;
  * 
  * @author kutzi
  */
-public abstract class AbstractTextSendingCommand extends BotCommand {
+public abstract class AbstractTextSendingCommand implements BotCommand {
 	
 	private static final Logger LOGGER = Logger.getLogger(AbstractTextSendingCommand.class.getName());
 
@@ -32,11 +32,11 @@ public abstract class AbstractTextSendingCommand extends BotCommand {
 	/**
 	 * {@inheritDoc}
 	 */
-	public final void executeCommand(Bot bot, IMChat chat, IMMessage message,
-                                     Sender sender, String[] args) throws IMException {
+	public final void executeCommand(IMChat chat, IMMessage message,
+			Sender sender, String[] args) throws IMException {
 		String reply;
 		try {
-			reply = getReply(bot, sender, args);
+			reply = getReply(sender, args);
 		} catch (RuntimeException e) {
 			LOGGER.warning(ExceptionHelper.dump(e));
 			reply = sender.getNickname() + ": Error " + e.toString();
@@ -47,12 +47,11 @@ public abstract class AbstractTextSendingCommand extends BotCommand {
 	/**
 	 * Gets the text reply
 	 * 
-	 * @param bot
-     *      The bot for which this command is currently operating. Never be null.
-     * @param sender the command sender
-     * @param args arguments passed to the command, where <code>args[0]</code> is the command name itself   @throws RuntimeException in case of invalid args. This is automatically caught and reported to the sender
+	 * @param sender the command sender
+	 * @param args arguments passed to the command, where <code>args[0]</code> is the command name itself
+	 * @throws RuntimeException in case of invalid args. This is automatically caught and reported to the sender
 	 */
-	protected abstract String getReply(Bot bot, Sender sender, String args[]);
+	protected abstract String getReply(Sender sender, String args[]);
 
     protected String getErrorReply(Sender sender, CommandException e) {
         final StringBuilder reply;

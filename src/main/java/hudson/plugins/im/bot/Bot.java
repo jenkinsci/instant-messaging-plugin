@@ -3,7 +3,6 @@
  */
 package hudson.plugins.im.bot;
 
-import hudson.Extension;
 import hudson.plugins.im.AuthenticationHolder;
 import hudson.plugins.im.IMChat;
 import hudson.plugins.im.IMException;
@@ -14,8 +13,7 @@ import hudson.plugins.im.bot.SetAliasCommand.AliasCommand;
 import hudson.plugins.im.tools.ExceptionHelper;
 import hudson.plugins.im.tools.MessageHelper;
 
-import java.util.Collection;
-import java.util.Collections;
+import java.util.HashMap;
 import java.util.Map;
 import java.util.SortedMap;
 import java.util.TreeMap;
@@ -35,18 +33,13 @@ public class Bot implements IMMessageListener {
 
 	private static final Logger LOGGER = Logger.getLogger(Bot.class.getName());
 
-    @Extension
-	public static class HelpCommand extends BotCommand {
-        @Override
-        public Collection<String> getCommandNames() {
-            return Collections.singleton("help");
-        }
+	private class HelpCommand implements BotCommand {
 
-        public void executeCommand(Bot bot, IMChat groupChat, IMMessage message,
-                                   Sender sender, String[] args) throws IMException {
-			if (bot.helpCache == null) {
+		public void executeCommand(IMChat groupChat, IMMessage message,
+				Sender sender, String[] args) throws IMException {
+			if (helpCache == null) {
 				final StringBuilder msg = new StringBuilder("Available commands:");
-				for (final Entry<String, BotCommand> item : bot.cmdsAndAliases.entrySet()) {
+				for (final Entry<String, BotCommand> item : cmdsAndAliases.entrySet()) {
 					// skip myself
 					if ((item.getValue() != this)
 							&& (item.getValue().getHelp() != null)) {
@@ -55,16 +48,35 @@ public class Bot implements IMMessageListener {
 						msg.append(item.getValue().getHelp());
 					}
 				}
-				bot.helpCache = msg.toString();
+				helpCache = msg.toString();
 			}
-			groupChat.sendMessage(bot.helpCache);
+			groupChat.sendMessage(helpCache);
 		}
 
 		public String getHelp() {
 			return null;
 		}
-	}
 
+	};
+
+	private static final Map<String, BotCommand> STATIC_COMMANDS_MAP;
+
+	static {
+		STATIC_COMMANDS_MAP = new HashMap<String, BotCommand>();
+		STATIC_COMMANDS_MAP.put("status", new StatusCommand());
+		STATIC_COMMANDS_MAP.put("s", new StatusCommand());
+        STATIC_COMMANDS_MAP.put("health", new HealthCommand());
+        STATIC_COMMANDS_MAP.put("h", new HealthCommand());
+		STATIC_COMMANDS_MAP.put("jobs", new StatusCommand());
+		STATIC_COMMANDS_MAP.put("queue", new QueueCommand());
+		STATIC_COMMANDS_MAP.put("q", new QueueCommand());
+		STATIC_COMMANDS_MAP.put("testresult", new TestResultCommand());
+		STATIC_COMMANDS_MAP.put("abort", new AbortCommand());
+		STATIC_COMMANDS_MAP.put("comment", new CommentCommand());
+		STATIC_COMMANDS_MAP.put("botsnack", new SnackCommand());
+		STATIC_COMMANDS_MAP.put("userstat", new UserStatCommand());
+	}
+	
 	private final SortedMap<String, BotCommand> cmdsAndAliases = new TreeMap<String, BotCommand>();
 
 	private final IMChat chat;
@@ -83,24 +95,19 @@ public class Bot implements IMMessageListener {
 		this.imServer = imServer;
 		this.commandPrefix = commandPrefix;
 		this.authentication = authentication;
-
-        for (BotCommand cmd : BotCommand.all()) {
-            for (String name : cmd.getCommandNames())
-                this.cmdsAndAliases.put(name,cmd);
-        }
-
+		
+		this.cmdsAndAliases.putAll(STATIC_COMMANDS_MAP);
+		BuildCommand buildCommand  = new BuildCommand(this.nick + "@" + this.imServer);
+		this.cmdsAndAliases.put("build", buildCommand);
+		this.cmdsAndAliases.put("schedule", buildCommand);
+		this.cmdsAndAliases.put("help", new HelpCommand());
+		this.cmdsAndAliases.put("alias", new SetAliasCommand(this));
+		
+		
 		chat.addMessageListener(this);
 	}
 
-    /**
-     * Returns an identifier describing the Im account used to send the build command.
-     *   E.g. the Jabber ID of the Bot.
-     */
-    public String getImId() {
-        return this.nick + "@" + this.imServer;
-    }
-
-    public void onMessage(IMMessage msg) {
+	public void onMessage(IMMessage msg) {
         // is it a command for me ? (returns null if not, the payload if so)
         String payload = retrieveMessagePayLoad(msg.getBody());
         if (payload != null) {
@@ -137,7 +144,7 @@ public class Bot implements IMMessageListener {
                     	    if (this.authentication != null) {
                     	        SecurityContextHolder.getContext().setAuthentication(this.authentication.getAuthentication());
                     	    }
-	                    	command.executeCommand(this, this.chat, msg, s, args);
+	                    	command.executeCommand(this.chat, msg, s, args);
                     	} finally {
                     	    if (this.authentication != null) {
                     	        SecurityContextHolder.getContext().setAuthentication(oldAuthentication);

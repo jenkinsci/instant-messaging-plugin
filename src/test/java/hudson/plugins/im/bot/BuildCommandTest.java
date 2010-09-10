@@ -22,10 +22,7 @@ public class BuildCommandTest {
     @Test
     @SuppressWarnings("unchecked")
     public void testDelay() {
-        Bot bot = mock(Bot.class);
-        when(bot.getImId()).thenReturn("hudsonbot");
-
-        BuildCommand cmd = new BuildCommand();
+        BuildCommand cmd = new BuildCommand("hudsonbot");
         JobProvider jobProvider = mock(JobProvider.class);
         cmd.setJobProvider(jobProvider);
         
@@ -34,23 +31,23 @@ public class BuildCommandTest {
         
         Sender sender = new Sender("sender");
         
-        cmd.getReply(bot, sender, new String[]{ "build", "project", "5s" });
+        cmd.getReply(sender, new String[]{ "build", "project", "5s" });
         verify(project).scheduleBuild(eq(5), (Cause) Mockito.any());
         
         Mockito.reset(project);
-        cmd.getReply(bot, sender, new String[]{ "build", "project", "5" });
+        cmd.getReply(sender, new String[]{ "build", "project", "5" });
         verify(project).scheduleBuild(eq(5), (Cause) Mockito.any());
         
         Mockito.reset(project);
-        cmd.getReply(bot, sender, new String[]{ "build", "project", "1m" });
+        cmd.getReply(sender, new String[]{ "build", "project", "1m" });
         verify(project).scheduleBuild(eq(60), (Cause) Mockito.any());
         
         Mockito.reset(project);
-        cmd.getReply(bot, sender, new String[]{ "build", "project", "1min" });
+        cmd.getReply(sender, new String[]{ "build", "project", "1min" });
         verify(project).scheduleBuild(eq(60), (Cause) Mockito.any());
         
         Mockito.reset(project);
-        cmd.getReply(bot, sender, new String[]{ "build", "project", "2h" });
+        cmd.getReply(sender, new String[]{ "build", "project", "2h" });
         verify(project).scheduleBuild(eq(7200), (Cause) Mockito.any());
         
         // TODO kutzi: this doesn't work, yet. Catch typo before 's'
@@ -63,10 +60,7 @@ public class BuildCommandTest {
     @SuppressWarnings("unchecked")
     @Test
     public void testParameters() {
-        Bot bot = mock(Bot.class);
-        when(bot.getImId()).thenReturn("hudsonbot");
-
-        BuildCommand cmd = new BuildCommand();
+        BuildCommand cmd = new BuildCommand("hudsonbot");
         JobProvider jobProvider = mock(JobProvider.class);
         cmd.setJobProvider(jobProvider);
         
@@ -74,7 +68,7 @@ public class BuildCommandTest {
         when(jobProvider.getJobByName(Mockito.anyString())).thenReturn(project);
         
         Sender sender = new Sender("sender");
-        cmd.getReply(bot, sender, new String[]{ "build", "project", "key=value" });
+        cmd.getReply(sender, new String[]{ "build", "project", "key=value" });
         
         ArgumentCaptor<ParametersAction> captor = ArgumentCaptor.forClass(ParametersAction.class);
         verify(project).scheduleBuild(Mockito.anyInt(), (Cause) Mockito.any(),
@@ -86,7 +80,7 @@ public class BuildCommandTest {
         
         
         Mockito.reset(project);
-        cmd.getReply(bot, sender, new String[]{ "build", "project", "3s", "key=value", "key2=true" });
+        cmd.getReply(sender, new String[]{ "build", "project", "3s", "key=value", "key2=true" });
         captor = ArgumentCaptor.forClass(ParametersAction.class);
         verify(project).scheduleBuild(Mockito.anyInt(), (Cause) Mockito.any(),
                 captor.capture());

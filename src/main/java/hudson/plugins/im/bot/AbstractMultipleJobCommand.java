@@ -43,7 +43,7 @@ abstract class AbstractMultipleJobCommand extends AbstractTextSendingCommand {
     }
 
     @Override
-	protected String getReply(Bot bot, Sender sender, String[] args) {
+	protected String getReply(Sender sender, String[] args) {
     	
 //    	if (!authorizationCheck()) {
 //    		return "Sorry, can't do that!";
