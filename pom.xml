@@ -21,4 +21,10 @@
 			<timezone>1</timezone>
 		</developer>
 	</developers>
+    
+    <scm>
+        <connection>scm:svn:https://guest@svn.dev.java.net/svn/hudson/trunk/hudson/plugins/instant-messaging</connection>
+        <developerConnection>scm:svn:https://svn.dev.java.net/svn/hudson/trunk/hudson/plugins/instant-messaging</developerConnection>
+        <url>http://fisheye4.atlassian.com/browse/hudson/trunk/hudson/plugins/instant-messaging</url>
+    </scm>    
 </project>
