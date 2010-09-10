@@ -10,7 +10,7 @@
 	<groupId>org.jvnet.hudson.plugins</groupId>
 	<artifactId>instant-messaging</artifactId>
 	<name>Hudson instant-messaging plugin</name>
-	<version>1.9</version>
+	<version>1.9-SNAPSHOT</version>
 	<packaging>hpi</packaging>
 	<url>http://wiki.hudson-ci.org/display/HUDSON/Instant+Messaging+Plugin</url>
 	<developers>
@@ -22,10 +22,4 @@
 		</developer>
 	</developers>
     
-
-  <scm>
-    <connection>scm:svn:https://guest@svn.dev.java.net/svn/hudson/tags/instant-messaging-1.9</connection>
-    <developerConnection>scm:svn:https://svn.dev.java.net/svn/hudson/tags/instant-messaging-1.9</developerConnection>
-    <url>https://hudson.dev.java.net/source/browse/hudson/hudson/plugins/instant-messaging/tags/instant-messaging-1.9</url>
-  </scm>
 </project>
