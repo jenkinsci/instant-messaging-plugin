@@ -1,18 +1,26 @@
 package hudson.plugins.im.bot;
 
+import hudson.Extension;
 import hudson.model.AbstractBuild;
 import hudson.model.AbstractProject;
 import hudson.tasks.junit.CaseResult;
 import hudson.tasks.test.AbstractTestResultAction;
 
+import java.util.Collection;
+import java.util.Collections;
 import java.util.List;
 
 /**
  * Print out the latest test results for a build
  * @author R. Tyler Ballance <tyler@slide.com>
  */
+@Extension
 public class TestResultCommand extends AbstractMultipleJobCommand {
-	
+    @Override
+    public Collection<String> getCommandNames() {
+        return Collections.singleton("testresult");
+    }
+
     @Override
     protected String getCommandShortName() {
         return "test results";

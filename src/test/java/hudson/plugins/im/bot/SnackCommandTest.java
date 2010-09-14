@@ -27,14 +27,14 @@ public class SnackCommandTest {
         Sender sender = new Sender("tester");
         String[] args = { "!botsnack", "peanuts" };
 
-        String reply = cmd.getReply(sender, args);
+        String reply = cmd.getReply(null, sender, args);
         System.out.println(reply);
         assertNotNull(reply);
         assertTrue(reply.contains(sender.getNickname()));
         assertTrue(reply.contains("peanuts"));
         
         args = new String[] { "!botsnack" };
-        reply = cmd.getReply(sender, args);
+        reply = cmd.getReply(null, sender, args);
         System.out.println(reply);
         assertNotNull(reply);
         assertTrue(reply.contains(sender.getNickname()));

@@ -3,6 +3,7 @@
  */
 package hudson.plugins.im.bot;
 
+import hudson.Extension;
 import hudson.model.AbstractProject;
 import hudson.model.BooleanParameterValue;
 import hudson.model.Cause;
@@ -14,6 +15,8 @@ import hudson.plugins.im.IMCause;
 import hudson.plugins.im.Sender;
 
 import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.Collection;
 import java.util.List;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
@@ -24,31 +27,26 @@ import java.util.regex.Pattern;
  * @author Pascal Bleser
  * @author kutzi
  */
+@Extension
 public class BuildCommand extends AbstractTextSendingCommand {
 	
 	private static final Pattern NUMERIC_EXTRACTION_REGEX = Pattern.compile("^(\\d+)");
 	private static final String SYNTAX = " <job> [now|<delay>[s|m|h]] [<parameterkey>=<value>]*";
 	private static final String HELP = SYNTAX + " - schedule a job build, with standard, custom or no quiet period";
 	
-	private final String imId;
-	
-	/**
-	 * 
-	 * @param imId An identifier describing the Im account used to send the build command.
-	 *   E.g. the Jabber ID of the Bot.
-	 */
-	public BuildCommand(final String imId) {
-		this.imId = imId;
-	}
+    @Override
+    public Collection<String> getCommandNames() {
+        return Arrays.asList("build","schedule");
+    }
 
-	private boolean scheduleBuild(AbstractProject<?, ?> project, int delaySeconds, Sender sender, List<ParameterValue> parameters) {
+    private boolean scheduleBuild(Bot bot, AbstractProject<?, ?> project, int delaySeconds, Sender sender, List<ParameterValue> parameters) {
 	    
 	    String senderId = sender.getId();
 	    if (senderId == null) {
 	        senderId = sender.getNickname();
 	    }
 	    
-		Cause cause = new IMCause("Started by " + this.imId + " on request of '" + senderId + "'");
+		Cause cause = new IMCause("Started by " + bot.getImId() + " on request of '" + senderId + "'");
 		if (parameters.isEmpty()) {
 		    return project.scheduleBuild(delaySeconds, cause);
 		} else {
@@ -57,7 +55,7 @@ public class BuildCommand extends AbstractTextSendingCommand {
 	}
 
 	@Override
-	public String getReply(Sender sender, String args[]) {
+	public String getReply(Bot bot, Sender sender, String args[]) {
 		if (args.length >= 2) {
 			String jobName = args[1];
 			jobName = jobName.replaceAll("\"", "");
@@ -130,7 +128,7 @@ public class BuildCommand extends AbstractTextSendingCommand {
 				        msg += "Ignoring parameters as project is not parametrized!\n";
 				    }
 				    
-				    if (scheduleBuild(project, delay, sender, parameters)) {
+				    if (scheduleBuild(bot, project, delay, sender, parameters)) {
 				        if (delay == 0) {
 				            return msg + sender.getNickname() + ": job " + jobName + " build scheduled now";
 				        } else {

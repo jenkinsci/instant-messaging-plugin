@@ -1,5 +1,6 @@
 package hudson.plugins.im.bot;
 
+import hudson.Extension;
 import hudson.plugins.im.IMChat;
 import hudson.plugins.im.IMException;
 import hudson.plugins.im.IMMessage;
@@ -7,6 +8,8 @@ import hudson.plugins.im.Sender;
 import hudson.plugins.im.tools.MessageHelper;
 
 import java.util.Arrays;
+import java.util.Collection;
+import java.util.Collections;
 import java.util.Map;
 
 import org.apache.commons.lang.ArrayUtils;
@@ -16,20 +19,19 @@ import org.apache.commons.lang.ArrayUtils;
  * 
  * @author kutzi
  */
+@Extension
 public class SetAliasCommand extends AbstractTextSendingCommand {
+    @Override
+    public Collection<String> getCommandNames() {
+        return Collections.singleton("alias");
+    }
 
-	private final Bot bot;
-
-	public SetAliasCommand(Bot bot) {
-		this.bot = bot;
-	}
-	
-	@Override
-	protected String getReply(Sender sender, String[] args) {
+    @Override
+	protected String getReply(Bot bot, Sender sender, String[] args) {
 		if (args.length < 1) {
 			throw new IllegalArgumentException();
 		} else if (args.length == 1) {
-			Map<String, AliasCommand> aliases = this.bot.getAliases();
+			Map<String, AliasCommand> aliases = bot.getAliases();
 			if (aliases.isEmpty()) {
 				return "Defined aliases: none";
 			} else {
@@ -43,7 +45,7 @@ public class SetAliasCommand extends AbstractTextSendingCommand {
 			}
 		} else if (args.length < 3) {
 			String alias = args[1];
-			AliasCommand aliasCmd = this.bot.removeAlias(alias);
+			AliasCommand aliasCmd = bot.removeAlias(alias);
 			if (aliasCmd != null) {
 				return "deleted alias: " + alias + aliasCmd.getHelp();
 			} else {
@@ -52,7 +54,7 @@ public class SetAliasCommand extends AbstractTextSendingCommand {
 		} else {
 			String alias = args[1];
 			String cmdName = args[2];
-			BotCommand cmd = this.bot.getCommand(cmdName);
+			BotCommand cmd = bot.getCommand(cmdName);
 			if (cmd == null) {
 				return sender.getNickname() + ": sorry don't know a command or alias called '" + cmdName + "'";
 			}
@@ -63,7 +65,7 @@ public class SetAliasCommand extends AbstractTextSendingCommand {
 			
 			AliasCommand aliasCmd = new AliasCommand(cmd, cmdName, cmdArguments);
 			try {
-				this.bot.addAlias(alias, aliasCmd);
+				bot.addAlias(alias, aliasCmd);
 			} catch (IllegalArgumentException e) {
 				return sender.getNickname() + ": " + e.getMessage();
 			}
@@ -78,26 +80,31 @@ public class SetAliasCommand extends AbstractTextSendingCommand {
 	/**
 	 * An alias.
 	 */
-	public static class AliasCommand implements BotCommand {
+	public static class AliasCommand extends BotCommand {
 
 		private final BotCommand command;
 		private final String commandName;
 		private final String[] arguments;
 
-		public AliasCommand(BotCommand cmd, String commandName, String[] arguments) {
+        public AliasCommand(BotCommand cmd, String commandName, String[] arguments) {
 			this.command = cmd;
 			this.commandName = commandName;
 			this.arguments = arguments;
 		}
 		
-		public void executeCommand(IMChat chat, IMMessage message,
-				Sender sender, String[] args) throws IMException {
+        @Override
+        public Collection<String> getCommandNames() {
+            return Collections.singleton(commandName);
+        }
+
+		public void executeCommand(Bot bot, IMChat chat, IMMessage message,
+                                   Sender sender, String[] args) throws IMException {
 			String[] dynamicArgs = MessageHelper.copyOfRange(args, 1, args.length);
 			
 			String[] allArgs = MessageHelper.concat(new String[] {this.commandName}, this.arguments, dynamicArgs);
 			System.out.println("Args: " + Arrays.toString(allArgs));
 			
-			this.command.executeCommand(chat, message, sender, allArgs);
+			this.command.executeCommand(bot, chat, message, sender, allArgs);
 		}
 
 		public String getHelp() {

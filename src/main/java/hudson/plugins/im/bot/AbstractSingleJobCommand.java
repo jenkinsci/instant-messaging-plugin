@@ -41,7 +41,7 @@ abstract class AbstractSingleJobCommand extends AbstractTextSendingCommand {
             String[] arguments) throws CommandException;
 
     @Override
-    protected String getReply(Sender sender, String[] args) {
+    protected String getReply(Bot bot, Sender sender, String[] args) {
         if (args.length > 1 + numberOfArguments) {
             final String jobName;
             final String[] remainingArgs;

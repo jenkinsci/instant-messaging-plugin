@@ -1,18 +1,28 @@
 package hudson.plugins.im.bot;
 
+import hudson.Extension;
 import hudson.model.AbstractBuild;
 import hudson.model.AbstractProject;
 import hudson.model.Executor;
 import hudson.model.Hudson;
 import hudson.plugins.im.Sender;
 
+import java.util.Collection;
+import java.util.Collections;
+
 /**
  * Abort a running job
  * @author R. Tyler Ballance <tyler@slide.com>
  */
+@Extension
 public class AbortCommand extends AbstractSingleJobCommand {
-	
-	private static final String HELP = " <job> - specify which job to abort";
+
+    @Override
+    public Collection<String> getCommandNames() {
+        return Collections.singleton("abort");
+    }
+
+    private static final String HELP = " <job> - specify which job to abort";
 
 	public String getHelp() {
 		return HELP;
