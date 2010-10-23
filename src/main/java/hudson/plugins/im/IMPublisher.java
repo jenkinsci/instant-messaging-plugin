@@ -56,7 +56,6 @@ public abstract class IMPublisher extends Notifier implements BuildStep
     private final boolean notifyCulprits;
     private final boolean notifyFixers;
     private final boolean notifyUpstreamCommitters;
-
     private BuildToChatNotifier buildToChatNotifier;
     
     /**
@@ -71,7 +70,8 @@ public abstract class IMPublisher extends Notifier implements BuildStep
      *      as of 1.9. Use {@link #IMPublisher(List, String, boolean, boolean, boolean, boolean, boolean, BuildToChatNotifier)}
      *      instead.
      */
-    protected IMPublisher(List<IMMessageTarget> defaultTargets,
+    @Deprecated
+	protected IMPublisher(List<IMMessageTarget> defaultTargets,
     		String notificationStrategyString,
     		boolean notifyGroupChatsOnBuildStart,
     		boolean notifySuspects,
@@ -108,6 +108,7 @@ public abstract class IMPublisher extends Notifier implements BuildStep
         this.notifyCulprits = notifyCulprits;
         this.notifyFixers = notifyFixers;
         this.notifyUpstreamCommitters = notifyUpstreamCommitters;
+        this.buildToChatNotifier = buildToChatNotifier;
     }
     
     /**
