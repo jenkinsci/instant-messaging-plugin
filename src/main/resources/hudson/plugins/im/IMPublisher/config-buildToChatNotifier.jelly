@@ -27,6 +27,6 @@ THE SOFTWARE.
   </st:documentation>
   <j:invokeStatic var="allBuildToChatNotifiers" className="hudson.plugins.im.build_notify.BuildToChatNotifier" method="all" />
   <!-- TODO: replace this with f:dropdownDescriptorSelector when depending on 1.375 or later -->
-  <this:dropdownDescriptorSelector xmlns:this="/hudson/plugins/ircbot/IrcPublisher"
+  <this:dropdownDescriptorSelector xmlns:this="/hudson/plugins/im/IMPublisher"
      title="${%Channel Notification Message}" field="buildToChatNotifier" descriptors="${allBuildToChatNotifiers}"/>
 </j:jelly>

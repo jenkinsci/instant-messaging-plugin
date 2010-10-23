@@ -64,8 +64,9 @@ public class DefaultBuildToChatNotifier extends SummaryOnlyBuildToChatNotifier {
     // set a high ordinal so that this comes in the top, as the default selection
     @Extension(ordinal=100)
     public static class DescriptorImpl extends BuildToChatNotifierDescriptor {
-        public String getDisplayName() {
-            return "Summary + changes";
+        @Override
+		public String getDisplayName() {
+            return "Summary + SCM changes";
         }
     }
 }
