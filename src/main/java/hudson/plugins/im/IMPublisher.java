@@ -1,6 +1,5 @@
 package hudson.plugins.im;
 
-import static hudson.plugins.im.tools.BuildHelper.getProjectName;
 import hudson.Launcher;
 import hudson.model.AbstractBuild;
 import hudson.model.AbstractProject;
@@ -13,7 +12,6 @@ import hudson.plugins.im.build_notify.DefaultBuildToChatNotifier;
 import hudson.plugins.im.tools.Assert;
 import hudson.plugins.im.tools.BuildHelper;
 import hudson.plugins.im.tools.ExceptionHelper;
-import hudson.plugins.im.tools.MessageHelper;
 import hudson.scm.ChangeLogSet;
 import hudson.scm.ChangeLogSet.Entry;
 import hudson.tasks.BuildStep;
@@ -276,8 +274,7 @@ public abstract class IMPublisher extends Notifier implements BuildStep
         if (BuildHelper.isStillFailureOrUnstable(build)) {
             if (this.notifySuspects) {
             	log(buildListener, "Notifying suspects");
-            	final String message = "Build " + getProjectName(build) +
-            	    " is " + BuildHelper.getResultDescription(build) + ": " + MessageHelper.getBuildURL(build);
+            	final String message = getBuildToChatNotifier().suspectMessage(this, build, buildListener, false);
             	
             	for (IMMessageTarget target : calculateIMTargets(getCommitters(build), buildListener)) {
             		try {
@@ -291,7 +288,7 @@ public abstract class IMPublisher extends Notifier implements BuildStep
             
             if (this.notifyCulprits) {
             	log(buildListener, "Notifying culprits");
-            	final String message = "You're still being suspected of having broken " + getProjectName(build) + ": " + MessageHelper.getBuildURL(build);
+            	final String message = getBuildToChatNotifier().culpritMessage(this, build, buildListener);
             	
             	for (IMMessageTarget target : calculateIMTargets(getCulpritsOnly(build), buildListener)) {
             		try {
@@ -306,7 +303,7 @@ public abstract class IMPublisher extends Notifier implements BuildStep
             boolean committerNotified = false;
             if (this.notifySuspects) {
                 log(buildListener, "Notifying suspects");
-                String message = "Oh no! You're suspected of having broken " + getProjectName(build) + ": " + MessageHelper.getBuildURL(build);
+                String message = getBuildToChatNotifier().suspectMessage(this, build, buildListener, true);
                 
                 for (IMMessageTarget target : calculateIMTargets(getCommitters(build), buildListener)) {
                     try {
@@ -326,7 +323,7 @@ public abstract class IMPublisher extends Notifier implements BuildStep
         
         if (this.notifyFixers && BuildHelper.isFix(build)) {
         	buildListener.getLogger().append("Notifying fixers\n");
-        	final String message = "Yippie! Seems you've fixed " + getProjectName(build) + ": " + MessageHelper.getBuildURL(build);
+        	final String message = getBuildToChatNotifier().fixerMessage(this, build, buildListener);
         	
         	for (IMMessageTarget target : calculateIMTargets(getCommitters(build), buildListener)) {
         		try {
@@ -354,8 +351,8 @@ public abstract class IMPublisher extends Notifier implements BuildStep
 
     /**
      * Looks for committers in the direct upstream builds and notifies them.
-     * If no committers are found in the next higher level, look one level higher.
-     * Repeat if necessary. 
+     * If no committers are found in the immediate upstream builds, then look one level higher.
+     * Repeat until a committer is found or no more upstream builds are found. 
      */
     @SuppressWarnings("unchecked")
 	private void notifyUpstreamCommitters(final AbstractBuild<?, ?> build,
@@ -379,10 +376,7 @@ public abstract class IMPublisher extends Notifier implements BuildStep
 		            
 			        Set<User> committers = getCommitters(upstreamBuild);
 			        
-			        String message = "Attention! Your change in " + getProjectName(upstreamBuild)
-			        + ": " + MessageHelper.getBuildURL(upstreamBuild)
-			        + " *might* have broken the downstream job " + getProjectName(build) + ": " + MessageHelper.getBuildURL(build)
-			        + "\nPlease have a look!";
+			        String message = getBuildToChatNotifier().upstreamCommitterMessage(this, build, buildListener, upstreamBuild);
 			        
 			        for (IMMessageTarget target : calculateIMTargets(committers, buildListener)) {
 			            try {
