@@ -81,7 +81,7 @@ public class PrintFailingTestsBuildToChatNotifier extends
 				} else if (o2.getAge() < o1.getAge()) {
 					return 1;
 				}
-				return 0;
+				return o1.getFullName().compareTo(o2.getFullName());
 			}
 		});
 		
