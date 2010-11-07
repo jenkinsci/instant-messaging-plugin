@@ -1,9 +1,5 @@
 package hudson.plugins.im.tools;
 
-import hudson.Util;
-import hudson.model.AbstractBuild;
-import hudson.model.Hudson;
-
 import java.lang.reflect.Array;
 import java.util.ArrayList;
 import java.util.Collections;
@@ -12,15 +8,26 @@ import java.util.regex.Pattern;
 
 import org.apache.commons.lang.StringUtils;
 
+import hudson.Util;
+import hudson.model.AbstractBuild;
+import hudson.model.Hudson;
+import hudson.tasks.junit.TestObject;
+import hudson.tasks.junit.TestResult;
+import hudson.tasks.junit.TestResultAction;
+
 /**
  * Utility class to help message creation
  * 
  * @author vsellier
+ * @author kutzi
  */
 public class MessageHelper {
 	private final static Pattern SPACE_PATTERN = Pattern.compile("\\s");
 	private final static String QUOTE = "\"";
 	
+	/**
+	 * Returns the full URL to the build details page for a given build.
+	 */
 	public static String getBuildURL(AbstractBuild<?, ?> build) {
 		// The hudson's base url
 	    final StringBuilder builder;
@@ -36,11 +43,39 @@ public class MessageHelper {
 		builder.append(Util.encode(build.getUrl()));
 
 		return builder.toString();
-
 	}
 
+	/**
+	 * Returns the full URL to the test details page for a given test result;
+	 */
+	public static String getTestUrl(TestObject result) {
+		String url = getBuildURL(result.getOwner());
+		TestResultAction action = result.getTestResultAction();
+		
+		TestObject parent = result.getParent();
+		TestResult testResultRoot = null;
+		while(parent != null) {
+			if (parent instanceof TestResult) {
+				testResultRoot = (TestResult) parent;
+				break;
+			}
+			parent = parent.getParent();
+		}
+		
+		url += action.getUrlName()
+			+ (testResultRoot != null ? testResultRoot.getUrl() : "")
+			+ result.getUrl();
+		return url;
+	}
+
+	/**
+	 * Parses a bot command from a given string.
+	 * The 1st entry in the array contains the command name itself.
+	 * The following entries contain the command parameters, if any.
+	 */
 	public static String[] extractCommandLine(String message) {
-		return extractParameters(message).toArray(new String[] {});
+		List<String> parameters = extractParameters(message);
+		return parameters.toArray(new String[parameters.size()]);
 	}
 
 	private static List<String> extractParameters(String commandLine) {
@@ -140,7 +175,8 @@ public class MessageHelper {
      *     to obtain the specified length
      * @throws NegativeArraySizeException if <tt>newLength</tt> is negative
      * @throws NullPointerException if <tt>original</tt> is null
-     * copied from java 6
+     * 
+     * Note: copied from java 6
      */
 	@SuppressWarnings("unchecked")
     public static <T> T[] copyOf(T[] original, int newLength) {

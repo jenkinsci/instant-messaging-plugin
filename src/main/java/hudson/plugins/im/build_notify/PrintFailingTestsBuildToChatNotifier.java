@@ -13,7 +13,6 @@ import hudson.model.BuildListener;
 import hudson.plugins.im.IMPublisher;
 import hudson.plugins.im.tools.MessageHelper;
 import hudson.tasks.junit.CaseResult;
-import hudson.tasks.junit.TestResult;
 import hudson.tasks.test.AbstractTestResultAction;
 
 /**
@@ -91,7 +90,7 @@ public class PrintFailingTestsBuildToChatNotifier extends
 			CaseResult test = failedTests.get(i);
 			buf.append(test.getFullName())
 				.append(": ")
-				.append(getTestUrl(testResultAction, test))
+				.append(MessageHelper.getTestUrl(test))
 				.append("\n");
 		}
 		
@@ -101,16 +100,6 @@ public class PrintFailingTestsBuildToChatNotifier extends
 		}
 		
 		return buf;
-	}
-
-	private String getTestUrl(
-			AbstractTestResultAction action, CaseResult caseResult) {
-		String url = MessageHelper.getBuildURL(caseResult.getOwner());
-		
-		TestResult testResult = caseResult.getParent().getParent().getParent();
-		
-		url += action.getUrlName() + testResult.getUrl() + caseResult.getUrl();
-		return url;
 	}
 
 	@Extension

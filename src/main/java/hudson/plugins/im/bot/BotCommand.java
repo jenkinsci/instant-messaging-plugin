@@ -27,7 +27,7 @@ import java.util.Collection;
  */
 public abstract class BotCommand implements ExtensionPoint {
     /**
-     * Obtains the name of the command. Single command can register multiple aliases,
+     * Obtains the name of the command. Single commands can register multiple aliases,
      * so this method returns a collection.
      *
      * @return
@@ -43,7 +43,8 @@ public abstract class BotCommand implements ExtensionPoint {
      * @param chat the {@link IMChat} object, may be used to send reply messages
      * @param message the original {@link IMMessage}
      * @param sender the command sender
-     * @param args arguments passed to the command, where <code>args[0]</code> is the command name itself     @throws IMException
+     * @param args arguments passed to the command, where <code>args[0]</code> is the command name itself
+     * @throws IMException if anything goes wrong while communicating with the remote IM server
 	 */
 	public abstract void executeCommand(Bot bot, IMChat chat, IMMessage message,
                                         Sender sender, String[] args) throws IMException;
