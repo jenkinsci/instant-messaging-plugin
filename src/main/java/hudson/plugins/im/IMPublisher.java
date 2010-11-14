@@ -510,14 +510,15 @@ public abstract class IMPublisher extends Notifier implements BuildStep
     @Override
     public abstract BuildStepDescriptor<Publisher> getDescriptor();
 	
-    // migrate old JabberPublisher instances
-    private Object readResolve() {
+    // migrate old instances
+    protected Object readResolve() {
     	if (this.strategy == null && this.notificationStrategy != null) {
     		this.strategy = NotificationStrategy.valueOf(this.notificationStrategy.name());
     		this.notificationStrategy = null;
     	}
-        if (buildToChatNotifier==null)
+        if (buildToChatNotifier==null) {
             buildToChatNotifier = new DefaultBuildToChatNotifier();
+        }
     	return this;
     }
     
