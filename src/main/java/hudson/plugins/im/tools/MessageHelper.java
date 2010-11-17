@@ -13,7 +13,7 @@ import hudson.model.AbstractBuild;
 import hudson.model.Hudson;
 import hudson.tasks.junit.TestObject;
 import hudson.tasks.junit.TestResult;
-import hudson.tasks.junit.TestResultAction;
+import hudson.tasks.test.AbstractTestResultAction;
 
 /**
  * Utility class to help message creation
@@ -50,7 +50,10 @@ public class MessageHelper {
 	 */
 	public static String getTestUrl(TestObject result) {
 		String url = getBuildURL(result.getOwner());
-		TestResultAction action = result.getTestResultAction();
+		// Note: keep the return type as AbstractTestResultAction even if when compiling
+		// against 1.327 this could be TestResultAction.
+		// In some later Hudson version this changed and so would result in a NoSuchMethodError
+		AbstractTestResultAction action = result.getTestResultAction();
 		
 		TestObject parent = result.getParent();
 		TestResult testResultRoot = null;
