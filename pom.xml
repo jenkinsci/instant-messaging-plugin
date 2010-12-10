@@ -107,6 +107,12 @@
         </plugins>
         <pluginManagement>
             <plugins>
+				<plugin>
+					<artifactId>maven-release-plugin</artifactId>
+					<configuration>
+						<goals>deploy</goals>
+					</configuration>
+				</plugin>
                 <!-- Enforce 2.6 until 2.9 is released. See http://jira.codehaus.org/browse/MECLIPSE-621 -->
                 <plugin>
                     <groupId>org.apache.maven.plugins</groupId>
