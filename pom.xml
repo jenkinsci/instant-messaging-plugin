@@ -28,8 +28,8 @@
 	</developers>
     
     <scm>
-        <connection>scm:svn:https://guest@svn.dev.java.net/svn/hudson/trunk/hudson/plugins/instant-messaging</connection>
-        <developerConnection>scm:svn:https://svn.dev.java.net/svn/hudson/trunk/hudson/plugins/instant-messaging</developerConnection>
+        <connection>scm:svn:https://guest@svn.java.net/svn/hudson~svn/trunk/hudson/plugins/instant-messaging</connection>
+        <developerConnection>scm:svn:https://svn.java.net/svn/hudson~svn/trunk/hudson/plugins/instant-messaging</developerConnection>
         <url>http://fisheye4.atlassian.com/browse/hudson/trunk/hudson/plugins/instant-messaging</url>
     </scm>    
 </project>
