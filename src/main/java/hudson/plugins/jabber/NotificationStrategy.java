@@ -1,9 +1,10 @@
 package hudson.plugins.jabber;
 
-import hudson.model.AbstractBuild;
 import hudson.model.Result;
-import hudson.plugins.im.tools.Assert;
+import hudson.model.AbstractBuild;
 import hudson.plugins.im.tools.BuildHelper;
+
+import org.springframework.util.Assert;
 
 /**
  * Represents the notification strategy.
@@ -38,7 +39,7 @@ public enum NotificationStrategy {
 		 */
 		@Override
 		public boolean notificationWanted(final AbstractBuild<?, ?> build) {
-			Assert.isNotNull(build, "Parameter 'build' must not be null.");
+			Assert.notNull(build, "Parameter 'build' must not be null.");
 			return build.getResult() != Result.SUCCESS;
 
 		}
@@ -53,7 +54,7 @@ public enum NotificationStrategy {
 		 */
 		@Override
 		public boolean notificationWanted(final AbstractBuild<?, ?> build) {
-			Assert.isNotNull(build, "Parameter 'build' must not be null.");
+			Assert.notNull(build, "Parameter 'build' must not be null.");
             if (build.getResult() != Result.SUCCESS) {
                 return true;
             }
@@ -72,7 +73,7 @@ public enum NotificationStrategy {
 		 */
 		@Override
 		public boolean notificationWanted(final AbstractBuild<?, ?> build) {
-			Assert.isNotNull(build, "Parameter 'build' must not be null.");
+			Assert.notNull(build, "Parameter 'build' must not be null.");
 			final AbstractBuild<?, ?> previousBuild = build.getPreviousBuild();
 			return (previousBuild == null)
 					|| (build.getResult() != previousBuild.getResult());

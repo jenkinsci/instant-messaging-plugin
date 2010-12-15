@@ -1,8 +1,8 @@
 package hudson.plugins.im;
 
 import hudson.Util;
-import hudson.plugins.im.IMMessageTarget;
-import hudson.plugins.im.tools.Assert;
+
+import org.springframework.util.Assert;
 
 /**
  * {@link GroupChatIMMessageTarget} represents a 'chat room' or something like that.
@@ -24,7 +24,7 @@ public class GroupChatIMMessageTarget implements IMMessageTarget {
     }
     
     public GroupChatIMMessageTarget(String name, String password) {
-    	Assert.isNotNull(name, "Parameter 'name' must not be null.");
+    	Assert.notNull(name, "Parameter 'name' must not be null.");
     	this.name = name;
     	this.password = password;
     }

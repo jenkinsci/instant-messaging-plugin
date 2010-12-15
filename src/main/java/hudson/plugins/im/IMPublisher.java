@@ -1,15 +1,14 @@
 package hudson.plugins.im;
 
 import hudson.Launcher;
+import hudson.model.BuildListener;
+import hudson.model.UserProperty;
 import hudson.model.AbstractBuild;
 import hudson.model.AbstractProject;
-import hudson.model.BuildListener;
-import hudson.model.User;
-import hudson.model.UserProperty;
 import hudson.model.Fingerprint.RangeSet;
+import hudson.model.User;
 import hudson.plugins.im.build_notify.BuildToChatNotifier;
 import hudson.plugins.im.build_notify.DefaultBuildToChatNotifier;
-import hudson.plugins.im.tools.Assert;
 import hudson.plugins.im.tools.BuildHelper;
 import hudson.plugins.im.tools.ExceptionHelper;
 import hudson.scm.ChangeLogSet;
@@ -29,6 +28,8 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 import java.util.logging.Logger;
+
+import org.springframework.util.Assert;
 
 /**
  * The actual Publisher that sends notification-Messages out to the clients.
@@ -265,8 +266,8 @@ public abstract class IMPublisher extends Notifier implements BuildStep
     @Override
     public boolean perform(final AbstractBuild<?,?> build, final Launcher launcher, final BuildListener buildListener)
             throws InterruptedException, IOException {
-        Assert.isNotNull(build, "Parameter 'build' must not be null.");
-        Assert.isNotNull(buildListener, "Parameter 'buildListener' must not be null.");
+        Assert.notNull(build, "Parameter 'build' must not be null.");
+        Assert.notNull(buildListener, "Parameter 'buildListener' must not be null.");
         if (getNotificationStrategy().notificationWanted(build)) {
             notifyChats(build, buildListener);
         }

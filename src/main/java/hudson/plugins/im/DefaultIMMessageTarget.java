@@ -1,7 +1,6 @@
 package hudson.plugins.im;
 
-import hudson.plugins.im.IMMessageTarget;
-import hudson.plugins.im.tools.Assert;
+import org.springframework.util.Assert;
 
 /**
  * {@link DefaultIMMessageTarget} basically is a String, that represents an Im-Account to send messages to.
@@ -14,7 +13,7 @@ public class DefaultIMMessageTarget implements IMMessageTarget
 
     public DefaultIMMessageTarget(final String value)
     {
-        Assert.isNotNull(value, "Parameter 'value' must not be null.");
+        Assert.notNull(value, "Parameter 'value' must not be null.");
         this.value = value;
     }
 
