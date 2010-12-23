@@ -128,6 +128,6 @@ public abstract class BuildToChatNotifier implements Describable<BuildToChatNoti
      * All the registered {@link BuildToChatNotifier} types.
      */
     public static DescriptorExtensionList<BuildToChatNotifier,BuildToChatNotifierDescriptor> all() {
-        return Hudson.getInstance().getDescriptorList(BuildToChatNotifier.class);
+        return Hudson.getInstance().<BuildToChatNotifier,BuildToChatNotifierDescriptor>getDescriptorList(BuildToChatNotifier.class);
     }
 }
