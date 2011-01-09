@@ -67,10 +67,16 @@
 	   </resources>
 	
         <plugins>
+			<plugin>
+				<artifactId>maven-release-plugin</artifactId>
+				<configuration>
+					<goals>deploy</goals>
+				</configuration>
+			</plugin>
             <plugin>
                 <groupId>org.jvnet.hudson.tools</groupId>
                 <artifactId>maven-hpi-plugin</artifactId>
-                <version>1.54</version>
+                <version>1.59</version>
                 <extensions>true</extensions>
             </plugin>
             <!-- Make sure that we don't use any Java 1.6 dependencies -->
@@ -107,12 +113,6 @@
         </plugins>
         <pluginManagement>
             <plugins>
-				<plugin>
-					<artifactId>maven-release-plugin</artifactId>
-					<configuration>
-						<goals>deploy</goals>
-					</configuration>
-				</plugin>
                 <!-- Enforce 2.6 until 2.9 is released. See http://jira.codehaus.org/browse/MECLIPSE-621 -->
                 <plugin>
                     <groupId>org.apache.maven.plugins</groupId>
@@ -125,7 +125,7 @@
                 </plugin>
                 <plugin>
                 	<artifactId>maven-compiler-plugin</artifactId>
-                	<version>2.3.1</version>
+                	<version>2.3.2</version>
                 </plugin>
                 <plugin>
                 	<artifactId>maven-deploy-plugin</artifactId>
@@ -141,7 +141,7 @@
                 </plugin>
                 <plugin>
                 	<artifactId>maven-release-plugin</artifactId>
-                	<version>2.0</version>
+                	<version>2.1</version>
                 </plugin>
                 <plugin>
                 	<artifactId>maven-site-plugin</artifactId>
