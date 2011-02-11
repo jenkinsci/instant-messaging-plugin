@@ -26,4 +26,8 @@ public class Sender {
     public String getId() {
         return id;
     }
+    
+    public String toString() {
+        return this.nickname;
+    }
 }
