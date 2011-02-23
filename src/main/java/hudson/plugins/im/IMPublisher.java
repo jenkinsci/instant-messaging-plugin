@@ -359,6 +359,8 @@ public abstract class IMPublisher extends Notifier implements BuildStep
 	private void notifyUpstreamCommitters(final AbstractBuild<?, ?> build,
 			final BuildListener buildListener) {
 		boolean committerNotified = false;
+		// TODO: get also all the upstream builds since the upstream build of the previous build on this level
+		// see MailSender#includeCulpritsOf
 		Map<AbstractProject, Integer> upstreamBuilds = build.getUpstreamBuilds();
 		
 		while (!committerNotified && !upstreamBuilds.isEmpty()) {
