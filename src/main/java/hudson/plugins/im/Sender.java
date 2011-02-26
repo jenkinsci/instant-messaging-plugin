@@ -1,3 +1,4 @@
+
 package hudson.plugins.im;
 
 /**
@@ -19,10 +20,17 @@ public class Sender {
         this.id = id;
     }
 
+    /**
+     * The nickname of the sender.
+     * This string is not necessarily unique - i.e. the nick in a chatroom. 
+     */
     public String getNickname() {
         return nickname;
     }
 
+    /**
+     * Returns the unique id of the sender.
+     */
     public String getId() {
         return id;
     }

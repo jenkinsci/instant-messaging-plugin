@@ -16,6 +16,9 @@ public class IMCause extends Cause {
 		this.description = description;
 	}
 	
+	/**
+	 * {@inheritDoc}
+	 */
 	@Override
 	public String getShortDescription() {
 		return this.description;

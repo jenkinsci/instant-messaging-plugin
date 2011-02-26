@@ -1,5 +1,10 @@
 package hudson.plugins.im;
 
+/**
+ * Represents a single message which is send in a IM protocol.
+ * 
+ * @author kutzi
+ */
 public class IMMessage {
 
     private final String from;

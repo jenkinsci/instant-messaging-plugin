@@ -14,7 +14,7 @@ public enum NotificationStrategy {
     // Note that the order of the constants also specifies the display order!
 
 	/**
-	 * Not matter what, notifications should always be send.
+	 * No matter what, notifications should always be send.
 	 */
 	ALL("all") {
 		/**
@@ -125,6 +125,9 @@ public enum NotificationStrategy {
         return null;
     }
     
+    /**
+     * Returns the display names of all notification strategies.
+     */
     public static String[] getDisplayNames() {
         return DISPLAY_NAMES;
     }

@@ -3,7 +3,7 @@ package hudson.plugins.im;
 import org.springframework.util.Assert;
 
 /**
- * {@link DefaultIMMessageTarget} basically is a String, that represents an Im-Account to send messages to.
+ * {@link DefaultIMMessageTarget} basically is a String, that represents an IM-Account to send messages to.
  * @author Uwe Schaefer
  */
 public class DefaultIMMessageTarget implements IMMessageTarget
