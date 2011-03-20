@@ -26,6 +26,13 @@
           <email>kk@kohsuke.org</email>
         </developer>
 	</developers>
+
+    <licenses>
+        <license>
+            <name>MIT license</name>
+            <comments>All source code is under the MIT license.</comments>
+        </license>
+    </licenses>
     
     <scm>
         <connection>scm:svn:https://guest@svn.java.net/svn/hudson~svn/trunk/hudson/plugins/instant-messaging</connection>
