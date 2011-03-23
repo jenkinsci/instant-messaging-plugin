@@ -19,6 +19,7 @@ import hudson.tasks.Notifier;
 import hudson.tasks.Publisher;
 
 import java.io.IOException;
+import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.HashMap;
@@ -398,6 +399,40 @@ public abstract class IMPublisher extends Notifier implements BuildStep
 		    }
 		}
 	}
+    
+    private Map<AbstractProject, List<Integer>> getUpstreamBuildsSinceLastStable(AbstractBuild<?,?> currentBuild) {
+    	// may be null:
+    	AbstractBuild<?, ?> previousSuccessfulBuild = BuildHelper.getPreviousSuccessfulBuild(currentBuild);
+    	
+    	AbstractBuild<?,?> build = (previousSuccessfulBuild != null ? previousSuccessfulBuild.getNextBuild() : currentBuild);
+    	
+    	List<AbstractProject> upstreamProjects = currentBuild.getParent().getUpstreamProjects();
+    	
+    	Map<AbstractProject, List<Integer>> result = new HashMap<AbstractProject, List<Integer>>();
+    	for(AbstractProject project : upstreamProjects) {
+    		result.put(project, new ArrayList<Integer>());
+    	}
+    	
+    	do {
+    		Map<AbstractProject, Integer> upstreamBuilds = build.getUpstreamBuilds();
+    		
+    		for (Map.Entry<AbstractProject, Integer> entry : upstreamBuilds.entrySet()) {
+    			
+    			List<Integer> buildNumberList = result.get(entry.getKey());
+    			
+    			if (buildNumberList != null) {
+    				buildNumberList.add(entry.getValue());
+    			} else {
+    				// project not anymore a upstream dependency of project!?
+    				// TODO add to result map?
+    			}
+    		}
+    		
+    		build = build.getNextBuild();
+    	} while (build.getNumber() < currentBuild.getNumber());
+    	
+    	return result;
+    }
 
     /**
      * Determines if downstreamBuild is the 1st build of the downstream project
