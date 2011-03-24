@@ -15,11 +15,11 @@ import hudson.scm.ChangeLogSet;
 import hudson.scm.ChangeLogSet.Entry;
 import hudson.tasks.BuildStep;
 import hudson.tasks.BuildStepDescriptor;
+import hudson.tasks.BuildStepMonitor;
 import hudson.tasks.Notifier;
 import hudson.tasks.Publisher;
 
 import java.io.IOException;
-import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.HashMap;
@@ -32,8 +32,10 @@ import java.util.logging.Logger;
 
 import org.springframework.util.Assert;
 
+import com.google.common.collect.Lists;
+
 /**
- * The actual Publisher that sends notification-Messages out to the clients.
+ * The actual Publisher which sends notification messages out to the clients.
  * 
  * @author Uwe Schaefer
  * @author Christoph Kutzinski
@@ -356,82 +358,117 @@ public abstract class IMPublisher extends Notifier implements BuildStep
      * If no committers are found in the immediate upstream builds, then look one level higher.
      * Repeat until a committer is found or no more upstream builds are found. 
      */
-    @SuppressWarnings("unchecked")
 	private void notifyUpstreamCommitters(final AbstractBuild<?, ?> build,
 			final BuildListener buildListener) {
-		boolean committerNotified = false;
-		// TODO: get also all the upstream builds since the upstream build of the previous build on this level
-		// see MailSender#includeCulpritsOf
-		Map<AbstractProject, Integer> upstreamBuilds = build.getUpstreamBuilds();
-		
-		while (!committerNotified && !upstreamBuilds.isEmpty()) {
-			Map<AbstractProject, Integer> currentLevel = upstreamBuilds;
-			// new map for the builds one level higher up:
-			upstreamBuilds = new HashMap<AbstractProject, Integer>();
-			
-		    for (Map.Entry<AbstractProject, Integer> entry : currentLevel.entrySet()) {
-		        AbstractBuild<?, ?> upstreamBuild = (AbstractBuild<?, ?>) entry.getKey().getBuildByNumber(entry.getValue());
-		        
-		        if (upstreamBuild != null) {
-		            
-		            if (! downstreamIsFirstInRangeTriggeredByUpstream(upstreamBuild, build)) {
-		                continue;
-		            }
-		            
-			        Set<User> committers = getCommitters(upstreamBuild);
+        
+        Map<User, AbstractBuild<?,?>> committers = getNearestUpstreamCommitters(build);
 			        
-			        String message = getBuildToChatNotifier().upstreamCommitterMessage(this, build, buildListener, upstreamBuild);
-			        
-			        for (IMMessageTarget target : calculateIMTargets(committers, buildListener)) {
-			            try {
-			                log(buildListener, "Sending notification to upstream committer: " + target.toString());
-			                sendNotification(message, target, buildListener);
-			                committerNotified = true;
-			            } catch (final Throwable e) {
-			                log(buildListener, "There was an error sending upstream committer notification to: " + target.toString());
-			            }
-			        }
-		        }
-		        
-		        if (!committerNotified) {
-		        	upstreamBuilds.putAll(upstreamBuild.getUpstreamBuilds());
-		        }
-		    }
-		}
+        
+        for (Map.Entry<User, AbstractBuild<?, ?>> entry : committers.entrySet()) {
+            String message = getBuildToChatNotifier().upstreamCommitterMessage(this, build, buildListener, entry.getValue());
+            
+            IMMessageTarget target = calculateIMTarget(entry.getKey(), buildListener);
+            try {
+                log(buildListener, "Sending notification to upstream committer: " + target.toString());
+                sendNotification(message, target, buildListener);
+            } catch (final Throwable e) {
+                log(buildListener, "There was an error sending upstream committer notification to: " + target.toString());
+            }
+        }
 	}
     
-    private Map<AbstractProject, List<Integer>> getUpstreamBuildsSinceLastStable(AbstractBuild<?,?> currentBuild) {
+	/**
+     * Looks for committers in the direct upstream builds.
+     * If no committers are found in the immediate upstream builds, then look one level higher.
+     * Repeat until a committer is found or no more upstream builds are found. 
+     */
+    @SuppressWarnings("rawtypes")
+    Map<User, AbstractBuild<?,?>> getNearestUpstreamCommitters(AbstractBuild<?, ?> build) {
+        Map<AbstractProject, List<AbstractBuild>> upstreamBuilds = getUpstreamBuildsSinceLastStable(build);
+        Map<User, AbstractBuild<?,?>> upstreamCommitters = new HashMap<User, AbstractBuild<?,?>>();
+        
+        while (upstreamCommitters.isEmpty() && !upstreamBuilds.isEmpty()) {
+            Map<AbstractProject, List<AbstractBuild>> currentLevel = upstreamBuilds;
+            // new map for the builds one level higher up:
+            upstreamBuilds = new HashMap<AbstractProject, List<AbstractBuild>>();
+            
+            for (Map.Entry<AbstractProject, List<AbstractBuild>> entry : currentLevel.entrySet()) {
+                List<AbstractBuild> upstreams = entry.getValue();
+                
+                for (AbstractBuild upstreamBuild : upstreams) {
+                
+                    if (upstreamBuild != null) {
+                        
+                        if (! downstreamIsFirstInRangeTriggeredByUpstream(upstreamBuild, build)) {
+                            continue;
+                        }
+                        
+                        Set<User> committers = getCommitters(upstreamBuild);
+                        for (User committer : committers) {
+                            upstreamCommitters.put(committer, upstreamBuild);
+                        }
+                        
+                        upstreamBuilds.putAll(getUpstreamBuildsSinceLastStable(upstreamBuild));
+                    }
+                }
+            }
+        }
+        
+        return upstreamCommitters;
+    }
+    
+    @SuppressWarnings("rawtypes")
+    private Map<AbstractProject, List<AbstractBuild>> getUpstreamBuildsSinceLastStable(AbstractBuild<?,?> currentBuild) {
     	// may be null:
     	AbstractBuild<?, ?> previousSuccessfulBuild = BuildHelper.getPreviousSuccessfulBuild(currentBuild);
     	
-    	AbstractBuild<?,?> build = (previousSuccessfulBuild != null ? previousSuccessfulBuild.getNextBuild() : currentBuild);
-    	
-    	List<AbstractProject> upstreamProjects = currentBuild.getParent().getUpstreamProjects();
-    	
-    	Map<AbstractProject, List<Integer>> result = new HashMap<AbstractProject, List<Integer>>();
-    	for(AbstractProject project : upstreamProjects) {
-    		result.put(project, new ArrayList<Integer>());
+    	if (previousSuccessfulBuild == null) {
+    	    return Collections.emptyMap();
     	}
     	
-    	do {
-    		Map<AbstractProject, Integer> upstreamBuilds = build.getUpstreamBuilds();
-    		
-    		for (Map.Entry<AbstractProject, Integer> entry : upstreamBuilds.entrySet()) {
-    			
-    			List<Integer> buildNumberList = result.get(entry.getKey());
-    			
-    			if (buildNumberList != null) {
-    				buildNumberList.add(entry.getValue());
-    			} else {
-    				// project not anymore a upstream dependency of project!?
-    				// TODO add to result map?
-    			}
-    		}
-    		
-    		build = build.getNextBuild();
-    	} while (build.getNumber() < currentBuild.getNumber());
+    	Map<AbstractProject, List<AbstractBuild>> result = new HashMap<AbstractProject, List<AbstractBuild>>();
+    	
+    	
+    	Set<AbstractProject> upstreamProjects = currentBuild.getUpstreamBuilds().keySet();
+    	
+    	for (AbstractProject upstreamProject : upstreamProjects) {
+    	    result.put(upstreamProject, 
+    	            getUpstreamBuilds(upstreamProject, previousSuccessfulBuild, currentBuild));
+    	}
     	
     	return result;
+    }
+
+    /**
+     * Gets all upstream builds for a given upstream project and a given downstream since/until build pair
+     * 
+     * @param upstreamProject the upstream project
+     * @param sinceBuild the downstream build since when to get the upstream builds (exclusive)
+     * @param untilBuild the downstream build until when to get the upstream builds (inclusive)
+     */
+    @SuppressWarnings("rawtypes")
+    private List<AbstractBuild> getUpstreamBuilds(
+            AbstractProject upstreamProject,
+            AbstractBuild<?, ?> sinceBuild,
+            AbstractBuild<?, ?> untilBuild) {
+        
+        List<AbstractBuild> result = Lists.newArrayList();
+        
+        AbstractBuild<?, ?> sinceBuildUpstreamBuild = sinceBuild.getUpstreamRelationshipBuild(upstreamProject);
+        AbstractBuild<?, ?> untilBuildUpstreamBuild = untilBuild.getUpstreamRelationshipBuild(upstreamProject);
+        
+        AbstractBuild<?, ?> build = sinceBuildUpstreamBuild;
+        
+        do {
+            build = build.getNextBuild();
+            
+            if (build != null) {
+                result.add(build);
+            }
+            
+        } while (build != untilBuildUpstreamBuild && build != null);
+        
+        return result;
     }
 
     /**
@@ -523,30 +560,48 @@ public abstract class IMPublisher extends Notifier implements BuildStep
 		LOGGER.fine("Default Suffix: " + defaultIdSuffix);
 		
 		for (User target : targets) {
-			LOGGER.fine("Possible target: " + target.getId());
-            String imId = getConfiguredIMId(target);
-			if (imId == null && defaultIdSuffix != null) {
-                imId = target.getId() + defaultIdSuffix;
-            }
-
-            if (imId != null) {
-                try {
-                    suspects.add(getIMDescriptor().getIMMessageTargetConverter().fromString(imId));
-                } catch (final IMMessageTargetConversionException e) {
-                    log(listener, "Invalid IM ID: " + imId);
-                }
-            } else {
-            	log(listener, "No IM ID found for: " + target.getId());
-            }
+		    IMMessageTarget imTarget = calculateIMTarget(target, listener);
+		    if (imTarget != null) {
+		        suspects.add(imTarget);
+		    }
 		}
 		return suspects;
 	}
+
+    private IMMessageTarget calculateIMTarget(User target, BuildListener listener) {
+        
+        String defaultIdSuffix = ((IMPublisherDescriptor)getDescriptor()).getDefaultIdSuffix();
+        
+        LOGGER.fine("Possible target: " + target.getId());
+        String imId = getConfiguredIMId(target);
+        if (imId == null && defaultIdSuffix != null) {
+            imId = target.getId() + defaultIdSuffix;
+        }
+
+        if (imId != null) {
+            try {
+                return getIMDescriptor().getIMMessageTargetConverter().fromString(imId);
+            } catch (final IMMessageTargetConversionException e) {
+                log(listener, "Invalid IM ID: " + imId);
+            }
+        } else {
+        	log(listener, "No IM ID found for: " + target.getId());
+        }
+        
+        return null;
+    }
 
 	/**
 	 * {@inheritDoc}
 	 */
     @Override
     public abstract BuildStepDescriptor<Publisher> getDescriptor();
+    
+    // since Hudson 1.319:
+    @Override
+    public BuildStepMonitor getRequiredMonitorService() {
+        return BuildStepMonitor.BUILD;
+    }
 	
     // migrate old instances
     protected Object readResolve() {
