@@ -9,10 +9,10 @@
 
 	<groupId>org.jvnet.hudson.plugins</groupId>
 	<artifactId>instant-messaging</artifactId>
-	<name>Hudson instant-messaging plugin</name>
+	<name>Jenkins instant-messaging plugin</name>
 	<version>1.14-SNAPSHOT</version>
 	<packaging>hpi</packaging>
-	<url>http://wiki.hudson-ci.org/display/HUDSON/Instant+Messaging+Plugin</url>
+	<url>http://wiki.jenkins-ci.org/display/JENKINS/Instant+Messaging+Plugin</url>
 	<developers>
 		<developer>
 			<id>kutzi</id>
@@ -35,8 +35,8 @@
     </licenses>
     
     <scm>
-        <connection>scm:svn:https://guest@svn.java.net/svn/hudson~svn/trunk/hudson/plugins/instant-messaging</connection>
-        <developerConnection>scm:svn:https://svn.java.net/svn/hudson~svn/trunk/hudson/plugins/instant-messaging</developerConnection>
-        <url>http://fisheye4.atlassian.com/browse/hudson/trunk/hudson/plugins/instant-messaging</url>
+        <connection>scm:svn:https://guest@svn.jenkins-ci.org/trunk/hudson/plugins/instant-messaging</connection>
+        <developerConnection>scm:svn:https://svn.jenkins-ci.org/trunk/hudson/plugins/instant-messaging</developerConnection>
+        <url>http://fisheye.jenkins-ci.org/browse/Jenkins/trunk/trunk/hudson/plugins/instant-messaging</url>
     </scm>    
 </project>
