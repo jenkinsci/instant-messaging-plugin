@@ -12,7 +12,7 @@
 	<name>Parent project for all instant-messaging plugins</name>
 	<version>1.13-SNAPSHOT</version>
 	<packaging>pom</packaging>
-	<url>http://wiki.hudson-ci.org/display/HUDSON/Instant+Messaging+Plugin</url>
+	<url>http://wiki.jenkins-ci.org/display/JENKINS/Instant+Messaging+Plugin</url>
 	<developers>
 		<developer>
 			<id>kutzi</id>
@@ -157,6 +157,22 @@
             </plugins>
         </pluginManagement>
     </build>
+    
+    <!-- get every artifact through maven.glassfish.org, which proxies all 
+        the artifacts that we need -->
+    <repositories>
+        <repository>
+            <id>m.g.o-public</id>
+            <url>http://maven.glassfish.org/content/groups/public/</url>
+        </repository>
+    </repositories>
+
+    <pluginRepositories>
+        <pluginRepository>
+            <id>m.g.o-public</id>
+            <url>http://maven.glassfish.org/content/groups/public/</url>
+        </pluginRepository>
+    </pluginRepositories>
     
     <distributionManagement>
         <repository>
