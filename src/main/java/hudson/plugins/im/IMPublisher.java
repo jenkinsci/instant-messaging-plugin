@@ -445,6 +445,7 @@ public abstract class IMPublisher extends Notifier implements BuildStep
      * @param upstreamProject the upstream project
      * @param sinceBuild the downstream build since when to get the upstream builds (exclusive)
      * @param untilBuild the downstream build until when to get the upstream builds (inclusive)
+     * @return the upstream builds. May be empty but never null
      */
     @SuppressWarnings("rawtypes")
     private List<AbstractBuild> getUpstreamBuilds(
@@ -458,6 +459,10 @@ public abstract class IMPublisher extends Notifier implements BuildStep
         AbstractBuild<?, ?> untilBuildUpstreamBuild = untilBuild.getUpstreamRelationshipBuild(upstreamProject);
         
         AbstractBuild<?, ?> build = sinceBuildUpstreamBuild;
+        
+        if (build == null) {
+        	return result;
+        }
         
         do {
             build = build.getNextBuild();
