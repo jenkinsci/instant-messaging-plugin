@@ -601,8 +601,10 @@ public abstract class IMPublisher extends Notifier implements BuildStep
 	 */
     @Override
     public abstract BuildStepDescriptor<Publisher> getDescriptor();
-    
-    // since Hudson 1.319:
+
+    /**
+     * {@inheritDoc}
+     */
     @Override
     public BuildStepMonitor getRequiredMonitorService() {
         return BuildStepMonitor.BUILD;
@@ -625,7 +627,7 @@ public abstract class IMPublisher extends Notifier implements BuildStep
     }
     
     /**
-     * Returns the instant-messaging ID which is configured for a Hudson user
+     * Returns the instant-messaging ID which is configured for a Jenkins user
      * (e.g. via a {@link UserProperty}) or null if there's nothing configured for
      * him/her.
      */
