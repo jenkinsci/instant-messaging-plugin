@@ -10,7 +10,7 @@
 	<groupId>org.jvnet.hudson.plugins</groupId>
 	<artifactId>instant-messaging-parent</artifactId>
 	<name>Parent project for all instant-messaging plugins</name>
-	<version>1.13</version>
+	<version>1.13-SNAPSHOT</version>
 	<packaging>pom</packaging>
 	<url>http://wiki.jenkins-ci.org/display/JENKINS/Instant+Messaging+Plugin</url>
 	<developers>
@@ -180,10 +180,4 @@
           <url>http://maven.jenkins-ci.org:8081/content/repositories/releases/</url>
         </repository>
       </distributionManagement>
-
-  <scm>
-    <connection>scm:svn:https://guest@svn.dev.java.net/svn/hudson/tags/instant-messaging-parent-1.13</connection>
-    <developerConnection>scm:svn:https://svn.dev.java.net/svn/hudson/tags/instant-messaging-parent-1.13</developerConnection>
-    <url>https://hudson.dev.java.net/source/browse/hudson/tags/instant-messaging-parent-1.13</url>
-  </scm>
 </project>
