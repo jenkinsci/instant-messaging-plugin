@@ -179,5 +179,11 @@
           <id>maven.jenkins-ci.org</id>
           <url>http://maven.jenkins-ci.org:8081/content/repositories/releases/</url>
         </repository>
-      </distributionManagement>
+    </distributionManagement>
+      
+    <scm>
+        <connection>scm:svn:https://guest@svn.jenkins-ci.org/trunk/hudson/plugins/instant-messaging-parent</connection>
+        <developerConnection>scm:svn:https://svn.jenkins-ci.org/trunk/hudson/plugins/instant-messaging-parent</developerConnection>
+        <url>http://fisheye.jenkins-ci.org/browse/Jenkins/trunk/hudson/plugins/instant-messaging-parent</url>
+    </scm>
 </project>
