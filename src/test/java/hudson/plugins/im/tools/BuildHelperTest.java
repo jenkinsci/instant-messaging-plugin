@@ -7,6 +7,7 @@ import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 import hudson.model.FreeStyleBuild;
 import hudson.model.Result;
+import hudson.plugins.im.tools.BuildHelper.ExtResult;
 
 import org.junit.Test;
 
@@ -105,5 +106,10 @@ public class BuildHelperTest {
         when(build.getResult()).thenReturn(Result.SUCCESS);
         // don't mark it as fixed:
         assertEquals("SUCCESS", BuildHelper.getResultDescription(build));
+        
+        // NOW UNSTABLE
+        when(previousBuild.getResult()).thenReturn(Result.FAILURE);
+        when(build.getResult()).thenReturn(Result.UNSTABLE);
+        assertEquals(ExtResult.NOW_UNSTABLE.toString(), BuildHelper.getResultDescription(build));
     }
 }

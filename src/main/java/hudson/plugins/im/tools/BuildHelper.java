@@ -16,7 +16,12 @@ public class BuildHelper {
      * @author kutzi
      */
     public static enum ExtResult {
-        FIXED, SUCCESS, STILL_UNSTABLE("STILL UNSTABLE"), UNSTABLE,
+        FIXED, SUCCESS,
+        /**
+         * Marks a build which was previously a failure and is now 'only' unstable.
+         */
+        NOW_UNSTABLE("NOW UNSTABLE"),
+        STILL_UNSTABLE("STILL UNSTABLE"), UNSTABLE,
         STILL_FAILING("STILL FAILING"), FAILURE,
         ABORTED, NOT_BUILT("NOT BUILT");
         
@@ -135,8 +140,15 @@ public class BuildHelper {
         
         AbstractBuild<?, ?> previousBuild = getPreviousNonAbortedBuild(build);
         if (result == Result.UNSTABLE) {
-            if (previousBuild != null && previousBuild.getResult() == Result.UNSTABLE) {
+            if (previousBuild == null) {
+                return ExtResult.UNSTABLE;
+            }
+            
+            
+            if (previousBuild.getResult() == Result.UNSTABLE) {
                 return ExtResult.STILL_UNSTABLE;
+            } else if (previousBuild.getResult() == Result.FAILURE) {
+                return ExtResult.NOW_UNSTABLE;
             } else {
                 return ExtResult.UNSTABLE;
             }

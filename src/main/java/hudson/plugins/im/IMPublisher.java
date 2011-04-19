@@ -11,6 +11,7 @@ import hudson.plugins.im.build_notify.BuildToChatNotifier;
 import hudson.plugins.im.build_notify.DefaultBuildToChatNotifier;
 import hudson.plugins.im.tools.BuildHelper;
 import hudson.plugins.im.tools.ExceptionHelper;
+import hudson.plugins.im.tools.BuildHelper.ExtResult;
 import hudson.scm.ChangeLogSet;
 import hudson.scm.ChangeLogSet.Entry;
 import hudson.tasks.BuildStep;
@@ -275,7 +276,7 @@ public abstract class IMPublisher extends Notifier implements BuildStep
             notifyChats(build, buildListener);
         }
 
-        if (BuildHelper.isStillFailureOrUnstable(build)) {
+        if (BuildHelper.isStillFailureOrUnstable(build) || BuildHelper.getExtendedResult(build) == ExtResult.NOW_UNSTABLE) {
             if (this.notifySuspects) {
             	log(buildListener, "Notifying suspects");
             	final String message = getBuildToChatNotifier().suspectMessage(this, build, buildListener, false);
