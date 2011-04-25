@@ -1,6 +1,11 @@
 package hudson.plugins.im;
 
 import hudson.Launcher;
+import hudson.matrix.MatrixAggregatable;
+import hudson.matrix.MatrixAggregator;
+import hudson.matrix.MatrixBuild;
+import hudson.matrix.MatrixProject;
+import hudson.matrix.MatrixRun;
 import hudson.model.BuildListener;
 import hudson.model.UserProperty;
 import hudson.model.AbstractBuild;
@@ -41,7 +46,7 @@ import com.google.common.collect.Lists;
  * @author Uwe Schaefer
  * @author Christoph Kutzinski
  */
-public abstract class IMPublisher extends Notifier implements BuildStep
+public abstract class IMPublisher extends Notifier implements BuildStep, MatrixAggregatable
 {
 	private static final Logger LOGGER = Logger.getLogger(IMPublisher.class.getName());
 	
@@ -60,6 +65,7 @@ public abstract class IMPublisher extends Notifier implements BuildStep
     private final boolean notifyFixers;
     private final boolean notifyUpstreamCommitters;
     private BuildToChatNotifier buildToChatNotifier;
+    private MatrixJobMultiplier matrixMultiplier = MatrixJobMultiplier.ONLY_CONFIGURATIONS;
     
     /**
      * @deprecated Only for deserializing old instances
@@ -82,7 +88,7 @@ public abstract class IMPublisher extends Notifier implements BuildStep
     		boolean notifyFixers,
     		boolean notifyUpstreamCommitters) {
         this(defaultTargets,notificationStrategyString,notifyGroupChatsOnBuildStart,notifySuspects,notifyCulprits,
-                notifyFixers,notifyUpstreamCommitters,new DefaultBuildToChatNotifier());
+                notifyFixers,notifyUpstreamCommitters,new DefaultBuildToChatNotifier(), MatrixJobMultiplier.ALL);
     }
 
     protected IMPublisher(List<IMMessageTarget> defaultTargets,
@@ -92,7 +98,8 @@ public abstract class IMPublisher extends Notifier implements BuildStep
     		boolean notifyCulprits,
     		boolean notifyFixers,
     		boolean notifyUpstreamCommitters,
-            BuildToChatNotifier buildToChatNotifier)
+            BuildToChatNotifier buildToChatNotifier,
+            MatrixJobMultiplier matrixMultiplier)
     {
     	if (defaultTargets != null) {
     		this.targets = defaultTargets;
@@ -112,6 +119,7 @@ public abstract class IMPublisher extends Notifier implements BuildStep
         this.notifyFixers = notifyFixers;
         this.notifyUpstreamCommitters = notifyUpstreamCommitters;
         this.buildToChatNotifier = buildToChatNotifier;
+        this.matrixMultiplier = matrixMultiplier;
     }
     
     /**
@@ -272,6 +280,25 @@ public abstract class IMPublisher extends Notifier implements BuildStep
             throws InterruptedException, IOException {
         Assert.notNull(build, "Parameter 'build' must not be null.");
         Assert.notNull(buildListener, "Parameter 'buildListener' must not be null.");
+        
+        if (build.getProject() instanceof MatrixProject) {
+            if (getMatrixNotifier() == MatrixJobMultiplier.ONLY_CONFIGURATIONS
+                || getMatrixNotifier() == MatrixJobMultiplier.ALL) {
+                notifyOnBuildEnd(build, buildListener);
+            }
+        } else {
+            notifyOnBuildEnd(build, buildListener);
+        }
+        
+        return true;
+    }
+
+    /**
+     * Sends notification at build end including maybe notifications of culprits, fixers or so.
+     */
+    private void notifyOnBuildEnd(final AbstractBuild<?, ?> build,
+            final BuildListener buildListener) throws IOException,
+            InterruptedException {
         if (getNotificationStrategy().notificationWanted(build)) {
             notifyChats(build, buildListener);
         }
@@ -339,8 +366,6 @@ public abstract class IMPublisher extends Notifier implements BuildStep
         		}
         	}
         }
-        
-        return true;
     }
 
 	private void sendNotification(String message, IMMessageTarget target, BuildListener buildListener)
@@ -520,25 +545,39 @@ public abstract class IMPublisher extends Notifier implements BuildStep
 	 */
 	@Override
 	public boolean prebuild(AbstractBuild<?, ?> build, BuildListener buildListener) {
-		try {
-			if (notifyOnBuildStart) {
-                final String msg = buildToChatNotifier.buildStartMessage(this,build,buildListener);
-				for (final IMMessageTarget target : calculateTargets()) {
-					// only notify group chats
-					if (target instanceof GroupChatIMMessageTarget) {
-		                try {
-		                    sendNotification(msg, target, buildListener);
-		                } catch (final Throwable e) {
-		                    log(buildListener, "There was an error sending notification to: " + target.toString());
-		                }
-					}
-	            }
-			}
-		} catch (Throwable t) {
-			// ignore: never, ever cancel a build because a notification fails
-            log(buildListener, "There was an error in the IM plugin: " + ExceptionHelper.dump(t));
+		if (notifyOnBuildStart) {
+           if (build.getProject() instanceof MatrixProject) {
+               if (getMatrixNotifier() == MatrixJobMultiplier.ONLY_CONFIGURATIONS
+                       || getMatrixNotifier() == MatrixJobMultiplier.ALL) {
+                   notifyOnBuildStart(build, buildListener);
+               }
+           } else {
+               notifyOnBuildStart(build, buildListener);
+           }
 		}
 		return true;
+	}
+	
+	/**
+	 * Sends notification about the build start.
+	 */
+	private void notifyOnBuildStart(AbstractBuild<?, ?> build, BuildListener buildListener) {
+	    try {
+            final String msg = buildToChatNotifier.buildStartMessage(this,build,buildListener);
+            for (final IMMessageTarget target : calculateTargets()) {
+                // only notify group chats
+                if (target instanceof GroupChatIMMessageTarget) {
+                    try {
+                        sendNotification(msg, target, buildListener);
+                    } catch (final Throwable e) {
+                        log(buildListener, "There was an error sending notification to: " + target.toString());
+                    }
+                }
+            }
+        } catch (Throwable t) {
+            // ignore: never, ever cancel a build because a notification fails
+            log(buildListener, "There was an error in the IM plugin: " + ExceptionHelper.dump(t));
+        }
 	}
 	
 	private static Set<User> getCommitters(AbstractBuild<?, ?> build) {
@@ -617,8 +656,11 @@ public abstract class IMPublisher extends Notifier implements BuildStep
     		this.strategy = NotificationStrategy.valueOf(this.notificationStrategy.name());
     		this.notificationStrategy = null;
     	}
-        if (buildToChatNotifier==null) {
-            buildToChatNotifier = new DefaultBuildToChatNotifier();
+        if (buildToChatNotifier == null) {
+            this.buildToChatNotifier = new DefaultBuildToChatNotifier();
+        }
+        if (matrixMultiplier == null) {
+            this.matrixMultiplier = MatrixJobMultiplier.ONLY_CONFIGURATIONS;
         }
     	return this;
     }
@@ -633,4 +675,42 @@ public abstract class IMPublisher extends Notifier implements BuildStep
      * him/her.
      */
     protected abstract String getConfiguredIMId(User user);
+    
+    public MatrixJobMultiplier getMatrixNotifier() {
+        return this.matrixMultiplier;
+    }
+    
+    public void setMatrixNotifier(MatrixJobMultiplier matrixMultiplier) {
+        this.matrixMultiplier = matrixMultiplier;
+    }
+    
+    
+    public MatrixAggregator createAggregator(MatrixBuild build, Launcher launcher, BuildListener listener) {
+        return new MatrixAggregator(build, launcher, listener) {
+
+            @Override
+            public boolean startBuild() throws InterruptedException,
+                    IOException {
+                if (IMPublisher.this.notifyOnBuildStart) {
+                    if (getMatrixNotifier() == MatrixJobMultiplier.ALL || getMatrixNotifier() == MatrixJobMultiplier.ONLY_PARENT) {
+                        notifyOnBuildStart(build, listener);
+                    }
+                }
+                return super.startBuild();
+            }
+
+            @Override
+            public boolean endBuild() throws InterruptedException, IOException {
+                if (getMatrixNotifier() == MatrixJobMultiplier.ALL || getMatrixNotifier() == MatrixJobMultiplier.ONLY_PARENT) {
+                    notifyOnBuildEnd(build, listener);
+                }
+                return super.endBuild();
+            }
+        };
+    }
+    
+    // Helper method for the config.jelly
+    public boolean isMatrixProject(AbstractProject project) {
+        return project instanceof MatrixProject;
+    }
 }

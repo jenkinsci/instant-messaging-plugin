@@ -5,6 +5,9 @@ import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertTrue;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
+import hudson.Launcher;
+import hudson.matrix.MatrixAggregator;
+import hudson.matrix.MatrixBuild;
 import hudson.model.BuildListener;
 import hudson.model.Result;
 import hudson.model.AbstractBuild;
@@ -160,7 +163,7 @@ public class IMPublisherTest {
     private static class IMTestPublisher extends IMPublisher {
         public IMTestPublisher() {
             super(Collections.<IMMessageTarget>emptyList(), NotificationStrategy.FAILURE_AND_FIXED.getDisplayName(),
-                    true, true, true, true, true, new DefaultBuildToChatNotifier());
+                    true, true, true, true, true, new DefaultBuildToChatNotifier(), MatrixJobMultiplier.ALL);
         }
         
         @Override
