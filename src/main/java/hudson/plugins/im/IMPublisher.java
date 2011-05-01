@@ -676,6 +676,10 @@ public abstract class IMPublisher extends Notifier implements BuildStep, MatrixA
      */
     protected abstract String getConfiguredIMId(User user);
     
+    /**
+     * Specifies how many notifications to send for matrix projects.
+     * Like 'only parent', 'only configurations', 'both'
+     */
     public MatrixJobMultiplier getMatrixNotifier() {
         return this.matrixMultiplier;
     }
@@ -710,7 +714,7 @@ public abstract class IMPublisher extends Notifier implements BuildStep, MatrixA
     }
     
     // Helper method for the config.jelly
-    public boolean isMatrixProject(AbstractProject project) {
+    public boolean isMatrixProject(AbstractProject<?,?> project) {
         return project instanceof MatrixProject;
     }
 }

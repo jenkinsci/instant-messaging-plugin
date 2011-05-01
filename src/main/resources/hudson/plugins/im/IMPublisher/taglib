@@ -1,1 +1,1 @@
-Get rid of this when get rid of dropdownDescriptorSelector.jelly
+This file is needed here, so all .jelly files in this directory can be used as taglibs

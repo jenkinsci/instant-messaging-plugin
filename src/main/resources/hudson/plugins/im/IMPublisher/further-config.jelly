@@ -1,0 +1,16 @@
+<?jelly escape-by-default='true'?>
+<j:jelly xmlns:j="jelly:core" xmlns:st="jelly:stapler" xmlns:d="jelly:define" xmlns:l="/lib/layout" xmlns:t="/lib/hudson" xmlns:f="/lib/form">
+  
+  <st:documentation>
+    Further IM configuration options.    
+  </st:documentation>
+
+    <j:if test="${instance.isMatrixProject(it)}">
+      <f:entry title="${%Notify for matrix projects}" field="matrixNotifier" help="/plugin/instant-messaging/help-matrix_notify.html">
+          <f:enum field="matrixNotifier">
+             ${it.getLabel()}
+          </f:enum>
+      </f:entry>
+   </j:if>
+
+</j:jelly>
