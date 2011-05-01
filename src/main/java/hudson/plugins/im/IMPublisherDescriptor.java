@@ -4,6 +4,19 @@ import java.util.List;
 
 public interface IMPublisherDescriptor {
 
+    static final String PREFIX = "im.";
+    public static final String PARAMETERNAME_STRATEGY = PREFIX + "strategy";
+    public static final String PARAMETERNAME_NOTIFY_START = PREFIX + "notifyStart";
+    public static final String PARAMETERNAME_NOTIFY_SUSPECTS = PREFIX + "notifySuspects";
+    public static final String PARAMETERNAME_NOTIFY_CULPRITS = PREFIX + "notifyCulprits";
+    public static final String PARAMETERNAME_NOTIFY_FIXERS = PREFIX + "notifyFixers";
+    public static final String PARAMETERNAME_NOTIFY_UPSTREAM_COMMITTERS = PREFIX + "notifyUpstreamCommitters";
+    
+    public static final String PARAMETERVALUE_STRATEGY_DEFAULT = NotificationStrategy.STATECHANGE_ONLY.getDisplayName();;
+    public static final String[] PARAMETERVALUE_STRATEGY_VALUES = NotificationStrategy.getDisplayNames();
+    public static final String PARAMETERNAME_HUDSON_LOGIN = PREFIX + "hudsonLogin";
+    public static final String PARAMETERNAME_HUDSON_PASSWORD = PREFIX + "hudsonPassword";
+    
 	/**
 	 * Returns <code>true</code> iff the plugin is globally enabled.
 	 */
