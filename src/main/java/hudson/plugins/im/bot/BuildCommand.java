@@ -7,12 +7,14 @@ import hudson.Extension;
 import hudson.model.AbstractProject;
 import hudson.model.BooleanParameterValue;
 import hudson.model.Cause;
+import hudson.model.Item;
 import hudson.model.ParameterValue;
 import hudson.model.ParametersAction;
 import hudson.model.Queue;
 import hudson.model.StringParameterValue;
 import hudson.plugins.im.IMCause;
 import hudson.plugins.im.Sender;
+import hudson.security.Permission;
 
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -62,6 +64,11 @@ public class BuildCommand extends AbstractTextSendingCommand {
     		AbstractProject<?, ?> project = getJobProvider().getJobByName(jobName);
 			if (project != null) {
 
+			    String checkPermission = checkPermission(sender, project);
+			    if (checkPermission != null) {
+			        return checkPermission;
+			    }
+			    
 			    String msg = "";
 				if (project.isInQueue()) {
 					Queue.Item queueItem = project.getQueueItem();
@@ -147,12 +154,20 @@ public class BuildCommand extends AbstractTextSendingCommand {
 		}
 	}
 	
-	private String giveSyntax(String sender, String cmd) {
+	private String checkPermission(Sender sender, AbstractProject<?, ?> project) {
+        if (!project.hasPermission(Item.BUILD)) {
+            return sender.getNickname() + ": you're not allowed to build job " + project.getDisplayName() + "!";
+        }
+        return null;
+    }
+
+    private String giveSyntax(String sender, String cmd) {
 		return sender + ": syntax is: '" + cmd +  SYNTAX + "'";
 	}
 
 	public String getHelp() {
 		return HELP;
 	}
+
 
 }
