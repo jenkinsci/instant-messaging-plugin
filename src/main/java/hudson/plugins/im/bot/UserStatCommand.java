@@ -2,6 +2,7 @@ package hudson.plugins.im.bot;
 
 import hudson.Extension;
 import hudson.model.Hudson;
+import hudson.model.Item;
 import hudson.model.User;
 import hudson.plugins.cigame.UserScoreProperty;
 import hudson.plugins.im.Sender;
@@ -22,6 +23,12 @@ public class UserStatCommand extends AbstractTextSendingCommand {
 		String userName = args[1];
 		User user = User.get(userName, false);
 		if (user != null) {
+		    
+		    String checkPermission = checkPermission(user, sender);
+		    if (checkPermission != null) {
+		        return checkPermission;
+		    }
+		    
 			StringBuilder buf = new StringBuilder();
 			buf.append(userName).append(":");
 			
@@ -51,11 +58,18 @@ public class UserStatCommand extends AbstractTextSendingCommand {
 			}
 			return buf.toString();
 		} else {
-			return "Don't know a user named " + userName;
+			return sender.getNickname() + ": don't know a user named " + userName;
 		}
 	}
 
-	@Override
+	private String checkPermission(User user, Sender sender) {
+        if (!user.hasPermission(Item.READ)) {
+            return sender.getNickname() + ": you may not read that user!"; 
+        }
+        return null;
+    }
+
+    @Override
 	public String getHelp() {
 		return " <username> - prints information about a Hudson user";
 	}
