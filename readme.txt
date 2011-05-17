@@ -1,0 +1,1 @@
+The sources have moved to Github. See https://github.com/jenkinsci/instant-messaging-plugin
