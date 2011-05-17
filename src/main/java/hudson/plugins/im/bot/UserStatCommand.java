@@ -2,7 +2,6 @@ package hudson.plugins.im.bot;
 
 import hudson.Extension;
 import hudson.model.Hudson;
-import hudson.model.Item;
 import hudson.model.User;
 import hudson.plugins.cigame.UserScoreProperty;
 import hudson.plugins.im.Sender;
@@ -63,7 +62,7 @@ public class UserStatCommand extends AbstractTextSendingCommand {
 	}
 
 	private String checkPermission(User user, Sender sender) {
-        if (!user.hasPermission(Item.READ)) {
+        if (!user.hasPermission(Hudson.READ)) {
             return sender.getNickname() + ": you may not read that user!"; 
         }
         return null;
