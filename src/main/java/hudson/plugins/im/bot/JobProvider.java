@@ -7,15 +7,15 @@ import java.util.List;
 
 public interface JobProvider {
     /**
-     * Returns the Hudson job with the given name or null
+     * Returns the Jenkins job with the given name or null
      * if no job with that name exists.
      */
     AbstractProject<?, ?> getJobByName(String name);
     
     /**
-     * Returns all Hudson jobs.
+     * Returns all Jenkins jobs.
      *
-     * @return a list with all Hudson jobs. Never null.
+     * @return a list with all Jenkins jobs. Never null.
      */
     @SuppressWarnings("unchecked")
     List<AbstractProject> getAllJobs();

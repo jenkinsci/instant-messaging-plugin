@@ -14,7 +14,7 @@ import java.util.Collections;
 public class UserStatCommand extends AbstractTextSendingCommand {
 
     private static final String SYNTAX = " <username>";
-    private static final String HELP = SYNTAX + " - prints information about a Hudson user";
+    private static final String HELP = SYNTAX + " - prints information about a Jenkins user";
 
     @Override
     public Collection<String> getCommandNames() {

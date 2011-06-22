@@ -234,14 +234,14 @@ public class Bot implements IMMessageListener {
 	}
 
 	/**
-	 * Called on Hudson shutdown.
+	 * Called on Jenkins shutdown.
 	 */
 	public void shutdown() {
 		this.chat.removeMessageListener(this);
 		
 		if (this.chat.isMultiUserChat()) {
 			try {
-				chat.sendMessage("Oops, seems like Hudson is going down now. See ya!");
+				chat.sendMessage("Oops, seems like Jenkins is going down now. See ya!");
 			} catch (IMException e) {
 				// ignore
 			}
