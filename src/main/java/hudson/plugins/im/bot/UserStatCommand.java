@@ -12,6 +12,10 @@ import java.util.Collections;
 
 @Extension
 public class UserStatCommand extends AbstractTextSendingCommand {
+
+    private static final String SYNTAX = " <username>";
+    private static final String HELP = SYNTAX + " - prints information about a Hudson user";
+
     @Override
     public Collection<String> getCommandNames() {
         return Collections.singleton("userstat");
@@ -19,6 +23,9 @@ public class UserStatCommand extends AbstractTextSendingCommand {
 
     @Override
 	protected String getReply(Bot bot, Sender sender, String[] args) {
+		if (args.length < 2) {
+		    return giveSyntax(sender.getNickname(), args[0]);
+		}
 		String userName = args[1];
 		User user = User.get(userName, false);
 		if (user != null) {
@@ -70,7 +77,11 @@ public class UserStatCommand extends AbstractTextSendingCommand {
 
     @Override
 	public String getHelp() {
-		return " <username> - prints information about a Hudson user";
+		return HELP;
+	}
+
+	private String giveSyntax(String sender, String cmd) {
+		return sender + ": syntax is: '" + cmd +  SYNTAX + "'";
 	}
 
 }
