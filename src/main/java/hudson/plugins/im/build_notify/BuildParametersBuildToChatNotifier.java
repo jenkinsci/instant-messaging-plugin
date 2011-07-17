@@ -14,10 +14,9 @@ import hudson.plugins.im.IMPublisher;
 
 /**
  * Extends {@link DefaultBuildToChatNotifier} and also prints
- * failed tests if any.
- * Up to 5 failing tests are printed. Youngest failing tests are displayed first.
+ * build parameters used in the build, if any.
  * 
- * @author kutzi
+ * @author petehayes
  */
 public class BuildParametersBuildToChatNotifier extends SummaryOnlyBuildToChatNotifier {
 
