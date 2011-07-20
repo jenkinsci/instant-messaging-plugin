@@ -34,6 +34,15 @@
         </license>
     </licenses>
     
+    <!-- get every artifact through maven.glassfish.org, which proxies all 
+        the artifacts that we need -->
+    <repositories>
+        <repository>
+            <id>m.g.o-public</id>
+            <url>http://maven.glassfish.org/content/groups/public/</url>
+        </repository>
+    </repositories>
+    
     <scm>
         <connection>scm:git:git@github.com:jenkinsci/instant-messaging-plugin.git</connection>
         <developerConnection>scm:git:git@github.com:jenkinsci/instant-messaging-plugin.git</developerConnection>
