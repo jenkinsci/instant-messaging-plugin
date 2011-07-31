@@ -10,7 +10,7 @@
 	<groupId>org.jvnet.hudson.plugins</groupId>
 	<artifactId>instant-messaging</artifactId>
 	<name>Jenkins instant-messaging plugin</name>
-	<version>1.18</version>
+	<version>1.19-SNAPSHOT</version>
 	<packaging>hpi</packaging>
 	<url>http://wiki.jenkins-ci.org/display/JENKINS/Instant+Messaging+Plugin</url>
 	<developers>
