@@ -56,6 +56,8 @@ public abstract class BuildToChatNotifier implements Describable<BuildToChatNoti
      *      The build that just completed. Never null.
      * @param listener
      *      Any errors can be reported here.
+     * @param firstFailure
+     *      True if this is the first failed build, false if it's a 'still-failing' build
      */
     public String suspectMessage(IMPublisher publisher, AbstractBuild<?, ?> build, BuildListener listener,
     		boolean firstFailure) {
