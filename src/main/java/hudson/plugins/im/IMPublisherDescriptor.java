@@ -11,8 +11,14 @@ public interface IMPublisherDescriptor {
     public static final String PARAMETERNAME_NOTIFY_CULPRITS = PREFIX + "notifyCulprits";
     public static final String PARAMETERNAME_NOTIFY_FIXERS = PREFIX + "notifyFixers";
     public static final String PARAMETERNAME_NOTIFY_UPSTREAM_COMMITTERS = PREFIX + "notifyUpstreamCommitters";
+	public static final String PARAMETERNAME_CUSTOM_GROUP_MESSAGES = PREFIX + "customGroupMessages";
+	public static final String PARAMETERNAME_CUSTOM_START_MESSAGE = PREFIX + "customStartMessage";
+	public static final String PARAMETERNAME_CUSTOM_SUCCESS_MESSAGE = PREFIX + "customSuccessMessage";
+	public static final String PARAMETERNAME_CUSTOM_FIXED_MESSAGE = PREFIX + "customFixedMessage";
+	public static final String PARAMETERNAME_CUSTOM_UNSTABLE_MESSAGE = PREFIX + "customUnstableMessage";
+	public static final String PARAMETERNAME_CUSTOM_FAILED_MESSAGE = PREFIX + "customFailedMessage";
     
-    public static final String PARAMETERVALUE_STRATEGY_DEFAULT = NotificationStrategy.STATECHANGE_ONLY.getDisplayName();;
+    public static final String PARAMETERVALUE_STRATEGY_DEFAULT = NotificationStrategy.STATECHANGE_ONLY.getDisplayName();
     public static final String[] PARAMETERVALUE_STRATEGY_VALUES = NotificationStrategy.getDisplayNames();
     public static final String PARAMETERNAME_HUDSON_LOGIN = PREFIX + "hudsonLogin";
     public static final String PARAMETERNAME_HUDSON_PASSWORD = PREFIX + "hudsonPassword";
