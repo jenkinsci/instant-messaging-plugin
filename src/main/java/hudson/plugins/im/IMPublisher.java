@@ -1,44 +1,27 @@
 package hudson.plugins.im;
 
+import com.google.common.collect.Lists;
 import hudson.Launcher;
 import hudson.matrix.MatrixAggregatable;
 import hudson.matrix.MatrixAggregator;
 import hudson.matrix.MatrixBuild;
 import hudson.matrix.MatrixProject;
-import hudson.matrix.MatrixRun;
-import hudson.model.BuildListener;
-import hudson.model.UserProperty;
-import hudson.model.AbstractBuild;
-import hudson.model.AbstractProject;
+import hudson.model.*;
 import hudson.model.Fingerprint.RangeSet;
-import hudson.model.User;
 import hudson.plugins.im.build_notify.BuildToChatNotifier;
+import hudson.plugins.im.build_notify.CustomGroupMessageNotifier;
 import hudson.plugins.im.build_notify.DefaultBuildToChatNotifier;
 import hudson.plugins.im.tools.BuildHelper;
-import hudson.plugins.im.tools.ExceptionHelper;
 import hudson.plugins.im.tools.BuildHelper.ExtResult;
+import hudson.plugins.im.tools.ExceptionHelper;
 import hudson.scm.ChangeLogSet;
 import hudson.scm.ChangeLogSet.Entry;
-import hudson.tasks.BuildStep;
-import hudson.tasks.BuildStepDescriptor;
-import hudson.tasks.BuildStepMonitor;
-import hudson.tasks.Notifier;
-import hudson.tasks.Publisher;
-
-import java.io.IOException;
-import java.util.Collection;
-import java.util.Collections;
-import java.util.HashMap;
-import java.util.HashSet;
-import java.util.LinkedList;
-import java.util.List;
-import java.util.Map;
-import java.util.Set;
-import java.util.logging.Logger;
-
+import hudson.tasks.*;
 import org.springframework.util.Assert;
 
-import com.google.common.collect.Lists;
+import java.io.IOException;
+import java.util.*;
+import java.util.logging.Logger;
 
 /**
  * The actual Publisher which sends notification messages out to the clients.
@@ -66,6 +49,12 @@ public abstract class IMPublisher extends Notifier implements BuildStep, MatrixA
     private final boolean notifyUpstreamCommitters;
     private BuildToChatNotifier buildToChatNotifier;
     private MatrixJobMultiplier matrixMultiplier = MatrixJobMultiplier.ONLY_CONFIGURATIONS;
+	private final String customStartMessage;
+	private final String customSuccessMessage;
+	private final String customFixedMessage;
+	private final String customUnstableMessage;
+	private final String customFailedMessage;
+	private final CustomGroupMessageNotifier customGroupMessageNotifier;
     
     /**
      * @deprecated Only for deserializing old instances
@@ -76,7 +65,7 @@ public abstract class IMPublisher extends Notifier implements BuildStep, MatrixA
 
     /**
      * @deprecated
-     *      as of 1.9. Use {@link #IMPublisher(List, String, boolean, boolean, boolean, boolean, boolean, BuildToChatNotifier)}
+     *      as of 1.9. Use {@link #IMPublisher(java.util.List, String, boolean, boolean, boolean, boolean, boolean, hudson.plugins.im.build_notify.BuildToChatNotifier, MatrixJobMultiplier)}
      *      instead.
      */
     @Deprecated
@@ -88,10 +77,29 @@ public abstract class IMPublisher extends Notifier implements BuildStep, MatrixA
     		boolean notifyFixers,
     		boolean notifyUpstreamCommitters) {
         this(defaultTargets,notificationStrategyString,notifyGroupChatsOnBuildStart,notifySuspects,notifyCulprits,
-                notifyFixers,notifyUpstreamCommitters,new DefaultBuildToChatNotifier(), MatrixJobMultiplier.ALL);
+                notifyFixers,notifyUpstreamCommitters,new DefaultBuildToChatNotifier(), MatrixJobMultiplier.ALL,
+				false, null, null, null, null, null);
     }
 
-    protected IMPublisher(List<IMMessageTarget> defaultTargets,
+	/**
+	 * @deprecated as of 1.19. Use {@link #IMPublisher(java.util.List, String, boolean, boolean, boolean, boolean, boolean, hudson.plugins.im.build_notify.BuildToChatNotifier, MatrixJobMultiplier, boolean, String, String, String, String, String)} instead.
+	 */
+	@Deprecated
+	protected IMPublisher(List<IMMessageTarget> defaultTargets,
+						  String notificationStrategyString,
+						  boolean notifyGroupChatsOnBuildStart,
+						  boolean notifySuspects,
+						  boolean notifyCulprits,
+						  boolean notifyFixers,
+						  boolean notifyUpstreamCommitters,
+						  BuildToChatNotifier buildToChatNotifier,
+						  MatrixJobMultiplier matrixMultiplier) {
+		this(defaultTargets, notificationStrategyString, notifyGroupChatsOnBuildStart, notifySuspects,
+				notifyCulprits, notifyFixers, notifyUpstreamCommitters, buildToChatNotifier, matrixMultiplier,
+				false, null, null, null, null, null);
+	}
+
+	protected IMPublisher(List<IMMessageTarget> defaultTargets,
     		String notificationStrategyString,
     		boolean notifyGroupChatsOnBuildStart,
     		boolean notifySuspects,
@@ -99,7 +107,13 @@ public abstract class IMPublisher extends Notifier implements BuildStep, MatrixA
     		boolean notifyFixers,
     		boolean notifyUpstreamCommitters,
             BuildToChatNotifier buildToChatNotifier,
-            MatrixJobMultiplier matrixMultiplier)
+            MatrixJobMultiplier matrixMultiplier,
+			boolean customGroupMessages,
+			String customStartMessage,
+			String customSuccessMessage,
+			String customFixedMessage,
+			String customUnstableMessage,
+			String customFailedMessage)
     {
     	if (defaultTargets != null) {
     		this.targets = defaultTargets;
@@ -120,6 +134,17 @@ public abstract class IMPublisher extends Notifier implements BuildStep, MatrixA
         this.notifyUpstreamCommitters = notifyUpstreamCommitters;
         this.buildToChatNotifier = buildToChatNotifier;
         this.matrixMultiplier = matrixMultiplier;
+		this.customStartMessage = customStartMessage;
+		this.customSuccessMessage = customSuccessMessage;
+		this.customFixedMessage = customFixedMessage;
+		this.customUnstableMessage = customUnstableMessage;
+		this.customFailedMessage = customFailedMessage;
+
+		if (customGroupMessages) {
+			customGroupMessageNotifier = new CustomGroupMessageNotifier(buildToChatNotifier);
+		} else {
+			customGroupMessageNotifier = null;
+		}
     }
     
     /**
@@ -267,8 +292,32 @@ public abstract class IMPublisher extends Notifier implements BuildStep, MatrixA
     public final boolean getNotifyUpstreamCommitters() {
         return notifyUpstreamCommitters;
     }
-    
-    /**
+
+	public final boolean getCustomGroupMessages() {
+		return customGroupMessageNotifier != null;
+	}
+
+	public final String getCustomStartMessage() {
+		return customStartMessage;
+	}
+
+	public final String getCustomSuccessMessage() {
+		return customSuccessMessage;
+	}
+
+	public final String getCustomFailedMessage() {
+		return customFailedMessage;
+	}
+
+	public final String getCustomFixedMessage() {
+		return customFixedMessage;
+	}
+
+	public final String getCustomUnstableMessage() {
+		return customUnstableMessage;
+	}
+
+	/**
      * Logs message to the build listener's logger.
      */
     protected void log(BuildListener listener, String message) {
@@ -527,7 +576,12 @@ public abstract class IMPublisher extends Notifier implements BuildStep, MatrixA
      * Notify all registered chats about the build result.
      */
 	private void notifyChats(final AbstractBuild<?, ?> build, final BuildListener buildListener) throws IOException, InterruptedException {
-        String msg = buildToChatNotifier.buildCompletionMessage(this,build,buildListener);
+		final String msg;
+		if (customGroupMessageNotifier != null) {
+			msg = customGroupMessageNotifier.buildCompletionMessage(this, build, buildListener);
+		} else {
+        	msg = buildToChatNotifier.buildCompletionMessage(this,build,buildListener);
+		}
 
 		for (IMMessageTarget target : calculateTargets())
 		{
@@ -563,7 +617,12 @@ public abstract class IMPublisher extends Notifier implements BuildStep, MatrixA
 	 */
 	private void notifyOnBuildStart(AbstractBuild<?, ?> build, BuildListener buildListener) {
 	    try {
-            final String msg = buildToChatNotifier.buildStartMessage(this,build,buildListener);
+			final String msg;
+			if (customGroupMessageNotifier != null) {
+				msg = customGroupMessageNotifier.buildStartMessage(this, build, buildListener);
+			} else {
+            	msg = buildToChatNotifier.buildStartMessage(this,build,buildListener);
+			}
             for (final IMMessageTarget target : calculateTargets()) {
                 // only notify group chats
                 if (target instanceof GroupChatIMMessageTarget) {

@@ -29,4 +29,29 @@ THE SOFTWARE.
   <!-- TODO: replace this with f:dropdownDescriptorSelector when depending on 1.375 or later -->
   <this:dropdownDescriptorSelector xmlns:this="/hudson/plugins/im/IMPublisher"
      title="${%Channel Notification Message}" field="buildToChatNotifier" descriptors="${allBuildToChatNotifiers}"/>
+
+  <f:optionalBlock name="${descriptor.PARAMETERNAME_CUSTOM_GROUP_MESSAGES}"
+  	title="${%Customize group chat messages}" field="customGroupMessages">
+    <f:entry title="${%Custom start message}"
+      description="${%Custom group chat start message; used only when notify build start is checked.}">
+      <f:textbox name="${descriptor.PARAMETERNAME_CUSTOM_START_MESSAGE}" field="customStartMessage"/>
+    </f:entry>
+    <f:entry title="${%Custom build success message}"
+      description="${%Custom group chat message on successful build}">
+      <f:textbox name="${descriptor.PARAMETERNAME_CUSTOM_SUCCESS_MESSAGE}" field="customSuccessMessage"/>
+    </f:entry>
+    <f:entry title="${%Custom build fixed message}"
+      description="${%Custom group chat message on fixed build}">
+      <f:textbox name="${descriptor.PARAMETERNAME_CUSTOM_FIXED_MESSAGE}" field="customFixedMessage"/>
+    </f:entry>
+    <f:entry title="${%Custom build unstable message}"
+      description="${%Custom group chat message on unstable build}">
+      <f:textbox name="${descriptor.PARAMETERNAME_CUSTOM_UNSTABLE_MESSAGE}" field="customUnstableMessage"/>
+    </f:entry>
+    <f:entry title="${%Custom build failed message}"
+      description="${%Custom group chat message on failed build}">
+      <f:textbox name="${descriptor.PARAMETERNAME_CUSTOM_FAILED_MESSAGE}" field="customFailedMessage"/>
+    </f:entry>
+
+  </f:optionalBlock>
 </j:jelly>

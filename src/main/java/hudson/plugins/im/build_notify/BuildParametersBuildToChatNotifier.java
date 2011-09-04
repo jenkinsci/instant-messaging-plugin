@@ -1,16 +1,15 @@
 package hudson.plugins.im.build_notify;
 
-import java.io.IOException;
-import java.util.List;
-
-import org.kohsuke.stapler.DataBoundConstructor;
-
 import hudson.Extension;
 import hudson.model.AbstractBuild;
 import hudson.model.BuildListener;
 import hudson.model.ParameterValue;
 import hudson.model.ParametersAction;
 import hudson.plugins.im.IMPublisher;
+import org.kohsuke.stapler.DataBoundConstructor;
+
+import java.io.IOException;
+import java.util.List;
 
 /**
  * Extends {@link DefaultBuildToChatNotifier} and also prints
