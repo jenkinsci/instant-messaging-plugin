@@ -3,9 +3,9 @@ package hudson.plugins.im;
 import hudson.Launcher;
 import hudson.matrix.MatrixAggregatable;
 import hudson.matrix.MatrixAggregator;
+import hudson.matrix.MatrixConfiguration;
 import hudson.matrix.MatrixBuild;
 import hudson.matrix.MatrixProject;
-import hudson.matrix.MatrixRun;
 import hudson.model.BuildListener;
 import hudson.model.UserProperty;
 import hudson.model.AbstractBuild;
@@ -232,7 +232,7 @@ public abstract class IMPublisher extends Notifier implements BuildStep, MatrixA
      * Specifies if the starting of builds should be notified to
      * the registered chat rooms.
      */
-    public final boolean getNotifyOnStart() {
+    public boolean getNotifyOnStart() {
     	return notifyOnBuildStart;
     }
     
@@ -281,7 +281,7 @@ public abstract class IMPublisher extends Notifier implements BuildStep, MatrixA
         Assert.notNull(build, "Parameter 'build' must not be null.");
         Assert.notNull(buildListener, "Parameter 'buildListener' must not be null.");
         
-        if (build.getProject() instanceof MatrixProject) {
+        if (build.getProject() instanceof MatrixConfiguration) {
             if (getMatrixNotifier() == MatrixJobMultiplier.ONLY_CONFIGURATIONS
                 || getMatrixNotifier() == MatrixJobMultiplier.ALL) {
                 notifyOnBuildEnd(build, buildListener);
@@ -296,7 +296,7 @@ public abstract class IMPublisher extends Notifier implements BuildStep, MatrixA
     /**
      * Sends notification at build end including maybe notifications of culprits, fixers or so.
      */
-    private void notifyOnBuildEnd(final AbstractBuild<?, ?> build,
+    /* package for testing */ void notifyOnBuildEnd(final AbstractBuild<?, ?> build,
             final BuildListener buildListener) throws IOException,
             InterruptedException {
         if (getNotificationStrategy().notificationWanted(build)) {
@@ -545,8 +545,8 @@ public abstract class IMPublisher extends Notifier implements BuildStep, MatrixA
 	 */
 	@Override
 	public boolean prebuild(AbstractBuild<?, ?> build, BuildListener buildListener) {
-		if (notifyOnBuildStart) {
-           if (build.getProject() instanceof MatrixProject) {
+		if (getNotifyOnStart()) {
+           if (build.getProject() instanceof MatrixConfiguration) {
                if (getMatrixNotifier() == MatrixJobMultiplier.ONLY_CONFIGURATIONS
                        || getMatrixNotifier() == MatrixJobMultiplier.ALL) {
                    notifyOnBuildStart(build, buildListener);
@@ -561,7 +561,7 @@ public abstract class IMPublisher extends Notifier implements BuildStep, MatrixA
 	/**
 	 * Sends notification about the build start.
 	 */
-	private void notifyOnBuildStart(AbstractBuild<?, ?> build, BuildListener buildListener) {
+	/* package for testing */ void notifyOnBuildStart(AbstractBuild<?, ?> build, BuildListener buildListener) {
 	    try {
             final String msg = buildToChatNotifier.buildStartMessage(this,build,buildListener);
             for (final IMMessageTarget target : calculateTargets()) {
@@ -695,7 +695,7 @@ public abstract class IMPublisher extends Notifier implements BuildStep, MatrixA
             @Override
             public boolean startBuild() throws InterruptedException,
                     IOException {
-                if (IMPublisher.this.notifyOnBuildStart) {
+                if (getNotifyOnStart()) {
                     if (getMatrixNotifier() == MatrixJobMultiplier.ALL || getMatrixNotifier() == MatrixJobMultiplier.ONLY_PARENT) {
                         notifyOnBuildStart(build, listener);
                     }
