@@ -3,11 +3,10 @@
 	<parent>
 		<groupId>org.jvnet.hudson.plugins</groupId>
 		<artifactId>instant-messaging-parent</artifactId>
-		<version>1.16</version>
+		<version>1.17-SNAPSHOT</version>
 		<relativePath>../instant-messaging-parent-plugin/pom.xml</relativePath>
 	</parent>
 
-	<groupId>org.jvnet.hudson.plugins</groupId>
 	<artifactId>instant-messaging</artifactId>
 	<name>Jenkins instant-messaging plugin</name>
 	<version>1.20-SNAPSHOT</version>
