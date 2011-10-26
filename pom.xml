@@ -9,7 +9,7 @@
 
 	<artifactId>instant-messaging</artifactId>
 	<name>Jenkins instant-messaging plugin</name>
-	<version>1.20</version>
+	<version>1.21-SNAPSHOT</version>
 	<packaging>hpi</packaging>
 	<url>http://wiki.jenkins-ci.org/display/JENKINS/Instant+Messaging+Plugin</url>
 	<developers>
