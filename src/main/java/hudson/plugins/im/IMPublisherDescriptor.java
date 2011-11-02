@@ -15,7 +15,6 @@ public interface IMPublisherDescriptor {
     public static final String PARAMETERVALUE_STRATEGY_DEFAULT = NotificationStrategy.STATECHANGE_ONLY.getDisplayName();;
     public static final String[] PARAMETERVALUE_STRATEGY_VALUES = NotificationStrategy.getDisplayNames();
     public static final String PARAMETERNAME_HUDSON_LOGIN = PREFIX + "hudsonLogin";
-    public static final String PARAMETERNAME_HUDSON_PASSWORD = PREFIX + "hudsonPassword";
     
 	/**
 	 * Returns <code>true</code> iff the plugin is globally enabled.
@@ -70,11 +69,6 @@ public interface IMPublisherDescriptor {
      * Returns the user name needed to login into Hudson.
      */
     String getHudsonUserName();
-    
-    /**
-     * Returns the password needed to login into Hudson.
-     */
-    String getHudsonPassword();
     
     /**
      * Returns the default targets which should be used for build notification.

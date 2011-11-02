@@ -5,9 +5,5 @@
     <f:textbox name="${descriptor.PARAMETERNAME_HUDSON_LOGIN}"
       value="${descriptor.hudsonUserName}" />
   </f:entry>
-  <f:entry title="Jenkins Password">
-    <f:password name="${descriptor.PARAMETERNAME_HUDSON_PASSWORD}"
-      value="${descriptor.hudsonPassword}" />
-  </f:entry>
   
 </j:jelly>

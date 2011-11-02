@@ -1,12 +1,17 @@
 package hudson.plugins.im;
 
+import hudson.model.User;
 import hudson.model.Hudson;
 import hudson.plugins.im.tools.ExceptionHelper;
+import hudson.security.SecurityRealm;
 import java.util.concurrent.Semaphore;
 import java.util.concurrent.TimeUnit;
 import java.util.logging.Logger;
 
 import org.acegisecurity.Authentication;
+import org.acegisecurity.AuthenticationException;
+import org.acegisecurity.GrantedAuthority;
+import org.acegisecurity.userdetails.UserDetails;
 import org.acegisecurity.providers.UsernamePasswordAuthenticationToken;
 
 /**
@@ -113,7 +118,7 @@ public abstract class IMConnectionProvider implements IMConnectionListener {
     // we need an additional level of indirection to the Authentication entity
     // to fix HUDSON-5978 and HUDSON-5233
 	public synchronized AuthenticationHolder getAuthenticationHolder() {
-	    if (this.descriptor == null || this.descriptor.getHudsonUserName() == null) {
+	    if (descriptor == null || descriptor.getHudsonUserName() == null) {
 	        return null;
 	    }
 	    
@@ -124,16 +129,17 @@ public abstract class IMConnectionProvider implements IMConnectionListener {
                     return authentication;
                 }
                 
+                User u = User.get(descriptor.getHudsonUserName());
+
+                // Ruthlessly copied from User.impersonate on latest Jenkins, for bw-compatibility.
                 try {
-                    Authentication tmp = new UsernamePasswordAuthenticationToken(
-                            descriptor.getHudsonUserName(),
-                            descriptor.getHudsonPassword());
-                    authentication = Hudson.getInstance().getSecurityRealm().getSecurityComponents().manager.authenticate(tmp);
-                } catch (Exception e) {
-                    LOGGER.warning(descriptor.getPluginDescription() 
-                            + " couldn't authenticate against Hudson: " + e);
+                    UserDetails d = Hudson.getInstance().getSecurityRealm().loadUserByUsername(u.getId());
+                    return new UsernamePasswordAuthenticationToken(d.getUsername(), "", d.getAuthorities());
+                } catch (AuthenticationException e) {
+                    // TODO: use the stored GrantedAuthorities
+                    return new UsernamePasswordAuthenticationToken(
+                        u.getId(), "", new GrantedAuthority[]{SecurityRealm.AUTHENTICATED_AUTHORITY});
                 }
-                return authentication;
             }
         };
 	}
