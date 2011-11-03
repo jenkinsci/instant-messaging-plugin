@@ -131,20 +131,24 @@ public abstract class IMConnectionProvider implements IMConnectionListener {
                 
                 User u = User.get(descriptor.getHudsonUserName());
 
-                // Ruthlessly copied from User.impersonate on latest Jenkins, for bw-compatibility.
-                try {
-                    UserDetails d = Hudson.getInstance().getSecurityRealm().loadUserByUsername(u.getId());
-                    return new UsernamePasswordAuthenticationToken(d.getUsername(), "", d.getAuthorities());
-                } catch (AuthenticationException e) {
-                    // TODO: use the stored GrantedAuthorities
-                    return new UsernamePasswordAuthenticationToken(
-                        u.getId(), "", new GrantedAuthority[]{SecurityRealm.AUTHENTICATED_AUTHORITY});
-                }
+                return impersonateUser(u);
             }
         };
 	}
 
-	private final class ConnectorRunnable implements Runnable {
+	// TODO: replace with User#impersonate once we are requiring 1.419+ as core
+	private Authentication impersonateUser(User u) {
+        try {
+            UserDetails d = Hudson.getInstance().getSecurityRealm().loadUserByUsername(u.getId());
+            return new UsernamePasswordAuthenticationToken(d.getUsername(), "", d.getAuthorities());
+        } catch (AuthenticationException e) {
+            // TODO: use the stored GrantedAuthorities
+            return new UsernamePasswordAuthenticationToken(
+                u.getId(), "", new GrantedAuthority[]{SecurityRealm.AUTHENTICATED_AUTHORITY});
+        }
+    }
+
+    private final class ConnectorRunnable implements Runnable {
 
         private final Semaphore semaphore = new Semaphore(0);
         
