@@ -39,6 +39,14 @@ public interface IMChat {
      * as opposed to a single user chat (IRC private message exchange).
      */
     public boolean isMultiUserChat();
+
+    /**
+     * Returns if commands for Jenkins are accepted via this chat.
+     * Otherwise this chat only acts as a notification target.
+     * 
+     * @since 1.21
+     */
+    public boolean isCommandsAccepted();
     
     /**
      * Adds a new {@link IMMessageListener} to this chat.

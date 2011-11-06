@@ -71,6 +71,7 @@ public class Bot implements IMMessageListener {
 	private final String nick;
 	private final String imServer;
 	private final String commandPrefix;
+	private boolean commandsAccepted;
 	private String helpCache = null;
 
 	private final AuthenticationHolder authentication;
@@ -83,6 +84,7 @@ public class Bot implements IMMessageListener {
 		this.imServer = imServer;
 		this.commandPrefix = commandPrefix;
 		this.authentication = authentication;
+        this.commandsAccepted = chat.isCommandsAccepted();
 
         for (BotCommand cmd : BotCommand.all()) {
             for (String name : cmd.getCommandNames())
@@ -104,30 +106,26 @@ public class Bot implements IMMessageListener {
         // is it a command for me ? (returns null if not, the payload if so)
         String payload = retrieveMessagePayLoad(msg.getBody());
         if (payload != null) {
-        	String sender = msg.getFrom();
-        	if (!msg.isAuthorized()) {
-        		try {
-					this.chat.sendMessage(sender + " you're not a buddy of me. I won't take any commands from you.");
-				} catch (IMException e) {
-					LOGGER.warning(ExceptionHelper.dump(e));
-				}
-				return;
-        	}
+            Sender s = getSender(msg);
+        	
+        	try {
+            	if (!this.commandsAccepted) {
+            	    this.chat.sendMessage(s.getNickname() + " you may not issue bot commands in this chat!");
+            	    return;
+            	} else if (!msg.isAuthorized()) {
+    				this.chat.sendMessage(s.getNickname() + " you're not a buddy of me. I won't take any commands from you!");
+    				return;
+            	}
+        	} catch (IMException e) {
+                LOGGER.warning(ExceptionHelper.dump(e));
+                return;
+            }
         	
             // split words
             String[] args = MessageHelper.extractCommandLine(payload);
             if (args.length > 0) {
                 // first word is the command name
                 String cmd = args[0];
-                
-                String id = this.chat.getIMId(sender);
-                
-                final Sender s;
-                if (id != null) {
-                    s = new Sender(this.chat.getNickName(sender), id);
-                } else {
-                    s = new Sender(this.chat.getNickName(sender));
-                }
                 
                 try {
                 	BotCommand command = this.cmdsAndAliases.get(cmd);
@@ -144,7 +142,7 @@ public class Bot implements IMMessageListener {
                     	    }
                 	    }
                     } else {
-                        this.chat.sendMessage(sender + " did you mean me? Unknown command '" + cmd
+                        this.chat.sendMessage(s.getNickname() + " did you mean me? Unknown command '" + cmd
                                 + "'\nUse '" + this.commandPrefix + " help' to get help!");
                     }
                 } catch (IMException e) {
@@ -154,7 +152,20 @@ public class Bot implements IMMessageListener {
         }
 	}
 
-	private static boolean isNickSeparator(final String candidate) {
+	private Sender getSender(IMMessage msg) {
+	    String sender = msg.getFrom();
+	    String id = this.chat.getIMId(sender);
+        
+        final Sender s;
+        if (id != null) {
+            s = new Sender(this.chat.getNickName(sender), id);
+        } else {
+            s = new Sender(this.chat.getNickName(sender));
+        }
+        return s;
+    }
+
+    private static boolean isNickSeparator(final String candidate) {
 		return ":".equals(candidate) || ",".equals(candidate);
 	}
 
