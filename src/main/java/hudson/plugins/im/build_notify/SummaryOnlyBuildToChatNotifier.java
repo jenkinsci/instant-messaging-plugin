@@ -29,11 +29,19 @@ public class SummaryOnlyBuildToChatNotifier extends BuildToChatNotifier {
 
     @Override
     public String buildCompletionMessage(IMPublisher publisher, AbstractBuild<?, ?> build, BuildListener listener) throws IOException, InterruptedException {
-        return Messages.SummaryOnlyBuildToChatNotifier_Summary(
-               getProjectName(build), build.getDisplayName(),
-               BuildHelper.getResultDescription(build),
-               build.getTimestampString(),
-               MessageHelper.getBuildURL(build));
+        final StringBuilder sb;
+        if (BuildHelper.isFix(build)) {
+            sb = new StringBuilder(Messages.SummaryOnlyBuildToChatNotifier_BuildIsFixed());
+        } else {
+            sb = new StringBuilder();
+        }
+        sb.append(Messages.SummaryOnlyBuildToChatNotifier_Summary(
+                getProjectName(build), build.getDisplayName(),
+                BuildHelper.getResultDescription(build),
+                build.getTimestampString(),
+                MessageHelper.getBuildURL(build)));
+
+        return sb.toString();
     }
 
     @Extension
