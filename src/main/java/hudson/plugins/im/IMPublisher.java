@@ -446,7 +446,7 @@ public abstract class IMPublisher extends Notifier implements BuildStep, MatrixA
     @SuppressWarnings("rawtypes")
     private Map<AbstractProject, List<AbstractBuild>> getUpstreamBuildsSinceLastStable(AbstractBuild<?,?> currentBuild) {
     	// may be null:
-    	AbstractBuild<?, ?> previousSuccessfulBuild = BuildHelper.getPreviousSuccessfulBuild(currentBuild);
+    	AbstractBuild<?, ?> previousSuccessfulBuild = currentBuild.getPreviousSuccessfulBuild();
     	
     	if (previousSuccessfulBuild == null) {
     	    return Collections.emptyMap();

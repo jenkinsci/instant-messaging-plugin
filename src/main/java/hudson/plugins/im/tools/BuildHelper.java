@@ -1,6 +1,7 @@
 package hudson.plugins.im.tools;
 
 import hudson.model.AbstractBuild;
+import hudson.model.Run;
 import hudson.model.Result;
 
 /**
@@ -95,6 +96,8 @@ public class BuildHelper {
     /**
      * Returns the previous successful build (i.e. build with result SUCCESS)
      * or null.
+     * 
+     * @deprecated use {@link Run#getPreviousSuccessfulBuild()}
     */
     public static AbstractBuild<?, ?> getPreviousSuccessfulBuild(AbstractBuild<?, ?> build) {
         AbstractBuild<?, ?> previousBuild = build.getPreviousBuild();
