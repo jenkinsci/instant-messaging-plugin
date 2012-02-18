@@ -525,10 +525,13 @@ public abstract class IMPublisher extends Notifier implements BuildStep, MatrixA
 
     /**
      * Notify all registered chats about the build result.
+     * When the completion message is null or empty, no message is sent.
      */
 	private void notifyChats(final AbstractBuild<?, ?> build, final BuildListener buildListener) throws IOException, InterruptedException {
         String msg = buildToChatNotifier.buildCompletionMessage(this,build,buildListener);
-
+        if (msg == null || msg.isEmpty()) {
+            return;
+        }
 		for (IMMessageTarget target : calculateTargets())
 		{
 		    try {
@@ -560,10 +563,14 @@ public abstract class IMPublisher extends Notifier implements BuildStep, MatrixA
 	
 	/**
 	 * Sends notification about the build start.
+     * When the start message is null or empty, no message is sent.
 	 */
 	/* package for testing */ void notifyOnBuildStart(AbstractBuild<?, ?> build, BuildListener buildListener) {
 	    try {
             final String msg = buildToChatNotifier.buildStartMessage(this,build,buildListener);
+            if (msg == null || msg.isEmpty()) {
+                return;
+            }
             for (final IMMessageTarget target : calculateTargets()) {
                 // only notify group chats
                 if (target instanceof GroupChatIMMessageTarget) {
