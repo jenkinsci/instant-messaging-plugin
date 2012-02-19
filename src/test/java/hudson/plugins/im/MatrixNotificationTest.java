@@ -40,7 +40,7 @@ public class MatrixNotificationTest {
         when(publisher.createAggregator(any(MatrixBuild.class), any(Launcher.class), any(BuildListener.class))).thenCallRealMethod();
         when(publisher.getNotifyOnStart()).thenReturn(Boolean.TRUE);
         
-        Mockito.doNothing().when(publisher).notifyOnBuildStart(any(AbstractBuild.class), any(BuildListener.class));
+        Mockito.doNothing().when(publisher).notifyChatsOnBuildStart(any(AbstractBuild.class), any(BuildListener.class));
         Mockito.doNothing().when(publisher).notifyOnBuildEnd(any(AbstractBuild.class), any(BuildListener.class));
         
         this.listener = mock(BuildListener.class);
@@ -58,13 +58,13 @@ public class MatrixNotificationTest {
         
         publisher.prebuild(configurationBuild, listener);
         publisher.perform(configurationBuild, null, listener);
-        verify(publisher, times(0)).notifyOnBuildStart(any(AbstractBuild.class), any(BuildListener.class));
+        verify(publisher, times(0)).notifyChatsOnBuildStart(any(AbstractBuild.class), any(BuildListener.class));
         verify(publisher, times(0)).notifyOnBuildEnd(any(AbstractBuild.class), any(BuildListener.class));
         
         MatrixAggregator aggregator = publisher.createAggregator(parentBuild, null, listener);
         aggregator.startBuild();
         aggregator.endBuild();
-        verify(publisher).notifyOnBuildStart(parentBuild, listener);
+        verify(publisher).notifyChatsOnBuildStart(parentBuild, listener);
         verify(publisher).notifyOnBuildEnd(parentBuild, listener);
     }
     
@@ -75,12 +75,12 @@ public class MatrixNotificationTest {
         MatrixAggregator aggregator = publisher.createAggregator(parentBuild, null, listener);
         aggregator.startBuild();
         aggregator.endBuild();
-        verify(publisher, times(0)).notifyOnBuildStart(parentBuild, listener);
+        verify(publisher, times(0)).notifyChatsOnBuildStart(parentBuild, listener);
         verify(publisher, times(0)).notifyOnBuildEnd(parentBuild, listener);
         
         publisher.prebuild(configurationBuild, listener);
         publisher.perform(configurationBuild, null, listener);
-        verify(publisher).notifyOnBuildStart(configurationBuild, listener);
+        verify(publisher).notifyChatsOnBuildStart(configurationBuild, listener);
         verify(publisher).notifyOnBuildEnd(configurationBuild, listener);
     }
     
@@ -91,12 +91,12 @@ public class MatrixNotificationTest {
         MatrixAggregator aggregator = publisher.createAggregator(parentBuild, null, listener);
         aggregator.startBuild();
         aggregator.endBuild();
-        verify(publisher).notifyOnBuildStart(parentBuild, listener);
+        verify(publisher).notifyChatsOnBuildStart(parentBuild, listener);
         verify(publisher).notifyOnBuildEnd(parentBuild, listener);
         
         publisher.prebuild(configurationBuild, listener);
         publisher.perform(configurationBuild, null, listener);
-        verify(publisher).notifyOnBuildStart(configurationBuild, listener);
+        verify(publisher).notifyChatsOnBuildStart(configurationBuild, listener);
         verify(publisher).notifyOnBuildEnd(configurationBuild, listener);
     }
 }
