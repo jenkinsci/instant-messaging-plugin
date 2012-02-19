@@ -119,9 +119,15 @@ public class IMPublisherTest {
     private static void createPreviousNextRelationShip(AbstractBuild... builds) {
         int max = builds.length - 1;
         
+        AbstractBuild previousSuccessful = null;
         for (int i = 0; i < builds.length; i++) {
+            if (builds[i].getResult() == Result.SUCCESS) {
+                previousSuccessful = builds[i];
+            }
+            
             if (i < max) {
                 when(builds[i].getNextBuild()).thenReturn(builds[i+1]);
+                when(builds[i+1].getPreviousSuccessfulBuild()).thenReturn(previousSuccessful);
             }
         }
         
