@@ -1,6 +1,7 @@
 package hudson.plugins.im;
 
 import hudson.Launcher;
+import hudson.Util;
 import hudson.matrix.MatrixAggregatable;
 import hudson.matrix.MatrixAggregator;
 import hudson.matrix.MatrixConfiguration;
@@ -300,7 +301,7 @@ public abstract class IMPublisher extends Notifier implements BuildStep, MatrixA
             final BuildListener buildListener) throws IOException,
             InterruptedException {
         if (getNotificationStrategy().notificationWanted(build)) {
-            notifyChats(build, buildListener);
+            notifyChatsOnBuildEnd(build, buildListener);
         }
 
         if (BuildHelper.isStillFailureOrUnstable(build) || BuildHelper.getExtendedResult(build) == ExtResult.NOW_UNSTABLE) {
@@ -523,52 +524,33 @@ public abstract class IMPublisher extends Notifier implements BuildStep, MatrixA
         return false;
     }
 
-    /**
-     * Notify all registered chats about the build result.
-     * When the completion message is null or empty, no message is sent.
-     */
-	private void notifyChats(final AbstractBuild<?, ?> build, final BuildListener buildListener) throws IOException, InterruptedException {
-        String msg = buildToChatNotifier.buildCompletionMessage(this,build,buildListener);
-        if (msg == null || msg.isEmpty()) {
-            return;
-        }
-		for (IMMessageTarget target : calculateTargets())
-		{
-		    try {
-		        log(buildListener, "Sending notification to: " + target.toString());
-		        sendNotification(msg, target, buildListener);
-		    } catch (final Throwable t) {
-		        log(buildListener, "There was an error sending notification to: " + target.toString() + "\n" + ExceptionHelper.dump(t));
-		    }
-		}
-	}
 
-	/**
-	 * {@inheritDoc}
-	 */
-	@Override
-	public boolean prebuild(AbstractBuild<?, ?> build, BuildListener buildListener) {
-		if (getNotifyOnStart()) {
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    public boolean prebuild(AbstractBuild<?, ?> build, BuildListener buildListener) {
+        if (getNotifyOnStart()) {
            if (build.getProject() instanceof MatrixConfiguration) {
                if (getMatrixNotifier() == MatrixJobMultiplier.ONLY_CONFIGURATIONS
                        || getMatrixNotifier() == MatrixJobMultiplier.ALL) {
-                   notifyOnBuildStart(build, buildListener);
+                   notifyChatsOnBuildStart(build, buildListener);
                }
            } else {
-               notifyOnBuildStart(build, buildListener);
+               notifyChatsOnBuildStart(build, buildListener);
            }
-		}
-		return true;
-	}
-	
-	/**
-	 * Sends notification about the build start.
+        }
+        return true;
+    }
+    
+    /**
+     * Notify all registered chats about the build start.
      * When the start message is null or empty, no message is sent.
-	 */
-	/* package for testing */ void notifyOnBuildStart(AbstractBuild<?, ?> build, BuildListener buildListener) {
-	    try {
+     */
+    /* package for testing */ void notifyChatsOnBuildStart(AbstractBuild<?, ?> build, BuildListener buildListener) {
+        try {
             final String msg = buildToChatNotifier.buildStartMessage(this,build,buildListener);
-            if (msg == null || msg.isEmpty()) {
+            if (Util.fixEmpty(msg) == null) {
                 return;
             }
             for (final IMMessageTarget target : calculateTargets()) {
@@ -585,6 +567,26 @@ public abstract class IMPublisher extends Notifier implements BuildStep, MatrixA
             // ignore: never, ever cancel a build because a notification fails
             log(buildListener, "There was an error in the IM plugin: " + ExceptionHelper.dump(t));
         }
+    }
+    
+    /**
+     * Notify all registered chats about the build result.
+     * When the completion message is null or empty, no message is sent.
+     */
+	private void notifyChatsOnBuildEnd(final AbstractBuild<?, ?> build, final BuildListener buildListener) throws IOException, InterruptedException {
+        String msg = buildToChatNotifier.buildCompletionMessage(this,build,buildListener);
+        if (Util.fixEmpty(msg) == null)  {
+            return;
+        }
+		for (IMMessageTarget target : calculateTargets())
+		{
+		    try {
+		        log(buildListener, "Sending notification to: " + target.toString());
+		        sendNotification(msg, target, buildListener);
+		    } catch (final Throwable t) {
+		        log(buildListener, "There was an error sending notification to: " + target.toString() + "\n" + ExceptionHelper.dump(t));
+		    }
+		}
 	}
 	
 	private static Set<User> getCommitters(AbstractBuild<?, ?> build) {
@@ -704,7 +706,7 @@ public abstract class IMPublisher extends Notifier implements BuildStep, MatrixA
                     IOException {
                 if (getNotifyOnStart()) {
                     if (getMatrixNotifier() == MatrixJobMultiplier.ALL || getMatrixNotifier() == MatrixJobMultiplier.ONLY_PARENT) {
-                        notifyOnBuildStart(build, listener);
+                        notifyChatsOnBuildStart(build, listener);
                     }
                 }
                 return super.startBuild();
