@@ -37,8 +37,8 @@
         the artifacts that we need -->
     <repositories>
         <repository>
-            <id>m.g.o-public</id>
-            <url>http://maven.glassfish.org/content/groups/public/</url>
+            <id>repo.jenkins-ci.org</id>
+            <url>http://repo.jenkins-ci.org/public/</url>
         </repository>
     </repositories>
     
@@ -47,4 +47,12 @@
         <developerConnection>scm:git:git@github.com:jenkinsci/instant-messaging-plugin.git</developerConnection>
         <url>http://fisheye.jenkins-ci.org/browse/Jenkins/trunk/trunk/hudson/plugins/instant-messaging</url>
     </scm>    
-</project>
+
+    <pluginRepositories>
+        <pluginRepository>
+            <id>repo.jenkins-ci.org</id>
+            <url>http://repo.jenkins-ci.org/public/</url>
+        </pluginRepository>
+    </pluginRepositories>
+</project>  
+
