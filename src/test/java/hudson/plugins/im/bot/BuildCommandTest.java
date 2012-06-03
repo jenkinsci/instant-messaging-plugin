@@ -2,8 +2,6 @@ package hudson.plugins.im.bot;
 
 import static org.mockito.Matchers.*;
 import static org.mockito.Mockito.*;
-import static org.mockito.Mockito.verify;
-import static org.mockito.Mockito.when;
 import hudson.model.Item;
 import hudson.model.AbstractProject;
 import hudson.model.BooleanParameterValue;
@@ -35,27 +33,27 @@ public class BuildCommandTest {
         
         cmd.getReply(bot, sender, new String[]{ "build", "project", "5s" });
         verify(project).hasPermission(Item.BUILD);
-        verify(project).scheduleBuild(eq(5), (Cause) Mockito.any());
+        verify(project).scheduleBuild(eq(5), Mockito.any(Cause.class));
         
         project = mockProject(jobProvider);
         cmd.getReply(bot, sender, new String[]{ "build", "project", "5" });
         verify(project).hasPermission(Item.BUILD);
-        verify(project).scheduleBuild(eq(5), (Cause) Mockito.any());
+        verify(project).scheduleBuild(eq(5), Mockito.any(Cause.class));
         
         project = mockProject(jobProvider);
         cmd.getReply(bot, sender, new String[]{ "build", "project", "1m" });
         verify(project).hasPermission(Item.BUILD);
-        verify(project).scheduleBuild(eq(60), (Cause) Mockito.any());
+        verify(project).scheduleBuild(eq(60), Mockito.any(Cause.class));
         
         project = mockProject(jobProvider);
         cmd.getReply(bot, sender, new String[]{ "build", "project", "1min" });
         verify(project).hasPermission(Item.BUILD);
-        verify(project).scheduleBuild(eq(60), (Cause) Mockito.any());
+        verify(project).scheduleBuild(eq(60), Mockito.any(Cause.class));
         
         project = mockProject(jobProvider);
         cmd.getReply(bot, sender, new String[]{ "build", "project", "2h" });
         verify(project).hasPermission(Item.BUILD);
-        verify(project).scheduleBuild(eq(7200), (Cause) Mockito.any());
+        verify(project).scheduleBuild(eq(7200), Mockito.any(Cause.class));
         
         // TODO kutzi: this doesn't work, yet. Catch typo before 's'
         //Mockito.reset(project);

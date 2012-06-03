@@ -17,7 +17,7 @@ public interface JobProvider {
      *
      * @return a list with all Jenkins jobs. Never null.
      */
-    @SuppressWarnings("unchecked")
+    @SuppressWarnings("rawtypes")
     List<AbstractProject> getAllJobs();
     
     boolean isTopLevelJob(AbstractProject<?, ?> job);
