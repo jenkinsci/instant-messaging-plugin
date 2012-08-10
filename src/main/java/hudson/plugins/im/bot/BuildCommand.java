@@ -70,7 +70,7 @@ public class BuildCommand extends AbstractTextSendingCommand {
 			    }
 			    
 			    String msg = "";
-				if (project.isInQueue()) {
+				if (project.isInQueue() && !project.isParameterized()) {
 					Queue.Item queueItem = project.getQueueItem();
 					return sender.getNickname() + ": job " + jobName + " is already in the build queue (" + queueItem.getWhy() + ")";
     			} else if (project.isDisabled()) {
