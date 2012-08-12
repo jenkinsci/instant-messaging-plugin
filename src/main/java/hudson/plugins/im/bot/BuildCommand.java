@@ -14,8 +14,6 @@ import hudson.model.Queue;
 import hudson.model.StringParameterValue;
 import hudson.plugins.im.IMCause;
 import hudson.plugins.im.Sender;
-import hudson.security.Permission;
-
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collection;
@@ -41,6 +39,9 @@ public class BuildCommand extends AbstractTextSendingCommand {
         return Arrays.asList("build","schedule");
     }
 
+    /**
+     * @return whether the build was actually scheduled
+     */
     private boolean scheduleBuild(Bot bot, AbstractProject<?, ?> project, int delaySeconds, Sender sender, List<ParameterValue> parameters) {
 	    
 	    String senderId = sender.getId();
@@ -70,10 +71,7 @@ public class BuildCommand extends AbstractTextSendingCommand {
 			    }
 			    
 			    String msg = "";
-				if (project.isInQueue()) {
-					Queue.Item queueItem = project.getQueueItem();
-					return sender.getNickname() + ": job " + jobName + " is already in the build queue (" + queueItem.getWhy() + ")";
-    			} else if (project.isDisabled()) {
+    			if (project.isBuildable()) {
 					return sender.getNickname() + ": job " + jobName + " is disabled";
 				} else {
 				    
@@ -143,7 +141,14 @@ public class BuildCommand extends AbstractTextSendingCommand {
                                     delay + " seconds";
 				        }
                     } else {
-                        return sender.getNickname() + ": job " + jobName + " scheduling failed or already in build queue";
+                        // probably already queued
+                        Queue.Item queueItem = project.getQueueItem();
+                        if (queueItem != null) {
+                            return sender.getNickname() + ": job " + jobName + " is already in the build queue (" + queueItem.getWhy() + ")";
+                        } else {
+                            // could be race condition (build left build-queue while we were checking) or other reason
+                            return sender.getNickname() + ": job " + jobName + " scheduling failed or already in build queue";
+                        }
                     }
 				}
     		} else {
