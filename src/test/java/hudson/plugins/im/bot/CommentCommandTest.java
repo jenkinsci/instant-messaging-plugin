@@ -16,7 +16,7 @@ public class CommentCommandTest {
 
     @Test
     public void testSetComment() throws IOException, CommandException {
-        @SuppressWarnings("unchecked")
+        @SuppressWarnings({ "rawtypes" })
         AbstractProject project = mock(AbstractProject.class);
         AbstractBuild<?, ?> build = mock(AbstractBuild.class);
         when(project.getBuildByNumber(4711)).thenReturn(build);
@@ -40,7 +40,7 @@ public class CommentCommandTest {
     
     @Test(expected = CommandException.class)
     public void testUnknownBuildNumber() throws CommandException {
-        @SuppressWarnings("unchecked")
+        @SuppressWarnings("rawtypes")
         AbstractProject project = mock(AbstractProject.class);
         AbstractBuild<?, ?> build = mock(AbstractBuild.class);
         when(project.getBuildByNumber(4711)).thenReturn(build);

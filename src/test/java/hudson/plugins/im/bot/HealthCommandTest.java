@@ -39,7 +39,8 @@ public class HealthCommandTest {
 		assertEquals(sender + ": no job found", reply);
 	}
 	
-	@Test
+	@SuppressWarnings("rawtypes")
+    @Test
 	public void testHealth() throws Exception {
 		
 		FreeStyleBuild build = mock(FreeStyleBuild.class);
@@ -68,7 +69,8 @@ public class HealthCommandTest {
 		assertEquals("100", match);
 	}
 	
-	@Test
+	@SuppressWarnings("rawtypes")
+    @Test
 	public void testFailure() throws Exception {
         FreeStyleBuild build = mock(FreeStyleBuild.class);
         when(build.getUrl()).thenReturn("job/foo/32/");

@@ -62,6 +62,7 @@ public class BuildCommandTest {
         //verify(project).scheduleBuild(eq(42), (Cause) Mockito.any());
     }
 
+    @SuppressWarnings("unchecked")
     private AbstractProject<?, ?> mockProject(JobProvider jobProvider) {
         @SuppressWarnings("rawtypes")
         AbstractProject project = mock(FreeStyleProject.class);

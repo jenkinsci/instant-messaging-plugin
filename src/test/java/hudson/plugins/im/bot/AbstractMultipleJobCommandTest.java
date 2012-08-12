@@ -24,7 +24,7 @@ import org.junit.Test;
 public class AbstractMultipleJobCommandTest {
 
     @Test
-    @SuppressWarnings("unchecked")
+    @SuppressWarnings({ "unchecked", "rawtypes" })
     public void testGetJobByName() throws CommandException {
         String projectName = "project name with spaces";
         
