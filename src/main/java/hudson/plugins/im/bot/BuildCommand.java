@@ -71,7 +71,7 @@ public class BuildCommand extends AbstractTextSendingCommand {
 			    }
 			    
 			    String msg = "";
-    			if (project.isBuildable()) {
+    			if (!project.isBuildable()) {
 					return sender.getNickname() + ": job " + jobName + " is disabled";
 				} else {
 				    
