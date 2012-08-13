@@ -68,6 +68,7 @@ public class BuildCommandTest {
         AbstractProject project = mock(FreeStyleProject.class);
         when(jobProvider.getJobByName(Mockito.anyString())).thenReturn(project);
         when(project.hasPermission(Item.BUILD)).thenReturn(Boolean.TRUE);
+        when(project.isBuildable()).thenReturn(true);
         return project;
     }
     
