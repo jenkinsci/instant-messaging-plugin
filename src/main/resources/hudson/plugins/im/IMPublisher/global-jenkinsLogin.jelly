@@ -2,7 +2,7 @@
 <j:jelly xmlns:j="jelly:core" xmlns:st="jelly:stapler" xmlns:d="jelly:define" xmlns:l="/lib/layout" xmlns:t="/lib/hudson" xmlns:f="/lib/form">
 
   <f:entry title="Jenkins Username" help="/plugin/instant-messaging/help-jenkins-login.html">
-    <f:textbox name="${descriptor.PARAMETERNAME_HUDSON_LOGIN}"
+    <f:textbox name="${descriptor.paramNames.jenkinsLogin}"
       value="${descriptor.hudsonUserName}" />
   </f:entry>
   
