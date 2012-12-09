@@ -3,6 +3,7 @@ package hudson.plugins.im.build_notify;
 import hudson.Extension;
 import hudson.model.AbstractBuild;
 import hudson.model.BuildListener;
+import hudson.model.ResultTrend;
 import hudson.plugins.im.IMPublisher;
 import hudson.plugins.im.tools.BuildHelper;
 import hudson.plugins.im.tools.MessageHelper;
@@ -37,7 +38,7 @@ public class SummaryOnlyBuildToChatNotifier extends BuildToChatNotifier {
         }
         sb.append(Messages.SummaryOnlyBuildToChatNotifier_Summary(
                 getProjectName(build), build.getDisplayName(),
-                BuildHelper.getResultDescription(build),
+                ResultTrend.getResultTrend(build).getID(),
                 build.getTimestampString(),
                 MessageHelper.getBuildURL(build)));
 

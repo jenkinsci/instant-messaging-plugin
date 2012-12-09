@@ -4,8 +4,8 @@ import hudson.Extension;
 import hudson.model.AbstractBuild;
 import hudson.model.BuildListener;
 import hudson.model.Result;
+import hudson.model.ResultTrend;
 import hudson.plugins.im.IMPublisher;
-import hudson.plugins.im.tools.BuildHelper;
 import hudson.scm.ChangeLogSet.Entry;
 import org.kohsuke.stapler.DataBoundConstructor;
 
@@ -25,12 +25,14 @@ public class DefaultBuildToChatNotifier extends SummaryOnlyBuildToChatNotifier {
     public String buildStartMessage(IMPublisher publisher, AbstractBuild<?, ?> build, BuildListener listener) throws IOException, InterruptedException {
         StringBuilder sb = new StringBuilder(super.buildStartMessage(publisher, build, listener));
 
-        if (build.getPreviousBuild() != null) {
+        AbstractBuild<?, ?> previousBuild = build.getPreviousBuild();
+        if (previousBuild != null) {
             sb.append(" (previous build: ")
-                .append(BuildHelper.getResultDescription(build.getPreviousBuild()));
+                .append(ResultTrend.getResultTrend(previousBuild).getID());
 
-            if (build.getPreviousBuild().getResult().isWorseThan(Result.SUCCESS)) {
-                AbstractBuild<?, ?> lastSuccessfulBuild = BuildHelper.getPreviousSuccessfulBuild(build);
+            
+            if (previousBuild.getResult().isWorseThan(Result.SUCCESS)) {
+                AbstractBuild<?, ?> lastSuccessfulBuild = build.getPreviousSuccessfulBuild();
                 if (lastSuccessfulBuild != null) {
                     sb.append(" -- last ").append(Result.SUCCESS).append(" ")
                         .append(lastSuccessfulBuild.getDisplayName())

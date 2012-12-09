@@ -115,7 +115,10 @@ public class BuildHelper {
      * Returns a textual description of the result taking the previous build into
      * account.
      * E.g. reports 'fixes' and 'still failing/unstable' builds.
+     * 
+     * @deprecated use ResultTrend.getResultTrend(build).getID()
      */
+    @Deprecated
     public static String getResultDescription(AbstractBuild<?, ?> build) {
         ExtResult result = getExtendedResult(build);
         return result.toString();

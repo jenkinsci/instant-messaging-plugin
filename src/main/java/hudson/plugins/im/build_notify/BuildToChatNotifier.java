@@ -1,15 +1,14 @@
 package hudson.plugins.im.build_notify;
 
+import static hudson.plugins.im.tools.BuildHelper.getProjectName;
 import hudson.DescriptorExtensionList;
-import hudson.model.AbstractBuild;
 import hudson.model.BuildListener;
 import hudson.model.Describable;
+import hudson.model.AbstractBuild;
 import hudson.model.Hudson;
+import hudson.model.ResultTrend;
 import hudson.plugins.im.IMPublisher;
-import hudson.plugins.im.tools.BuildHelper;
 import hudson.plugins.im.tools.MessageHelper;
-
-import static hudson.plugins.im.tools.BuildHelper.getProjectName;
 
 import java.io.IOException;
 
@@ -65,7 +64,7 @@ public abstract class BuildToChatNotifier implements Describable<BuildToChatNoti
     		return "Oh no! You're suspected of having broken " + getProjectName(build) + ": " + MessageHelper.getBuildURL(build);
     	} else {
     		return "Build " + getProjectName(build) +
-    	    	" is " + BuildHelper.getResultDescription(build) + ": " + MessageHelper.getBuildURL(build);
+    	    	" is " + ResultTrend.getResultTrend(build).getID() + ": " + MessageHelper.getBuildURL(build);
     	}
     }
     

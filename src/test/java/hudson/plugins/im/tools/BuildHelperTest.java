@@ -75,6 +75,7 @@ public class BuildHelperTest {
         }
     }
     
+    @SuppressWarnings("deprecation")
     public void testGetResultDescription() throws Exception {
         FreeStyleBuild build = mock(FreeStyleBuild.class);
         when(build.getResult()).thenReturn(Result.SUCCESS);
