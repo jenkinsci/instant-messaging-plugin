@@ -3,6 +3,7 @@ package hudson.plugins.im.tools;
 import hudson.model.AbstractBuild;
 import hudson.model.Run;
 import hudson.model.Result;
+import hudson.model.ResultTrend;
 
 /**
  * Helper class to work with Hudson builds.
@@ -15,7 +16,10 @@ public class BuildHelper {
      * Extended result description of a build.
      *
      * @author kutzi
+     * 
+     * @deprecated use {@link ResultTrend}!
      */
+    @Deprecated
     public static enum ExtResult {
         FIXED, SUCCESS,
         /**
@@ -51,7 +55,10 @@ public class BuildHelper {
      * I.e. it is the first successful build after previous
      * 'failed' and/or 'unstable' builds.
      * Ignores 'aborted' and 'not built' builds.
+     * 
+     * @deprecated use {@link ResultTrend#FIXED}!
      */
+    @Deprecated
     public static boolean isFix(AbstractBuild<?, ?> build) {
         if (build.getResult() != Result.SUCCESS) {
             return false;
@@ -66,12 +73,19 @@ public class BuildHelper {
 
     /**
      * Does what the name says.
+     * 
+     * @deprecated use {@link ResultTrend#FAILURE} || {@link ResultTrend#UNSTABLE}!
      */
+    @Deprecated
     public static boolean isFailureOrUnstable(AbstractBuild<?,?> build) {
     	return build.getResult() == Result.FAILURE
     		|| build.getResult() == Result.UNSTABLE;
     }
     
+    /**
+     * @deprecated use {@link ResultTrend#STILL_FAILING} || {@link ResultTrend#STILL_UNSTABLE}!
+     */
+    @Deprecated
     public static boolean isStillFailureOrUnstable(AbstractBuild<?, ?> build) {
         ExtResult result = getExtendedResult(build);
         return result == ExtResult.STILL_FAILING || result == ExtResult.STILL_UNSTABLE;
