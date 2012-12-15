@@ -9,7 +9,7 @@
 
 	<artifactId>instant-messaging</artifactId>
 	<name>Jenkins instant-messaging plugin</name>
-	<version>1.24</version>
+	<version>1.25-SNAPSHOT</version>
 	<packaging>hpi</packaging>
 	<url>http://wiki.jenkins-ci.org/display/JENKINS/Instant+Messaging+Plugin</url>
 	<developers>
@@ -46,7 +46,7 @@
         <connection>scm:git:git@github.com:jenkinsci/instant-messaging-plugin.git</connection>
         <developerConnection>scm:git:git@github.com:jenkinsci/instant-messaging-plugin.git</developerConnection>
         <url>http://fisheye.jenkins-ci.org/browse/Jenkins/trunk/trunk/hudson/plugins/instant-messaging</url>
-      <tag>instant-messaging-1.24</tag>
+      <tag>HEAD</tag>
   </scm>    
 
     <pluginRepositories>
