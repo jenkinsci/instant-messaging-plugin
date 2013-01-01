@@ -53,6 +53,7 @@ public class AbortCommand extends AbstractSingleJobCommand {
                 aborted = false; // how the hell does this happen o_O
             } else {
                 ex.interrupt();
+                aborted = true;
             }
         }
 
