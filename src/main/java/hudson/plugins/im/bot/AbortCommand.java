@@ -46,8 +46,9 @@ public class AbortCommand extends AbstractSingleJobCommand {
                 // No builds?
                 throw new CommandException(
                         sender.getNickname() + ": it appears this job has never been built");
-            }   
-
+            }
+            
+            // TODO: do build.doStop() instead of the following lines when moving to core 1.489!
             Executor ex = build.getExecutor();
             if (ex == null) {
                 aborted = false; // how the hell does this happen o_O
