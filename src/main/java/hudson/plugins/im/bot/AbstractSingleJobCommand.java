@@ -3,9 +3,10 @@ package hudson.plugins.im.bot;
 import hudson.model.AbstractProject;
 import hudson.plugins.im.Sender;
 import hudson.plugins.im.tools.MessageHelper;
+import hudson.security.Permission;
 
 /**
- * Abstract job which works on a single job - without taking any further arguments.
+ * Abstract command which works on a single job.
  *
  * @author kutzi
  */
@@ -39,6 +40,8 @@ abstract class AbstractSingleJobCommand extends AbstractTextSendingCommand {
      */
     protected abstract CharSequence getMessageForJob(AbstractProject<?, ?> job, Sender sender,
             String[] arguments) throws CommandException;
+    
+    protected abstract Permission getRequiredPermission();
 
     @Override
     protected String getReply(Bot bot, Sender sender, String[] args) {
@@ -54,6 +57,10 @@ abstract class AbstractSingleJobCommand extends AbstractTextSendingCommand {
             }
             AbstractProject<?, ?> job = getJobProvider().getJobByName(jobName);
             if (job != null) {
+                if (!job.hasPermission(getRequiredPermission())) {
+                    return "You don't have the permissions to perform this command on this job.";
+                }
+                
                 try {
                     return getMessageForJob(job, sender, remainingArgs).toString();
                 } catch (CommandException e) {

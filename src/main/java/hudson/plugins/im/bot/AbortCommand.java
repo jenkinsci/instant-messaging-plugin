@@ -6,6 +6,7 @@ import hudson.model.AbstractProject;
 import hudson.model.Executor;
 import hudson.model.Hudson;
 import hudson.plugins.im.Sender;
+import hudson.security.Permission;
 
 import java.util.Collection;
 import java.util.Collections;
@@ -22,10 +23,8 @@ public class AbortCommand extends AbstractSingleJobCommand {
         return Collections.singleton("abort");
     }
 
-    private static final String HELP = " <job> - specify which job to abort";
-
 	public String getHelp() {
-		return HELP;
+		return " <job> - specify which job to abort";
 	}
 
     @Override
@@ -65,4 +64,8 @@ public class AbortCommand extends AbstractSingleJobCommand {
         }
     }
 
+    @Override
+    protected Permission getRequiredPermission() {
+        return AbstractProject.ABORT;
+    }
 }

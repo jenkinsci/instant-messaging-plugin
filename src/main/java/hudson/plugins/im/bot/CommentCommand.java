@@ -1,10 +1,12 @@
 package hudson.plugins.im.bot;
 
 import hudson.Extension;
+import hudson.model.Item;
 import hudson.model.AbstractProject;
 import hudson.model.Run;
 import hudson.plugins.im.Sender;
 import hudson.plugins.im.tools.MessageHelper;
+import hudson.security.Permission;
 
 import java.io.IOException;
 import java.util.Collection;
@@ -42,6 +44,11 @@ public class CommentCommand extends AbstractSingleJobCommand {
         }
     }
     
+    @Override
+    protected Permission getRequiredPermission() {
+        return Item.CONFIGURE;
+    }
+
     @Override
     public String getHelp() {
         return " <job> <build-#> <comment> - adds a description to a build";
