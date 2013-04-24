@@ -2,6 +2,7 @@ package hudson.plugins.im;
 
 import hudson.model.AbstractBuild;
 import hudson.model.Result;
+import hudson.model.ResultTrend;
 import hudson.plugins.im.tools.BuildHelper;
 
 /**
@@ -56,7 +57,22 @@ public enum NotificationStrategy {
 		}
 	},
 
-    /**
+	/**
+	 * Whenever there is a new failure or a failure was fixed, a notification should be send.
+	 * Similar to #FAILURE_AND_FIXED, but repeated failures do not trigger a notification.
+ 	 */
+	NEW_FAILURE_AND_FIXED("new failure and fixed") {
+		/**
+		 * {@inheritDoc}
+		 */
+		@Override
+		public boolean notificationWanted(final AbstractBuild<?, ?> build) {
+			ResultTrend trend = ResultTrend.getResultTrend(build);
+			return trend == ResultTrend.FAILURE || trend == ResultTrend.FIXED;
+		}
+	},
+
+	/**
 	 * Notifications should be send only if there was a change in the build
 	 * state, or this was the first build.
 	 */
