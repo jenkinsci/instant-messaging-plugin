@@ -1,7 +1,6 @@
 package hudson.plugins.im.bot;
 
 import hudson.model.AbstractProject;
-import hudson.model.Hudson;
 import hudson.model.View;
 
 import java.util.List;
@@ -9,7 +8,7 @@ import java.util.List;
 import jenkins.model.Jenkins;
 
 /**
- * Default {@link JobProvider} which directly accesses {@link Hudson#getInstance()}.
+ * Default {@link JobProvider} which directly accesses {@link Jenkins#getInstance()}.
  *
  * @author kutzi
  */
@@ -17,14 +16,14 @@ public class DefaultJobProvider implements JobProvider {
 
     @Override
     public AbstractProject<?, ?> getJobByName(String name) {
-        return Hudson.getInstance().getItemByFullName(name, AbstractProject.class);
+        return Jenkins.getInstance().getItemByFullName(name, AbstractProject.class);
     }
 
     @SuppressWarnings("unchecked")
     @Override
     public List<AbstractProject<?,?>> getAllJobs() {
         @SuppressWarnings("rawtypes")
-        List items = Hudson.getInstance().getAllItems(AbstractProject.class);
+        List items = Jenkins.getInstance().getAllItems(AbstractProject.class);
         return items;
     }
     
@@ -38,11 +37,11 @@ public class DefaultJobProvider implements JobProvider {
 
     @Override
     public boolean isTopLevelJob(AbstractProject<?, ?> job) {
-        return Hudson.getInstance().equals(job.getParent());
+        return Jenkins.getInstance().equals(job.getParent());
     }
 
     @Override
     public View getView(String viewName) {
-        return Hudson.getInstance().getView(viewName);
+        return Jenkins.getInstance().getView(viewName);
     }
 }
