@@ -55,7 +55,7 @@ abstract class AbstractSingleJobCommand extends AbstractTextSendingCommand {
                 jobName = args[1].replace("\"", "");
                 remainingArgs = MessageHelper.copyOfRange(args, 2, args.length);
             }
-            AbstractProject<?, ?> job = getJobProvider().getJobByName(jobName);
+            AbstractProject<?, ?> job = getJobProvider().getJobByNameOrDisplayName(jobName);
             if (job != null) {
                 if (!job.hasPermission(getRequiredPermission())) {
                     return "You don't have the permissions to perform this command on this job.";

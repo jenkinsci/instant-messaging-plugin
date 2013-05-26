@@ -18,6 +18,25 @@ public class DefaultJobProvider implements JobProvider {
     public AbstractProject<?, ?> getJobByName(String name) {
         return Jenkins.getInstance().getItemByFullName(name, AbstractProject.class);
     }
+    
+
+    @SuppressWarnings("rawtypes")
+    @Override
+    public AbstractProject<?, ?> getJobByDisplayName(String displayName) {
+        List<AbstractProject> allItems = Jenkins.getInstance().getAllItems(AbstractProject.class);
+        for (AbstractProject job : allItems) {
+            if (displayName.equals(job.getDisplayName())) {
+                return job;
+            }
+        }
+        return null;
+    }
+
+    @Override
+    public AbstractProject<?, ?> getJobByNameOrDisplayName(String name) {
+        AbstractProject<?,?> jobByName = getJobByName(name);
+        return jobByName != null ? jobByName : getJobByDisplayName(name);
+    }
 
     @SuppressWarnings("unchecked")
     @Override

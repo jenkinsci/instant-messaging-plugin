@@ -62,7 +62,7 @@ public class BuildCommand extends AbstractTextSendingCommand {
 		if (args.length >= 2) {
 			String jobName = args[1];
 			jobName = jobName.replaceAll("\"", "");
-    		AbstractProject<?, ?> project = getJobProvider().getJobByName(jobName);
+    		AbstractProject<?, ?> project = getJobProvider().getJobByNameOrDisplayName(jobName);
 			if (project != null) {
 
 			    String checkPermission = checkPermission(sender, project);

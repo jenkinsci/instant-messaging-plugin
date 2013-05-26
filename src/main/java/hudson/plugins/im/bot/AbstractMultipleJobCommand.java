@@ -109,7 +109,7 @@ abstract class AbstractMultipleJobCommand extends AbstractTextSendingCommand {
                 mode = Mode.SINGLE;
                 String jobName = MessageHelper.getJoinedName(args, 1);
 
-                AbstractProject<?, ?> project = getJobProvider().getJobByName(jobName);
+                AbstractProject<?, ?> project = getJobProvider().getJobByNameOrDisplayName(jobName);
                 if (project != null) {
                     projects.add(project);
                 } else {
