@@ -118,13 +118,8 @@ abstract class AbstractMultipleJobCommand extends AbstractTextSendingCommand {
             }
         } else if (args.length == 1) {
             mode = Mode.ALL;
-            for (AbstractProject<?, ?> project : getJobProvider().getAllJobs()) {
-                // add only top level project
-                // sub project are accessible by their name but are not shown for visibility
-                if (getJobProvider().isTopLevelJob(project)) {
-                    projects.add(project);
-                }
-            }
+            // don't show really all - could by quite many - but only the top-level jobs
+            projects.addAll(getJobProvider().getTopLevelJobs());
         } else {
             throw new CommandException(sender + ": 'args' must not be empty!");
         }

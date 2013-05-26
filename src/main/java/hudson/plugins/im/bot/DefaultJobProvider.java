@@ -6,6 +6,8 @@ import hudson.model.View;
 
 import java.util.List;
 
+import jenkins.model.Jenkins;
+
 /**
  * Default {@link JobProvider} which directly accesses {@link Hudson#getInstance()}.
  *
@@ -20,8 +22,18 @@ public class DefaultJobProvider implements JobProvider {
 
     @SuppressWarnings("unchecked")
     @Override
-    public List<AbstractProject> getAllJobs() {
-        return Hudson.getInstance().getAllItems(AbstractProject.class);
+    public List<AbstractProject<?,?>> getAllJobs() {
+        @SuppressWarnings("rawtypes")
+        List items = Hudson.getInstance().getAllItems(AbstractProject.class);
+        return items;
+    }
+    
+    @Override
+    @SuppressWarnings("unchecked")
+    public List<AbstractProject<?,?>> getTopLevelJobs() {
+        @SuppressWarnings("rawtypes")
+        List items = Jenkins.getInstance().getItems(AbstractProject.class);
+        return items;
     }
 
     @Override
