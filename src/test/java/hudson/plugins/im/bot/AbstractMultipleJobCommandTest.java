@@ -31,7 +31,7 @@ public class AbstractMultipleJobCommandTest {
         AbstractProject project = mock(AbstractProject.class);
         
         JobProvider jobProvider = mock(JobProvider.class);
-        when(jobProvider.getJobByName(projectName)).thenReturn(project);
+        when(jobProvider.getJobByNameOrDisplayName(projectName)).thenReturn(project);
         
         String[] projArgs = StringUtils.split(projectName);
         String[] args = new String[1 + projArgs.length];

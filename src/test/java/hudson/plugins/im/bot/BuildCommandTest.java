@@ -66,7 +66,7 @@ public class BuildCommandTest {
     private AbstractProject<?, ?> mockProject(JobProvider jobProvider) {
         @SuppressWarnings("rawtypes")
         AbstractProject project = mock(FreeStyleProject.class);
-        when(jobProvider.getJobByName(Mockito.anyString())).thenReturn(project);
+        when(jobProvider.getJobByNameOrDisplayName(Mockito.anyString())).thenReturn(project);
         when(project.hasPermission(Item.BUILD)).thenReturn(Boolean.TRUE);
         when(project.isBuildable()).thenReturn(true);
         return project;
