@@ -95,7 +95,7 @@ public abstract class BuildToChatNotifier implements Describable<BuildToChatNoti
      *      Any errors can be reported here.
      */
     public String fixerMessage(IMPublisher publisher, AbstractBuild<?, ?> build, BuildListener listener) {
-    	return "Yippie! Seems you've fixed " + getProjectName(build) + ": " + MessageHelper.getBuildURL(build);
+    	return "Yippee! Seems you've fixed " + getProjectName(build) + ": " + MessageHelper.getBuildURL(build);
     }
     
     /**
