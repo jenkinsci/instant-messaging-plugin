@@ -8,6 +8,8 @@ import hudson.model.BooleanParameterValue;
 import hudson.model.Cause;
 import hudson.model.FreeStyleProject;
 import hudson.model.ParametersAction;
+import hudson.model.ParametersDefinitionProperty;
+import hudson.model.StringParameterDefinition;
 import hudson.model.StringParameterValue;
 import hudson.plugins.im.Sender;
 
@@ -82,13 +84,16 @@ public class BuildCommandTest {
         cmd.setJobProvider(jobProvider);
         
         AbstractProject<?, ?> project = mockProject(jobProvider);
+        when(project.isParameterized()).thenReturn(Boolean.TRUE);
+        when(project.getProperty(ParametersDefinitionProperty.class)).thenReturn(new ParametersDefinitionProperty(new StringParameterDefinition("key", "default value", "")));
         
         Sender sender = new Sender("sender");
-        cmd.getReply(bot, sender, new String[]{ "build", "project", "key=value" });
+        cmd.getReply(bot, sender, new String[]{ "build", "project", "key=value", "unexisting_key=value" });
         
         ArgumentCaptor<ParametersAction> captor = ArgumentCaptor.forClass(ParametersAction.class);
         verify(project).hasPermission(Item.BUILD);
-        verify(project).scheduleBuild(Mockito.anyInt(), (Cause) Mockito.any(),
+        verify(project).isParameterized();
+        verify(project).scheduleBuild(anyInt(), (Cause) any(),
                 captor.capture());
         
         Assert.assertEquals(1, captor.getValue().getParameters().size());
@@ -97,6 +102,9 @@ public class BuildCommandTest {
         
         
         project = mockProject(jobProvider);
+        when(project.isParameterized()).thenReturn(Boolean.TRUE);
+        when(project.getProperty(ParametersDefinitionProperty.class)).thenReturn(new ParametersDefinitionProperty(new StringParameterDefinition("key", "default value", ""),
+        		new StringParameterDefinition("key2", "false", "")));
         cmd.getReply(bot, sender, new String[]{ "build", "project", "3s", "key=value", "key2=true" });
         captor = ArgumentCaptor.forClass(ParametersAction.class);
         verify(project).hasPermission(Item.BUILD);

@@ -8,8 +8,10 @@ import hudson.model.AbstractProject;
 import hudson.model.BooleanParameterValue;
 import hudson.model.Cause;
 import hudson.model.Item;
+import hudson.model.ParameterDefinition;
 import hudson.model.ParameterValue;
 import hudson.model.ParametersAction;
+import hudson.model.ParametersDefinitionProperty;
 import hudson.model.Queue;
 import hudson.model.StringParameterValue;
 import hudson.plugins.im.IMCause;
@@ -17,7 +19,9 @@ import hudson.plugins.im.Sender;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collection;
+import java.util.Hashtable;
 import java.util.List;
+import java.util.Map;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
@@ -111,28 +115,39 @@ public class BuildCommand extends AbstractTextSendingCommand {
 				            }
 				        }
 				        
-				        // parse possible parameters:
+				        // parse possible parameters from the command
+				        Map<String, ParameterValue> parsedParameters = new Hashtable<String, ParameterValue>();
 				        for (int i=parametersStartIndex; i < args.length; i++) {
-				            String[] split = args[i].split("=");
-				            // TODO: guess ParameterValue type from ParametersDefintion of job?
-				            if (split.length == 2) {
+				        	String[] split = args[i].split("=");
+				        	if (split.length == 2) {
 				                String value = split[1];
 				                if ("true".equals(value) || "false".equals(value)) {
-				                    parameters.add(new BooleanParameterValue(split[0], Boolean.parseBoolean(split[1])));
+				                	parsedParameters.put(split[0], new BooleanParameterValue(split[0], Boolean.parseBoolean(split[1])));
 				                } else {
-				                    parameters.add(new StringParameterValue(split[0], split[1]));
+				                	parsedParameters.put(split[0], new StringParameterValue(split[0], split[1]));
 				                }
-				            } else {
-				                msg += "Unparseable parameter: " + args[i];
-				            }
+				        	} else {
+				        		msg += "Unparseable parameter: " + args[i];
+				        	}
 				        }
+				        if (project.isParameterized()) {
+				        	// Then resolve the value based on the project definition
+				        	ParametersDefinitionProperty propDefs = project.getProperty(ParametersDefinitionProperty.class);
+				        	for (ParameterDefinition pd : propDefs.getParameterDefinitions()) {
+				        		if (pd.getName() != null && parsedParameters.containsKey(pd.getName())) {
+			        				parameters.add(parsedParameters.get(pd.getName()));
+				        		} else {
+				        			ParameterValue pv = pd.getDefaultParameterValue();
+				        			if (pv != null) {
+				        				parameters.add(pv);
+				        			}
+				        		}
+				        	}
+				        } else if (!parsedParameters.isEmpty() && !project.isParameterized()) {
+					        msg += "Ignoring parameters as project is not parametrized!\n";
+					    }
 				    }
-				    
-				    
-				    if (!parameters.isEmpty() && !project.isParameterized()) {
-				        msg += "Ignoring parameters as project is not parametrized!\n";
-				    }
-				    
+				    			    
 				    if (scheduleBuild(bot, project, delay, sender, parameters)) {
 				        if (delay == 0) {
 				            return msg + sender.getNickname() + ": job " + jobName + " build scheduled now";
