@@ -6,20 +6,20 @@ package hudson.plugins.im.bot;
 import hudson.Extension;
 import hudson.model.Item;
 import hudson.model.ParameterValue;
+import hudson.model.SimpleParameterDefinition;
 import hudson.model.AbstractProject;
-import hudson.model.BooleanParameterValue;
 import hudson.model.Cause;
 import hudson.model.ParameterDefinition;
 import hudson.model.ParametersAction;
 import hudson.model.ParametersDefinitionProperty;
 import hudson.model.Queue;
-import hudson.model.StringParameterValue;
 import hudson.plugins.im.IMCause;
 import hudson.plugins.im.Sender;
 
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collection;
+import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -150,42 +150,45 @@ public class BuildCommand extends AbstractTextSendingCommand {
 		}
 	}
 
-    private List<ParameterValue> parseBuildParameters(String[] args,
+    List<ParameterValue> parseBuildParameters(String[] args,
             AbstractProject<?, ?> project, StringBuilder commandReply) {
         
-        List<ParameterValue> parameters = new ArrayList<ParameterValue>();
+        if (args.length > 0 && !project.isParameterized()) {
+            commandReply.append("Ignoring parameters as project is not parametrized!\n");
+            return Collections.emptyList();
+        } else if (!project.isParameterized()) {
+            return Collections.emptyList();
+        }
+
         // parse possible parameters from the command
-        Map<String, ParameterValue> parsedParameters = new HashMap<String, ParameterValue>();
+        Map<String, String> parsedParameters = new HashMap<String, String>();
         for (int i=0; i < args.length; i++) {
         	String[] split = args[i].split("=");
         	if (split.length == 2) {
-        	    String key = split[0];
-                String value = split[1];
-                if ("true".equals(value) || "false".equals(value)) {
-                	parsedParameters.put(key, new BooleanParameterValue(key, Boolean.parseBoolean(value)));
-                } else {
-                	parsedParameters.put(key, new StringParameterValue(key, value));
-                }
+            	parsedParameters.put(split[0], split[1]);
         	} else {
         	    commandReply.append("Unparseable parameter: " + args[i] + "\n");
         	}
         }
-        if (project.isParameterized()) {
-        	// Then resolve the value based on the project definition
-        	ParametersDefinitionProperty propDefs = project.getProperty(ParametersDefinitionProperty.class);
-        	for (ParameterDefinition pd : propDefs.getParameterDefinitions()) {
-        		if (pd.getName() != null && parsedParameters.containsKey(pd.getName())) {
-        			parameters.add(parsedParameters.get(pd.getName()));
-        		} else {
-        			ParameterValue pv = pd.getDefaultParameterValue();
-        			if (pv != null) {
-        				parameters.add(pv);
-        			}
-        		}
-        	}
-        } else if (!parsedParameters.isEmpty()) {
-            commandReply.append("Ignoring parameters as project is not parametrized!\n");
-        }
+
+        List<ParameterValue> parameters = new ArrayList<ParameterValue>();
+    	ParametersDefinitionProperty propDefs = project.getProperty(ParametersDefinitionProperty.class);
+    	for (ParameterDefinition pd : propDefs.getParameterDefinitions()) {
+    		if (pd.getName() != null && parsedParameters.containsKey(pd.getName())) {
+    		    if (pd instanceof SimpleParameterDefinition) {
+    		        SimpleParameterDefinition spd = (SimpleParameterDefinition) pd;
+    		        parameters.add(spd.createValue(parsedParameters.get(pd.getName())));
+    		    } else {
+    		        commandReply.append("Unsupported parameter type " + pd.getClass().getSimpleName()
+    		                + " for parameter " + pd.getName() + "!\n");
+    		    }
+    		} else {
+    			ParameterValue pv = pd.getDefaultParameterValue();
+    			if (pv != null) {
+    				parameters.add(pv);
+    			}
+    		}
+    	}
         return parameters;
     }
 	
