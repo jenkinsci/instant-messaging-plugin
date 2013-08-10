@@ -4,12 +4,12 @@
 package hudson.plugins.im.bot;
 
 import hudson.Extension;
+import hudson.model.Item;
+import hudson.model.ParameterValue;
 import hudson.model.AbstractProject;
 import hudson.model.BooleanParameterValue;
 import hudson.model.Cause;
-import hudson.model.Item;
 import hudson.model.ParameterDefinition;
-import hudson.model.ParameterValue;
 import hudson.model.ParametersAction;
 import hudson.model.ParametersDefinitionProperty;
 import hudson.model.Queue;
@@ -25,6 +25,8 @@ import java.util.List;
 import java.util.Map;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
+
+import org.apache.commons.lang.ArrayUtils;
 
 /**
  * Build command for the instant messaging bot.
@@ -117,7 +119,7 @@ public class BuildCommand extends AbstractTextSendingCommand {
 				        }
 				        
 				        if (parametersStartIndex < args.length) {
-				            String[] potentialParameters = Arrays.copyOfRange(args, parametersStartIndex,args.length);
+				            String[] potentialParameters = (String[]) ArrayUtils.subarray(args, parametersStartIndex,args.length);
 				            parameters = parseBuildParameters(potentialParameters, project, reply);
 				        }
 				    }
