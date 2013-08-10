@@ -108,7 +108,6 @@ public class BuildCommandTest {
         cmd.getReply(bot, sender, new String[]{ "build", "project", "3s", "key=value", "key2=true" });
         
         ArgumentCaptor<ParametersAction> captor = ArgumentCaptor.forClass(ParametersAction.class);
-        verify(project).hasPermission(Item.BUILD);
         verify(project).scheduleBuild(anyInt(), any(Cause.class),
                 captor.capture());
         
@@ -138,13 +137,11 @@ public class BuildCommandTest {
         cmd.getReply(bot, sender, new String[]{ "build", "project", "key=value", "unexisting_key=value" });
         
         ArgumentCaptor<ParametersAction> captor = ArgumentCaptor.forClass(ParametersAction.class);
-        verify(project).hasPermission(Item.BUILD);
-        verify(project).isParameterized();
         verify(project).scheduleBuild(anyInt(), any(Cause.class),
                 captor.capture());
         
-        Assert.assertEquals(1, captor.getValue().getParameters().size());
-        Assert.assertEquals(new StringParameterValue("key", "value"),
+        assertEquals(1, captor.getValue().getParameters().size());
+        assertEquals(new StringParameterValue("key", "value"),
                 captor.getValue().getParameters().get(0));
     }
     
