@@ -9,6 +9,7 @@ import hudson.model.Cause;
 import hudson.model.FreeStyleProject;
 import hudson.model.ParametersAction;
 import hudson.model.ParametersDefinitionProperty;
+import hudson.model.BooleanParameterDefinition;
 import hudson.model.StringParameterDefinition;
 import hudson.model.StringParameterValue;
 import hudson.plugins.im.Sender;
@@ -75,7 +76,7 @@ public class BuildCommandTest {
     }
     
     @Test
-    public void testParameters() {
+    public void parametersFromCommandShouldBePassedToBuild() {
         Bot bot = mock(Bot.class);
         when(bot.getImId()).thenReturn("hudsonbot");
 
@@ -84,29 +85,17 @@ public class BuildCommandTest {
         cmd.setJobProvider(jobProvider);
         
         AbstractProject<?, ?> project = mockProject(jobProvider);
-        when(project.isParameterized()).thenReturn(Boolean.TRUE);
-        when(project.getProperty(ParametersDefinitionProperty.class)).thenReturn(new ParametersDefinitionProperty(new StringParameterDefinition("key", "default value", "")));
-        
-        Sender sender = new Sender("sender");
-        cmd.getReply(bot, sender, new String[]{ "build", "project", "key=value", "unexisting_key=value" });
-        
-        ArgumentCaptor<ParametersAction> captor = ArgumentCaptor.forClass(ParametersAction.class);
-        verify(project).hasPermission(Item.BUILD);
-        verify(project).isParameterized();
-        verify(project).scheduleBuild(anyInt(), (Cause) any(),
-                captor.capture());
-        
-        Assert.assertEquals(1, captor.getValue().getParameters().size());
-        Assert.assertEquals(new StringParameterValue("key", "value"),
-                captor.getValue().getParameters().get(0));
-        
-        
         project = mockProject(jobProvider);
         when(project.isParameterized()).thenReturn(Boolean.TRUE);
-        when(project.getProperty(ParametersDefinitionProperty.class)).thenReturn(new ParametersDefinitionProperty(new StringParameterDefinition("key", "default value", ""),
-        		new StringParameterDefinition("key2", "false", "")));
+        when(project.getProperty(ParametersDefinitionProperty.class)).thenReturn(
+                new ParametersDefinitionProperty(
+                        new StringParameterDefinition("key", "default value", ""),
+                        new BooleanParameterDefinition("key2", false, "")));
+        
+        Sender sender = new Sender("sender");
         cmd.getReply(bot, sender, new String[]{ "build", "project", "3s", "key=value", "key2=true" });
-        captor = ArgumentCaptor.forClass(ParametersAction.class);
+        
+        ArgumentCaptor<ParametersAction> captor = ArgumentCaptor.forClass(ParametersAction.class);
         verify(project).hasPermission(Item.BUILD);
         verify(project).scheduleBuild(anyInt(), any(Cause.class),
                 captor.capture());
@@ -116,6 +105,35 @@ public class BuildCommandTest {
                 captor.getValue().getParameters().get(0));
         Assert.assertEquals(new BooleanParameterValue("key2", true),
                 captor.getValue().getParameters().get(1));
+    }
+    
+    @Test
+    public void unknownParametersShouldBeIgnored() {
+        // TODO: really? Shouldn't we better raise an error?
+        Bot bot = mock(Bot.class);
+        when(bot.getImId()).thenReturn("hudsonbot");
+
+        BuildCommand cmd = new BuildCommand();
+        JobProvider jobProvider = mock(JobProvider.class);
+        cmd.setJobProvider(jobProvider);
+        
+        AbstractProject<?, ?> project = mockProject(jobProvider);
+        when(project.isParameterized()).thenReturn(Boolean.TRUE);
+        when(project.getProperty(ParametersDefinitionProperty.class)).thenReturn(
+                new ParametersDefinitionProperty(new StringParameterDefinition("key", "default value", "")));
+        
+        Sender sender = new Sender("sender");
+        cmd.getReply(bot, sender, new String[]{ "build", "project", "key=value", "unexisting_key=value" });
+        
+        ArgumentCaptor<ParametersAction> captor = ArgumentCaptor.forClass(ParametersAction.class);
+        verify(project).hasPermission(Item.BUILD);
+        verify(project).isParameterized();
+        verify(project).scheduleBuild(anyInt(), any(Cause.class),
+                captor.capture());
+        
+        Assert.assertEquals(1, captor.getValue().getParameters().size());
+        Assert.assertEquals(new StringParameterValue("key", "value"),
+                captor.getValue().getParameters().get(0));
     }
     
     @Test
