@@ -16,10 +16,11 @@ import hudson.model.Queue;
 import hudson.model.StringParameterValue;
 import hudson.plugins.im.IMCause;
 import hudson.plugins.im.Sender;
+
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collection;
-import java.util.Hashtable;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.regex.Matcher;
@@ -116,18 +117,19 @@ public class BuildCommand extends AbstractTextSendingCommand {
 				        }
 				        
 				        // parse possible parameters from the command
-				        Map<String, ParameterValue> parsedParameters = new Hashtable<String, ParameterValue>();
+				        Map<String, ParameterValue> parsedParameters = new HashMap<String, ParameterValue>();
 				        for (int i=parametersStartIndex; i < args.length; i++) {
 				        	String[] split = args[i].split("=");
 				        	if (split.length == 2) {
+				        	    String key = split[0];
 				                String value = split[1];
-				                if ("true".equals(value) || "false".equals(value)) {
-				                	parsedParameters.put(split[0], new BooleanParameterValue(split[0], Boolean.parseBoolean(split[1])));
+                                if ("true".equals(value) || "false".equals(value)) {
+				                	parsedParameters.put(key, new BooleanParameterValue(key, Boolean.parseBoolean(value)));
 				                } else {
-				                	parsedParameters.put(split[0], new StringParameterValue(split[0], split[1]));
+				                	parsedParameters.put(key, new StringParameterValue(key, value));
 				                }
 				        	} else {
-				        		msg += "Unparseable parameter: " + args[i];
+				        		msg += "Unparseable parameter: " + args[i] + "\n";
 				        	}
 				        }
 				        if (project.isParameterized()) {
@@ -143,7 +145,7 @@ public class BuildCommand extends AbstractTextSendingCommand {
 				        			}
 				        		}
 				        	}
-				        } else if (!parsedParameters.isEmpty() && !project.isParameterized()) {
+				        } else if (!parsedParameters.isEmpty()) {
 					        msg += "Ignoring parameters as project is not parametrized!\n";
 					    }
 				    }
