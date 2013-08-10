@@ -75,14 +75,14 @@ public class BuildCommand extends AbstractTextSendingCommand {
 			        return checkPermission;
 			    }
 			    
-			    String msg = "";
+			    StringBuilder reply = new StringBuilder();
     			if (!project.isBuildable()) {
 					return sender.getNickname() + ": job " + jobName + " is disabled";
 				} else {
 				    
 				    int delay = project.getQuietPeriod();
-				    List<ParameterValue> parameters = new ArrayList<ParameterValue>();
 				    
+				    List<ParameterValue> parameters = new ArrayList<ParameterValue>();
 				    if (args.length >= 3) {
 				        
 				        int parametersStartIndex = 2;
@@ -116,46 +116,18 @@ public class BuildCommand extends AbstractTextSendingCommand {
 				            }
 				        }
 				        
-				        // parse possible parameters from the command
-				        Map<String, ParameterValue> parsedParameters = new HashMap<String, ParameterValue>();
-				        for (int i=parametersStartIndex; i < args.length; i++) {
-				        	String[] split = args[i].split("=");
-				        	if (split.length == 2) {
-				        	    String key = split[0];
-				                String value = split[1];
-                                if ("true".equals(value) || "false".equals(value)) {
-				                	parsedParameters.put(key, new BooleanParameterValue(key, Boolean.parseBoolean(value)));
-				                } else {
-				                	parsedParameters.put(key, new StringParameterValue(key, value));
-				                }
-				        	} else {
-				        		msg += "Unparseable parameter: " + args[i] + "\n";
-				        	}
+				        if (parametersStartIndex < args.length) {
+				            String[] potentialParameters = Arrays.copyOfRange(args, parametersStartIndex,args.length);
+				            parameters = parseBuildParameters(potentialParameters, project, reply);
 				        }
-				        if (project.isParameterized()) {
-				        	// Then resolve the value based on the project definition
-				        	ParametersDefinitionProperty propDefs = project.getProperty(ParametersDefinitionProperty.class);
-				        	for (ParameterDefinition pd : propDefs.getParameterDefinitions()) {
-				        		if (pd.getName() != null && parsedParameters.containsKey(pd.getName())) {
-			        				parameters.add(parsedParameters.get(pd.getName()));
-				        		} else {
-				        			ParameterValue pv = pd.getDefaultParameterValue();
-				        			if (pv != null) {
-				        				parameters.add(pv);
-				        			}
-				        		}
-				        	}
-				        } else if (!parsedParameters.isEmpty()) {
-					        msg += "Ignoring parameters as project is not parametrized!\n";
-					    }
 				    }
 				    			    
 				    if (scheduleBuild(bot, project, delay, sender, parameters)) {
 				        if (delay == 0) {
-				            return msg + sender.getNickname() + ": job " + jobName + " build scheduled now";
+				            return reply.append(sender.getNickname() + ": job " + jobName + " build scheduled now").toString();
 				        } else {
-				            return msg + sender.getNickname() + ": job " + jobName + " build scheduled with a quiet period of " +
-                                    delay + " seconds";
+				            return reply.append(sender.getNickname() + ": job " + jobName + " build scheduled with a quiet period of " +
+                                    delay + " seconds").toString();
 				        }
                     } else {
                         // probably already queued
@@ -175,6 +147,45 @@ public class BuildCommand extends AbstractTextSendingCommand {
 			return sender.getNickname() + ": Error, syntax is: '" + args[0] +  SYNTAX + "'";
 		}
 	}
+
+    private List<ParameterValue> parseBuildParameters(String[] args,
+            AbstractProject<?, ?> project, StringBuilder commandReply) {
+        
+        List<ParameterValue> parameters = new ArrayList<ParameterValue>();
+        // parse possible parameters from the command
+        Map<String, ParameterValue> parsedParameters = new HashMap<String, ParameterValue>();
+        for (int i=0; i < args.length; i++) {
+        	String[] split = args[i].split("=");
+        	if (split.length == 2) {
+        	    String key = split[0];
+                String value = split[1];
+                if ("true".equals(value) || "false".equals(value)) {
+                	parsedParameters.put(key, new BooleanParameterValue(key, Boolean.parseBoolean(value)));
+                } else {
+                	parsedParameters.put(key, new StringParameterValue(key, value));
+                }
+        	} else {
+        	    commandReply.append("Unparseable parameter: " + args[i] + "\n");
+        	}
+        }
+        if (project.isParameterized()) {
+        	// Then resolve the value based on the project definition
+        	ParametersDefinitionProperty propDefs = project.getProperty(ParametersDefinitionProperty.class);
+        	for (ParameterDefinition pd : propDefs.getParameterDefinitions()) {
+        		if (pd.getName() != null && parsedParameters.containsKey(pd.getName())) {
+        			parameters.add(parsedParameters.get(pd.getName()));
+        		} else {
+        			ParameterValue pv = pd.getDefaultParameterValue();
+        			if (pv != null) {
+        				parameters.add(pv);
+        			}
+        		}
+        	}
+        } else if (!parsedParameters.isEmpty()) {
+            commandReply.append("Ignoring parameters as project is not parametrized!\n");
+        }
+        return parameters;
+    }
 	
 	private String checkPermission(Sender sender, AbstractProject<?, ?> project) {
         if (!project.hasPermission(Item.BUILD)) {
