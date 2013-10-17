@@ -49,8 +49,9 @@ public class MessageHelper {
 	 * Returns the full URL to the test details page for a given test result;
 	 */
 	public static String getTestUrl(hudson.tasks.test.TestResult result) {
-		String url = getBuildURL(result.getOwner());
-		AbstractTestResultAction action = result.getTestResultAction();
+		String buildUrl = getBuildURL(result.getOwner());
+		@SuppressWarnings("rawtypes")
+        AbstractTestResultAction action = result.getTestResultAction();
 		
 		TestObject parent = result.getParent();
 		TestResult testResultRoot = null;
@@ -62,10 +63,19 @@ public class MessageHelper {
 			parent = parent.getParent();
 		}
 		
-		url += action.getUrlName()
+		String testUrl = action.getUrlName()
 			+ (testResultRoot != null ? testResultRoot.getUrl() : "")
 			+ result.getUrl();
-		return url;
+		
+		String[] pathComponents = testUrl.split("/");
+		StringBuilder buf = new StringBuilder();
+		for (String c : pathComponents) {
+		    buf.append(Util.rawEncode(c)).append('/');
+		}
+		// remove last /
+		buf.deleteCharAt(buf.length() - 1);
+		
+        return buildUrl + buf.toString();
 	}
 
 	/**
@@ -146,7 +156,7 @@ public class MessageHelper {
 	 * Note: Unfortunately in Java 5 there is no Arrays#copyOfRange, yet.
 	 * So we have to implement it ourself.
 	 */
-	@SuppressWarnings("unchecked")
+	@SuppressWarnings({ "unchecked", "rawtypes" })
     public static <T> T[] copyOfRange(T[] original, int from, int to) {
         int newLength = to - from;
         if (newLength < 0)
@@ -178,7 +188,7 @@ public class MessageHelper {
      * 
      * Note: copied from java 6
      */
-	@SuppressWarnings("unchecked")
+	@SuppressWarnings({ "unchecked", "rawtypes" })
     public static <T> T[] copyOf(T[] original, int newLength) {
 		Class type = original.getClass();
         T[] copy = (type == Object[].class)
