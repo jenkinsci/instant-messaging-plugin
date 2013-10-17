@@ -1,7 +1,12 @@
 package hudson.plugins.im.tools;
 
 import static org.junit.Assert.assertEquals;
+import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.when;
+import hudson.model.AbstractBuild;
 import hudson.plugins.im.tools.MessageHelper;
+import hudson.tasks.test.AbstractTestResultAction;
+import hudson.tasks.test.TestResult;
 
 import org.junit.Assert;
 import org.junit.Test;
@@ -61,5 +66,23 @@ public class MessageHelperTest {
 		
 		concat = MessageHelper.concat(a);
 		Assert.assertArrayEquals(a, concat);
+	}
+	
+	@SuppressWarnings({ "rawtypes", "unchecked" })
+    @Test
+	public void testUrlShouldBeUrlEncoded() {
+	    TestResult result = mock(TestResult.class);
+	    AbstractBuild build = mock(AbstractBuild.class);
+	    when(build.getUrl()).thenReturn("/a build");
+	    
+	    AbstractTestResultAction action = mock(AbstractTestResultAction.class);
+	    when(action.getUrlName()).thenReturn("/action");
+	    
+	    when(result.getOwner()).thenReturn(build);
+	    when(result.getTestResultAction()).thenReturn(action);
+	    when(result.getUrl()).thenReturn("/some id with spaces");
+	    
+	    String testUrl = MessageHelper.getTestUrl(result);
+	    assertEquals("null/a%20build/action/some%20id%20with%20spaces", testUrl);
 	}
 }
