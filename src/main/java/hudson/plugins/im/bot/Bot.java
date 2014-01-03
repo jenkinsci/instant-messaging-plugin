@@ -125,7 +125,7 @@ public class Bot implements IMMessageListener {
             String[] args = MessageHelper.extractCommandLine(payload);
             if (args.length > 0) {
                 // first word is the command name
-                String cmd = args[0];
+                String cmd = args[0].toLowerCase();
                 
                 try {
                 	BotCommand command = this.cmdsAndAliases.get(cmd);
