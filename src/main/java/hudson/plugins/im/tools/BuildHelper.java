@@ -66,7 +66,8 @@ public class BuildHelper {
         
         AbstractBuild<?, ?> previousBuild = getPreviousNonAbortedBuild(build);
         if (previousBuild != null) {
-            return previousBuild.getResult().isWorseThan(Result.SUCCESS);
+            Result previousResult = previousBuild.getResult();
+			return previousResult != null && previousResult.isWorseThan(Result.SUCCESS);
         }
         return false;
     }
