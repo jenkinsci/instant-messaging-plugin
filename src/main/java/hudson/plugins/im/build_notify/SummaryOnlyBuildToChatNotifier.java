@@ -1,6 +1,7 @@
 package hudson.plugins.im.build_notify;
 
 import hudson.Extension;
+import hudson.Functions;
 import hudson.model.AbstractBuild;
 import hudson.model.BuildListener;
 import hudson.model.ResultTrend;
@@ -12,6 +13,7 @@ import org.kohsuke.stapler.DataBoundConstructor;
 import java.io.IOException;
 
 import static hudson.plugins.im.tools.BuildHelper.*;
+import hudson.tasks.test.AbstractTestResultAction;
 
 /**
  * {@link BuildToChatNotifier} that sends out a brief one line summary.
@@ -28,6 +30,15 @@ public class SummaryOnlyBuildToChatNotifier extends BuildToChatNotifier {
         return Messages.SummaryOnlyBuildToChatNotifier_StartMessage(build.getDisplayName(),getProjectName(build));
     }
 
+    public String getFailureDiffString(AbstractTestResultAction<?> tests) {
+        AbstractTestResultAction<?> prev = tests.getPreviousResult();
+        if (prev == null) {
+            return "";
+        }
+
+        return Functions.getDiffString(tests.getFailCount() - prev.getFailCount());
+    }
+
     @Override
     public String buildCompletionMessage(IMPublisher publisher, AbstractBuild<?, ?> build, BuildListener listener) throws IOException, InterruptedException {
         final StringBuilder sb;
@@ -36,11 +47,17 @@ public class SummaryOnlyBuildToChatNotifier extends BuildToChatNotifier {
         } else {
             sb = new StringBuilder();
         }
+
+        AbstractTestResultAction<?> tests = build.getTestResultAction();
         sb.append(Messages.SummaryOnlyBuildToChatNotifier_Summary(
                 getProjectName(build), build.getDisplayName(),
                 ResultTrend.getResultTrend(build).getID(),
                 build.getTimestampString(),
-                MessageHelper.getBuildURL(build)));
+                MessageHelper.getBuildURL(build),
+                tests.getTotalCount() - tests.getFailCount(),
+                tests.getTotalCount(),
+                tests.getFailCount(),
+                this.getFailureDiffString(tests)));
 
         return sb.toString();
     }
