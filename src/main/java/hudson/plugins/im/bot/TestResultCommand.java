@@ -5,6 +5,7 @@ import hudson.model.AbstractBuild;
 import hudson.model.AbstractProject;
 import hudson.tasks.junit.CaseResult;
 import hudson.tasks.test.AbstractTestResultAction;
+import hudson.tasks.test.TestResult;
 
 import java.util.Collection;
 import java.util.Collections;
@@ -41,8 +42,8 @@ public class TestResultCommand extends AbstractMultipleJobCommand {
         StringBuilder listing = new StringBuilder(String.format("%s build #%s had %s of %s tests fail\n", job.getFullDisplayName(), build.getNumber(), tests.getFailCount(), tests.getTotalCount()));
         
         listing.append("\n");
-        List<CaseResult> failedTests = tests.getFailedTests();
-        for (CaseResult result : failedTests) {
+        List<? extends TestResult> failedTests = tests.getFailedTests();
+        for (TestResult result : failedTests) {
             listing.append(String.format("%s failed in %ss\n", result.getFullName(), result.getDuration()));
         }
         return listing;
