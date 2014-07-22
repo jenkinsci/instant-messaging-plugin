@@ -65,7 +65,7 @@ public class PrintFailingTestsBuildToChatNotifier extends
 
 	private CharSequence getFailedTestsReport(AbstractBuild<?, ?> build) {
 		
-		AbstractTestResultAction testResultAction = build.getTestResultAction();
+		AbstractTestResultAction testResultAction = build.getAction(AbstractTestResultAction.class);
 		if (testResultAction == null || testResultAction.getFailCount() == 0) {
 			return "";
 		}

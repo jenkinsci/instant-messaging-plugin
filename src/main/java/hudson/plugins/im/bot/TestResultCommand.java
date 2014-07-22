@@ -33,7 +33,7 @@ public class TestResultCommand extends AbstractMultipleJobCommand {
             // No builds
             return job.getFullDisplayName() + " has never been built";
         }   
-        AbstractTestResultAction<?> tests = build.getTestResultAction();
+        AbstractTestResultAction<?> tests = build.getAction(AbstractTestResultAction.class);
         if (tests == null) {
             // no test results associated with this job
             return job.getFullDisplayName() + ": latest build contains no test results";
