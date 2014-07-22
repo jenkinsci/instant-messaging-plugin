@@ -3,13 +3,13 @@
 	<parent>
 		<groupId>org.jvnet.hudson.plugins</groupId>
 		<artifactId>instant-messaging-parent</artifactId>
-		<version>1.22</version>
+		<version>1.24</version>
 		<relativePath>../instant-messaging-parent-plugin/pom.xml</relativePath>
 	</parent>
 
 	<artifactId>instant-messaging</artifactId>
 	<name>Jenkins instant-messaging plugin</name>
-	<version>1.29-SNAPSHOT</version>
+	<version>1.30-SNAPSHOT</version>
 	<packaging>hpi</packaging>
 	<url>http://wiki.jenkins-ci.org/display/JENKINS/Instant+Messaging+Plugin</url>
 	<developers>
@@ -34,6 +34,12 @@
     </licenses>
     
     <dependencies>
+    	<dependency>
+        	<groupId>org.jenkins-ci.plugins</groupId>
+        	<artifactId>mailer</artifactId>
+        	<version>1.7</version>
+        	<!-- TODO: should be transformed into a optional dependency -->
+        </dependency>
         <dependency>
             <groupId>commons-lang</groupId>
             <artifactId>commons-lang</artifactId>
