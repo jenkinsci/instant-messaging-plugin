@@ -145,7 +145,7 @@ public class Bot implements IMMessageListener {
                         this.chat.sendMessage(s.getNickname() + " did you mean me? Unknown command '" + cmd
                                 + "'\nUse '" + this.commandPrefix + " help' to get help!");
                     }
-                } catch (IMException e) {
+                } catch (Exception e) {
                     LOGGER.warning(ExceptionHelper.dump(e));
                 }
             }
