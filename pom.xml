@@ -33,6 +33,19 @@
         </license>
     </licenses>
     
+    <build>
+    	<pluginManagement>
+    		<plugins>
+	    		<plugin>
+	        		<artifactId>maven-javadoc-plugin</artifactId>
+	        		<configuration>
+	        			<skip>true</skip>
+	        		</configuration>
+		      </plugin>
+	    	</plugins>
+    	</pluginManagement>
+    </build>
+    
     <dependencies>
     	<dependency>
         	<groupId>org.jenkins-ci.plugins</groupId>
