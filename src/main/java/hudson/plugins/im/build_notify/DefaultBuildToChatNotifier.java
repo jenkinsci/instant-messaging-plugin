@@ -26,7 +26,7 @@ public class DefaultBuildToChatNotifier extends SummaryOnlyBuildToChatNotifier {
         StringBuilder sb = new StringBuilder(super.buildStartMessage(publisher, build, listener));
 
         AbstractBuild<?, ?> previousBuild = build.getPreviousBuild();
-        if (previousBuild != null) {
+        if (previousBuild != null && !previousBuild.isBuilding()) {
             sb.append(" (previous build: ")
                 .append(ResultTrend.getResultTrend(previousBuild).getID());
 

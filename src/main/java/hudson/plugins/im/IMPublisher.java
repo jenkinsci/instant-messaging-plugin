@@ -656,7 +656,7 @@ public abstract class IMPublisher extends Notifier implements BuildStep, MatrixA
      */
     @Override
     public BuildStepMonitor getRequiredMonitorService() {
-        return BuildStepMonitor.BUILD;
+        return BuildStepMonitor.NONE;
     }
 	
     // migrate old instances
