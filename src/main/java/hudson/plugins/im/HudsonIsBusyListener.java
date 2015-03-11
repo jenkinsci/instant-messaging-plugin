@@ -6,6 +6,7 @@ import hudson.model.Hudson;
 import hudson.model.Run;
 import hudson.model.TaskListener;
 import hudson.model.listeners.RunListener;
+import hudson.util.DaemonThreadFactory;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -22,18 +23,11 @@ public class HudsonIsBusyListener extends RunListener {
 	private static HudsonIsBusyListener INSTANCE;
 	
 	private transient final List<IMConnectionProvider> connectionProviders = new ArrayList<IMConnectionProvider>();
-	private transient final ScheduledExecutorService executor = Executors.newSingleThreadScheduledExecutor();
+	private transient final ScheduledExecutorService executor = Executors.newSingleThreadScheduledExecutor(new DaemonThreadFactory());
 	
 	private transient int lastBusyExecutors = -1;
 	private transient int lastTotalExecutors = -1;
-	
-	private final Runnable updateRunner = new Runnable() {
-        @Override
-        public void run() {
-            updateIMStatus();
-        }
-    };
-    
+
     public static synchronized HudsonIsBusyListener getInstance() {
     	if (INSTANCE == null) {
     		INSTANCE = new HudsonIsBusyListener();
@@ -46,7 +40,12 @@ public class HudsonIsBusyListener extends RunListener {
 	
 	private HudsonIsBusyListener() {
         super(Run.class);
-        this.executor.scheduleAtFixedRate(this.updateRunner, 10, 60, TimeUnit.SECONDS);
+        this.executor.scheduleAtFixedRate(new Runnable() {
+            @Override
+            public void run() {
+                updateIMStatus();
+            }
+        }, 10, 60, TimeUnit.SECONDS);
         LOGGER.info("Executor busy listener created");
     }
 	
