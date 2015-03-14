@@ -4,14 +4,14 @@ package hudson.plugins.im;
 public class IMPlugin {
 
 	private transient IMConnectionProvider provider;
-	private transient HudsonIsBusyListener busyListener;
+	private transient JenkinsIsBusyListener busyListener;
 
     public IMPlugin(IMConnectionProvider provider) {
     	this.provider = provider;
     }
     
     public void start() throws Exception {
-    	this.busyListener = HudsonIsBusyListener.getInstance();
+    	this.busyListener = JenkinsIsBusyListener.getInstance();
     	this.busyListener.addConnectionProvider(this.provider);
     }
 

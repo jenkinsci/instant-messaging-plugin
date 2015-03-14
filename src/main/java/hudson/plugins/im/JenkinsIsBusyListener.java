@@ -16,11 +16,11 @@ import java.util.concurrent.TimeUnit;
 import java.util.logging.Logger;
 
 @SuppressWarnings("unchecked")
-public class HudsonIsBusyListener extends RunListener {
+public class JenkinsIsBusyListener extends RunListener {
 	
-	private static final Logger LOGGER = Logger.getLogger(HudsonIsBusyListener.class.getName());
+	private static final Logger LOGGER = Logger.getLogger(JenkinsIsBusyListener.class.getName());
 	
-	private static HudsonIsBusyListener INSTANCE;
+	private static JenkinsIsBusyListener INSTANCE;
 	
 	private transient final List<IMConnectionProvider> connectionProviders = new ArrayList<IMConnectionProvider>();
 	private transient final ScheduledExecutorService executor = Executors.newSingleThreadScheduledExecutor(new DaemonThreadFactory());
@@ -28,9 +28,9 @@ public class HudsonIsBusyListener extends RunListener {
 	private transient int lastBusyExecutors = -1;
 	private transient int lastTotalExecutors = -1;
 
-    public static synchronized HudsonIsBusyListener getInstance() {
+    public static synchronized JenkinsIsBusyListener getInstance() {
     	if (INSTANCE == null) {
-    		INSTANCE = new HudsonIsBusyListener();
+    		INSTANCE = new JenkinsIsBusyListener();
         	// registration via @Extension didn't seem to work!
         	// Have to retry it sometime.
         	INSTANCE.register();
@@ -38,7 +38,7 @@ public class HudsonIsBusyListener extends RunListener {
     	return INSTANCE;
     }
 	
-	private HudsonIsBusyListener() {
+	private JenkinsIsBusyListener() {
         super(Run.class);
         this.executor.scheduleAtFixedRate(new Runnable() {
             @Override
