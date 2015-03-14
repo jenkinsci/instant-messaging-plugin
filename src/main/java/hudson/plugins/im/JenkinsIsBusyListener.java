@@ -2,7 +2,6 @@ package hudson.plugins.im;
 
 import hudson.model.Computer;
 import hudson.model.Executor;
-import hudson.model.Hudson;
 import hudson.model.Run;
 import hudson.model.TaskListener;
 import hudson.model.listeners.RunListener;
@@ -14,6 +13,8 @@ import java.util.concurrent.Executors;
 import java.util.concurrent.ScheduledExecutorService;
 import java.util.concurrent.TimeUnit;
 import java.util.logging.Logger;
+
+import jenkins.model.Jenkins;
 
 @SuppressWarnings({ "unchecked", "rawtypes" })
 public class JenkinsIsBusyListener extends RunListener {
@@ -120,11 +121,11 @@ public class JenkinsIsBusyListener extends RunListener {
             } else if (busyExecutors == totalExecutors) {
                 conn.setPresence(IMPresence.DND, 
                         "Please give me some rest! All " + totalExecutors + " executors are busy, "
-                        + Hudson.getInstance().getQueue().getItems().length + " job(s) in queue.");
+                        + Jenkins.getInstance().getQueue().getItems().length + " job(s) in queue.");
             } else {
                 String msg = "Working: " + busyExecutors + " out of " + totalExecutors +
                     " executors are busy.";
-                int queueItems = Hudson.getInstance().getQueue().getItems().length;
+                int queueItems = Jenkins.getInstance().getQueue().getItems().length;
                 if (queueItems > 0) {
                     msg += " " + queueItems + " job(s) in queue.";
                 }
@@ -137,8 +138,7 @@ public class JenkinsIsBusyListener extends RunListener {
     
     private int getBusyExecutors() {
         int busyExecutors = 0;
-        //boolean stillRunningExecutorFound = false;
-        Computer[] computers = Hudson.getInstance().getComputers();
+        Computer[] computers = Jenkins.getInstance().getComputers();
         for (Computer compi : computers) {
             
             for (Executor executor : compi.getExecutors()) {
@@ -153,7 +153,7 @@ public class JenkinsIsBusyListener extends RunListener {
     
     private int getTotalExecutors() {
         int totalExecutors = 0;
-        Computer[] computers = Hudson.getInstance().getComputers();
+        Computer[] computers = Jenkins.getInstance().getComputers();
         for (Computer compi : computers) {
         	if (compi.isOnline()) {
         		totalExecutors += compi.getNumExecutors();
