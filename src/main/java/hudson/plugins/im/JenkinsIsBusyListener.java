@@ -15,7 +15,7 @@ import java.util.concurrent.ScheduledExecutorService;
 import java.util.concurrent.TimeUnit;
 import java.util.logging.Logger;
 
-@SuppressWarnings("unchecked")
+@SuppressWarnings({ "unchecked", "rawtypes" })
 public class JenkinsIsBusyListener extends RunListener {
 	
 	private static final Logger LOGGER = Logger.getLogger(JenkinsIsBusyListener.class.getName());
@@ -23,7 +23,15 @@ public class JenkinsIsBusyListener extends RunListener {
 	private static JenkinsIsBusyListener INSTANCE;
 	
 	private transient final List<IMConnectionProvider> connectionProviders = new ArrayList<IMConnectionProvider>();
-	private transient final ScheduledExecutorService executor = Executors.newSingleThreadScheduledExecutor(new DaemonThreadFactory());
+	private transient final ScheduledExecutorService executor = Executors.newSingleThreadScheduledExecutor(new DaemonThreadFactory() {
+
+		@Override
+		public Thread newThread(Runnable r) {
+			Thread t = super.newThread(r);
+			t.setName("JenkinsIsBusyListener-thread");
+			return t;
+		}
+	});
 	
 	private transient int lastBusyExecutors = -1;
 	private transient int lastTotalExecutors = -1;
