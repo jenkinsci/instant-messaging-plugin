@@ -14,6 +14,7 @@ import java.util.concurrent.ScheduledExecutorService;
 import java.util.concurrent.TimeUnit;
 import java.util.logging.Logger;
 
+import hudson.util.NamingThreadFactory;
 import jenkins.model.Jenkins;
 
 @SuppressWarnings({ "unchecked", "rawtypes" })
@@ -24,15 +25,7 @@ public class JenkinsIsBusyListener extends RunListener {
 	private static JenkinsIsBusyListener INSTANCE;
 	
 	private transient final List<IMConnectionProvider> connectionProviders = new ArrayList<IMConnectionProvider>();
-	private transient final ScheduledExecutorService executor = Executors.newSingleThreadScheduledExecutor(new DaemonThreadFactory() {
-
-		@Override
-		public Thread newThread(Runnable r) {
-			Thread t = super.newThread(r);
-			t.setName("JenkinsIsBusyListener-thread");
-			return t;
-		}
-	});
+	private transient final ScheduledExecutorService executor = Executors.newSingleThreadScheduledExecutor(new NamingThreadFactory(new DaemonThreadFactory(), JenkinsIsBusyListener.class.getSimpleName()));
 	
 	private transient int lastBusyExecutors = -1;
 	private transient int lastTotalExecutors = -1;
