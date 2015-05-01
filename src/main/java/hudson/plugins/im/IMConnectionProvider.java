@@ -1,18 +1,12 @@
 package hudson.plugins.im;
 
 import hudson.model.User;
-import hudson.model.Hudson;
 import hudson.plugins.im.tools.ExceptionHelper;
-import hudson.security.SecurityRealm;
 import java.util.concurrent.Semaphore;
 import java.util.concurrent.TimeUnit;
 import java.util.logging.Logger;
 
 import org.acegisecurity.Authentication;
-import org.acegisecurity.AuthenticationException;
-import org.acegisecurity.GrantedAuthority;
-import org.acegisecurity.userdetails.UserDetails;
-import org.acegisecurity.providers.UsernamePasswordAuthenticationToken;
 
 /**
  * Abstract implementation of a provider of {@link IMConnection}s.
@@ -131,22 +125,10 @@ public abstract class IMConnectionProvider implements IMConnectionListener {
                 
                 User u = User.get(descriptor.getHudsonUserName());
 
-                return impersonateUser(u);
+                return u.impersonate();
             }
         };
 	}
-
-	// TODO: replace with User#impersonate once we are requiring 1.419+ as core
-	private Authentication impersonateUser(User u) {
-        try {
-            UserDetails d = Hudson.getInstance().getSecurityRealm().loadUserByUsername(u.getId());
-            return new UsernamePasswordAuthenticationToken(d.getUsername(), "", d.getAuthorities());
-        } catch (AuthenticationException e) {
-            // TODO: use the stored GrantedAuthorities
-            return new UsernamePasswordAuthenticationToken(
-                u.getId(), "", new GrantedAuthority[]{SecurityRealm.AUTHENTICATED_AUTHORITY});
-        }
-    }
 
     private final class ConnectorRunnable implements Runnable {
 
