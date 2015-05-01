@@ -8,6 +8,7 @@ import hudson.matrix.MatrixConfiguration;
 import hudson.matrix.MatrixBuild;
 import hudson.matrix.MatrixProject;
 import hudson.model.BuildListener;
+import hudson.model.ResultTrend;
 import hudson.model.UserProperty;
 import hudson.model.AbstractBuild;
 import hudson.model.AbstractProject;
@@ -15,9 +16,7 @@ import hudson.model.Fingerprint.RangeSet;
 import hudson.model.User;
 import hudson.plugins.im.build_notify.BuildToChatNotifier;
 import hudson.plugins.im.build_notify.DefaultBuildToChatNotifier;
-import hudson.plugins.im.tools.BuildHelper;
 import hudson.plugins.im.tools.ExceptionHelper;
-import hudson.plugins.im.tools.BuildHelper.ExtResult;
 import hudson.scm.ChangeLogSet;
 import hudson.scm.ChangeLogSet.Entry;
 import hudson.tasks.BuildStep;
@@ -304,7 +303,8 @@ public abstract class IMPublisher extends Notifier implements BuildStep, MatrixA
             notifyChatsOnBuildEnd(build, buildListener);
         }
 
-        if (BuildHelper.isStillFailureOrUnstable(build) || BuildHelper.getExtendedResult(build) == ExtResult.NOW_UNSTABLE) {
+        ResultTrend resultTrend = ResultTrend.getResultTrend(build);
+		if (resultTrend == ResultTrend.STILL_FAILING || resultTrend == ResultTrend.STILL_UNSTABLE || resultTrend == ResultTrend.NOW_UNSTABLE) {
             if (this.notifySuspects) {
             	log(buildListener, "Notifying suspects");
             	final String message = getBuildToChatNotifier().suspectMessage(this, build, buildListener, false);
@@ -332,7 +332,7 @@ public abstract class IMPublisher extends Notifier implements BuildStep, MatrixA
             		}
             	}
             }
-        } else if (BuildHelper.isFailureOrUnstable(build)) {
+        } else if (resultTrend == ResultTrend.FAILURE || resultTrend == ResultTrend.UNSTABLE) {
             boolean committerNotified = false;
             if (this.notifySuspects) {
                 log(buildListener, "Notifying suspects");
@@ -354,7 +354,7 @@ public abstract class IMPublisher extends Notifier implements BuildStep, MatrixA
             }
         }
         
-        if (this.notifyFixers && BuildHelper.isFix(build)) {
+        if (this.notifyFixers && resultTrend == ResultTrend.FIXED) {
         	buildListener.getLogger().append("Notifying fixers\n");
         	final String message = getBuildToChatNotifier().fixerMessage(this, build, buildListener);
         	
