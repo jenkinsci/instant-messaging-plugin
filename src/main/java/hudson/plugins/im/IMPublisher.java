@@ -313,7 +313,7 @@ public abstract class IMPublisher extends Notifier implements BuildStep, MatrixA
             		try {
             			log(buildListener, "Sending notification to suspect: " + target.toString());
             			sendNotification(message, target, buildListener);
-            		} catch (final Throwable e) {
+            		} catch (RuntimeException e) {
             			log(buildListener, "There was an error sending suspect notification to: " + target.toString());
             		}
             	}
@@ -327,7 +327,7 @@ public abstract class IMPublisher extends Notifier implements BuildStep, MatrixA
             		try {
             			log(buildListener, "Sending notification to culprit: " + target.toString());
             			sendNotification(message, target, buildListener);
-            		} catch (final Throwable e) {
+            		} catch (RuntimeException e) {
             			log(buildListener, "There was an error sending culprit notification to: " + target.toString());
             		}
             	}
@@ -343,7 +343,7 @@ public abstract class IMPublisher extends Notifier implements BuildStep, MatrixA
                         log(buildListener, "Sending notification to suspect: " + target.toString());
                         sendNotification(message, target, buildListener);
                         committerNotified = true;
-                    } catch (final Throwable e) {
+                    } catch (RuntimeException e) {
                         log(buildListener, "There was an error sending suspect notification to: " + target.toString());
                     }
                 }
@@ -362,7 +362,7 @@ public abstract class IMPublisher extends Notifier implements BuildStep, MatrixA
         		try {
         			log(buildListener, "Sending notification to fixer: " + target.toString());
         			sendNotification(message, target, buildListener);
-        		} catch (final Throwable e) {
+        		} catch (RuntimeException e) {
         			log(buildListener, "There was an error sending fixer notification to: " + target.toString());
         		}
         	}
@@ -398,7 +398,7 @@ public abstract class IMPublisher extends Notifier implements BuildStep, MatrixA
             try {
                 log(buildListener, "Sending notification to upstream committer: " + target.toString());
                 sendNotification(message, target, buildListener);
-            } catch (final Throwable e) {
+            } catch (IMException e) {
                 log(buildListener, "There was an error sending upstream committer notification to: " + target.toString());
             }
         }
@@ -530,42 +530,52 @@ public abstract class IMPublisher extends Notifier implements BuildStep, MatrixA
      */
     @Override
     public boolean prebuild(AbstractBuild<?, ?> build, BuildListener buildListener) {
-        if (getNotifyOnStart()) {
-           if (build.getProject() instanceof MatrixConfiguration) {
-               if (getMatrixNotifier() == MatrixJobMultiplier.ONLY_CONFIGURATIONS
-                       || getMatrixNotifier() == MatrixJobMultiplier.ALL) {
-                   notifyChatsOnBuildStart(build, buildListener);
-               }
-           } else {
-               notifyChatsOnBuildStart(build, buildListener);
-           }
-        }
+        try {
+			if (getNotifyOnStart()) {
+			   if (build.getProject() instanceof MatrixConfiguration) {
+			       if (getMatrixNotifier() == MatrixJobMultiplier.ONLY_CONFIGURATIONS
+			               || getMatrixNotifier() == MatrixJobMultiplier.ALL) {
+			           notifyChatsOnBuildStart(build, buildListener);
+			       }
+			   } else {
+			       notifyChatsOnBuildStart(build, buildListener);
+			   }
+			}
+		} catch (IOException e) {
+			// ignore: never, ever cancel a build because a notification fails
+            log(buildListener, "[ERROR] in " + getPluginName() + " plugin: " + ExceptionHelper.dump(e));
+		} catch (InterruptedException e) {
+			// ignore: never, ever cancel a build because a notification fails
+            log(buildListener, "[ERROR] in " + getPluginName() + " plugin: " + ExceptionHelper.dump(e));
+            
+            Thread.currentThread().interrupt();
+		} catch (RuntimeException e) {
+			log(buildListener, "[ERROR] in " + getPluginName() + " plugin: " + ExceptionHelper.dump(e));
+		}
+        
         return true;
     }
     
     /**
      * Notify all registered chats about the build start.
      * When the start message is null or empty, no message is sent.
+     * @throws InterruptedException 
+     * @throws IOException 
      */
-    /* package for testing */ void notifyChatsOnBuildStart(AbstractBuild<?, ?> build, BuildListener buildListener) {
-        try {
-            final String msg = buildToChatNotifier.buildStartMessage(this,build,buildListener);
-            if (Util.fixEmpty(msg) == null) {
-                return;
-            }
-            for (final IMMessageTarget target : calculateTargets()) {
-                // only notify group chats
-                if (target instanceof GroupChatIMMessageTarget) {
-                    try {
-                        sendNotification(msg, target, buildListener);
-                    } catch (final Throwable e) {
-                        log(buildListener, "There was an error sending notification to: " + target.toString());
-                    }
+    /* package for testing */ void notifyChatsOnBuildStart(AbstractBuild<?, ?> build, BuildListener buildListener) throws IOException, InterruptedException {
+        final String msg = buildToChatNotifier.buildStartMessage(this,build,buildListener);
+        if (Util.fixEmpty(msg) == null) {
+            return;
+        }
+        for (final IMMessageTarget target : calculateTargets()) {
+            // only notify group chats
+            if (target instanceof GroupChatIMMessageTarget) {
+                try {
+                    sendNotification(msg, target, buildListener);
+                } catch (IMException e) {
+                    log(buildListener, "There was an error sending notification to: " + target.toString());
                 }
             }
-        } catch (Throwable t) {
-            // ignore: never, ever cancel a build because a notification fails
-            log(buildListener, "There was an error in the IM plugin: " + ExceptionHelper.dump(t));
         }
     }
     
@@ -583,7 +593,7 @@ public abstract class IMPublisher extends Notifier implements BuildStep, MatrixA
 		    try {
 		        log(buildListener, "Sending notification to: " + target.toString());
 		        sendNotification(msg, target, buildListener);
-		    } catch (final Throwable t) {
+		    } catch (RuntimeException t) {
 		        log(buildListener, "There was an error sending notification to: " + target.toString() + "\n" + ExceptionHelper.dump(t));
 		    }
 		}
