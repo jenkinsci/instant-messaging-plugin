@@ -13,6 +13,7 @@ import hudson.plugins.im.Sender;
 import hudson.plugins.im.bot.SetAliasCommand.AliasCommand;
 import hudson.plugins.im.tools.ExceptionHelper;
 import hudson.plugins.im.tools.MessageHelper;
+import hudson.security.ACL;
 
 import java.util.Collection;
 import java.util.Collections;
@@ -22,8 +23,8 @@ import java.util.TreeMap;
 import java.util.Map.Entry;
 import java.util.logging.Logger;
 
-import org.acegisecurity.Authentication;
-import org.acegisecurity.context.SecurityContextHolder;
+import jenkins.model.Jenkins;
+import jenkins.security.NotReallyRoleSensitiveCallable;
 
 /**
  * Instant messaging bot.
@@ -102,11 +103,11 @@ public class Bot implements IMMessageListener {
         return this.nick + "@" + this.imServer;
     }
 
-    public void onMessage(IMMessage msg) {
+    public void onMessage(final IMMessage msg) {
         // is it a command for me ? (returns null if not, the payload if so)
         String payload = retrieveMessagePayLoad(msg.getBody());
         if (payload != null) {
-            Sender s = getSender(msg);
+            final Sender s = getSender(msg);
         	
         	try {
             	if (!this.commandsAccepted) {
@@ -122,25 +123,27 @@ public class Bot implements IMMessageListener {
             }
         	
             // split words
-            String[] args = MessageHelper.extractCommandLine(payload);
+            final String[] args = MessageHelper.extractCommandLine(payload);
             if (args.length > 0) {
                 // first word is the command name
                 String cmd = args[0];
                 
                 try {
-                	BotCommand command = this.cmdsAndAliases.get(cmd);
+                	final BotCommand command = this.cmdsAndAliases.get(cmd);
                     if (command != null) {
-                    	Authentication oldAuthentication = SecurityContextHolder.getContext().getAuthentication();
-                    	try {
-                    	    if (this.authentication != null) {
-                    	        SecurityContextHolder.getContext().setAuthentication(this.authentication.getAuthentication());
-                    	    }
-	                    	command.executeCommand(this, this.chat, msg, s, args);
-                    	} finally {
-                    	    if (this.authentication != null) {
-                    	        SecurityContextHolder.getContext().setAuthentication(oldAuthentication);
-                    	    }
-                	    }
+                    	if (isAuthenticationNeeded()) {
+                    		ACL.impersonate(this.authentication.getAuthentication(), new NotReallyRoleSensitiveCallable<Void, IMException>() {
+								private static final long serialVersionUID = 1L;
+
+								@Override
+								public Void call() throws IMException {
+									command.executeCommand(Bot.this, chat, msg, s, args);
+									return null;
+								}
+							});
+                    	} else {
+                    		command.executeCommand(Bot.this, chat, msg, s, args);
+                    	}
                     } else {
                         this.chat.sendMessage(s.getNickname() + " did you mean me? Unknown command '" + cmd
                                 + "'\nUse '" + this.commandPrefix + " help' to get help!");
@@ -151,6 +154,10 @@ public class Bot implements IMMessageListener {
             }
         }
 	}
+    
+    private boolean isAuthenticationNeeded() {
+    	return this.authentication != null && Jenkins.getInstance().isUseSecurity();
+    }
 
 	private Sender getSender(IMMessage msg) {
 	    String sender = msg.getFrom();
