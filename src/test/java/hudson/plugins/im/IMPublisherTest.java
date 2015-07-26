@@ -13,6 +13,7 @@ import hudson.model.Fingerprint.RangeSet;
 import hudson.model.User;
 import hudson.plugins.im.build_notify.DefaultBuildToChatNotifier;
 import hudson.scm.ChangeLogSet;
+import hudson.scm.NullSCM;
 import hudson.tasks.BuildStepDescriptor;
 import hudson.tasks.Publisher;
 
@@ -60,10 +61,12 @@ public class IMPublisherTest {
         
         this.upstreamProject = mock(AbstractProject.class);
         this.project = mock(AbstractProject.class);
+        when(project.getScm()).thenReturn(new NullSCM());
 
         RangeSet rangeset = RangeSet.fromString(buildNumber + "-" + (buildNumber + 2), false);
         
         this.previousBuildUpstreamBuild = mock(AbstractBuild.class);
+        when(this.previousBuildUpstreamBuild.getParent()).thenReturn(project);
         
         this.upstreamBuildBetweenPreviousAndCurrent = mock(AbstractBuild.class);
         when(this.upstreamBuildBetweenPreviousAndCurrent.getDownstreamRelationship(this.project)).thenReturn(rangeset);
@@ -219,7 +222,7 @@ public class IMPublisherTest {
         private TestEntry entry;
         
         protected TestChangeLogSet(AbstractBuild<?, ?> build, TestEntry entry) {
-            super(build);
+            super(build, null);
             this.entry = entry;
         }
 
