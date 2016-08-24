@@ -50,12 +50,8 @@ public class UserStatCommand extends AbstractTextSendingCommand {
 			if (mailProperty != null) {
 				buf.append("\n").append("E-mail: ").append(mailProperty.getAddress());
 			}
-			
-//			if (Hudson.getInstance().getPlugin("jabber") != null) {
-//				
-//			}
-			
-			if (Hudson.getInstance().getPlugin("ci-game") != null) {
+
+			if (getJenkins().getPlugin("ci-game") != null) {
 				UserScoreProperty property = user.getProperty(UserScoreProperty.class);
 				if (property != null) {
 					int score = (int) property.getScore();

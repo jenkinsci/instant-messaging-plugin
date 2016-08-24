@@ -16,14 +16,14 @@ public class DefaultJobProvider implements JobProvider {
 
     @Override
     public AbstractProject<?, ?> getJobByName(String name) {
-        return Jenkins.getInstance().getItemByFullName(name, AbstractProject.class);
+        return getJenkins().getItemByFullName(name, AbstractProject.class);
     }
     
 
     @SuppressWarnings("rawtypes")
     @Override
     public AbstractProject<?, ?> getJobByDisplayName(String displayName) {
-        List<AbstractProject> allItems = Jenkins.getInstance().getAllItems(AbstractProject.class);
+        List<AbstractProject> allItems = getJenkins().getAllItems(AbstractProject.class);
         for (AbstractProject job : allItems) {
             if (displayName.equals(job.getDisplayName())) {
                 return job;
@@ -42,7 +42,7 @@ public class DefaultJobProvider implements JobProvider {
     @Override
     public List<AbstractProject<?,?>> getAllJobs() {
         @SuppressWarnings("rawtypes")
-        List items = Jenkins.getInstance().getAllItems(AbstractProject.class);
+        List items = getJenkins().getAllItems(AbstractProject.class);
         return items;
     }
     
@@ -50,17 +50,25 @@ public class DefaultJobProvider implements JobProvider {
     @SuppressWarnings("unchecked")
     public List<AbstractProject<?,?>> getTopLevelJobs() {
         @SuppressWarnings("rawtypes")
-        List items = Jenkins.getInstance().getItems(AbstractProject.class);
+        List items = getJenkins().getItems(AbstractProject.class);
         return items;
     }
 
     @Override
     public boolean isTopLevelJob(AbstractProject<?, ?> job) {
-        return Jenkins.getInstance().equals(job.getParent());
+        return getJenkins().equals(job.getParent());
     }
 
     @Override
     public View getView(String viewName) {
-        return Jenkins.getInstance().getView(viewName);
+        return getJenkins().getView(viewName);
+    }
+
+    protected static Jenkins getJenkins() {
+        Jenkins jenkins = Jenkins.getInstance();
+        if (jenkins == null) {
+            throw new IllegalStateException("Jenkins not running");
+        }
+        return jenkins;
     }
 }

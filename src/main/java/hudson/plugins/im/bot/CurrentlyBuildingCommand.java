@@ -39,7 +39,7 @@ public class CurrentlyBuildingCommand extends BotCommand {
 		StringBuffer msg = new StringBuffer();
 		msg.append("Currently building:");
 		boolean currentlyJobsInProgess = false;
-		for (Computer computer : Jenkins.getInstance().getComputers()) {
+		for (Computer computer : getJenkins().getComputers()) {
 			for (Executor executor : computer.getExecutors()) {
 				Executable currentExecutable = executor.getCurrentExecutable();
 				if (currentExecutable != null) {

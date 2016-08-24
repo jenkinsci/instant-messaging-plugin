@@ -5,6 +5,8 @@ import hudson.model.Result;
 import hudson.model.ResultTrend;
 import hudson.plugins.im.tools.BuildHelper;
 
+import java.util.Arrays;
+
 /**
  * Represents the notification strategy.
  * 
@@ -145,6 +147,6 @@ public enum NotificationStrategy {
      * Returns the display names of all notification strategies.
      */
     public static String[] getDisplayNames() {
-        return DISPLAY_NAMES;
+        return Arrays.copyOf(DISPLAY_NAMES, DISPLAY_NAMES.length);
     }
 }

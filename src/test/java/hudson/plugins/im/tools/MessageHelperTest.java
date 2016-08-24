@@ -9,10 +9,15 @@ import hudson.tasks.test.AbstractTestResultAction;
 import hudson.tasks.test.TestResult;
 
 import org.junit.Assert;
+import org.junit.Rule;
 import org.junit.Test;
 import org.jvnet.hudson.test.Bug;
+import org.jvnet.hudson.test.JenkinsRule;
 
 public class MessageHelperTest {
+
+	@Rule
+	public JenkinsRuleWithLocalPort jenkinsRule = new JenkinsRuleWithLocalPort();
 
 	@Test
 	public void testExtractCommandLine() {
@@ -70,19 +75,25 @@ public class MessageHelperTest {
 	
 	@SuppressWarnings({ "rawtypes", "unchecked" })
     @Test
-	public void testUrlShouldBeUrlEncoded() {
+	public void testUrl() {
 	    TestResult result = mock(TestResult.class);
 	    AbstractBuild build = mock(AbstractBuild.class);
-	    when(build.getUrl()).thenReturn("/a build");
+	    when(build.getUrl()).thenReturn("/a%20build");
 	    
 	    AbstractTestResultAction action = mock(AbstractTestResultAction.class);
 	    when(action.getUrlName()).thenReturn("/action");
 	    
-	    when(result.getOwner()).thenReturn(build);
+	    when(result.getRun()).thenReturn(build);
 	    when(result.getTestResultAction()).thenReturn(action);
 	    when(result.getUrl()).thenReturn("/some id with spaces");
 	    
 	    String testUrl = MessageHelper.getTestUrl(result);
-	    assertEquals("null/a%20build/action/some%20id%20with%20spaces", testUrl);
+	    assertEquals("http://localhost:" + jenkinsRule.getLocalPort() + "/jenkins/a%20build/action/some%20id%20with%20spaces", testUrl);
+	}
+
+	static class JenkinsRuleWithLocalPort extends JenkinsRule {
+		public int getLocalPort() {
+			return localPort;
+		}
 	}
 }

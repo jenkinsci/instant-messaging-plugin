@@ -31,7 +31,7 @@ public class QueueCommand extends BotCommand {
 
     public void executeCommand(Bot bot, IMChat chat, IMMessage message,
                                Sender sender, String[] args) throws IMException {
-		Queue queue = Hudson.getInstance().getQueue();
+		Queue queue = getJenkins().getQueue();
 		Item[] items = queue.getItems();
 		String reply;
 		if (items.length > 0) {
