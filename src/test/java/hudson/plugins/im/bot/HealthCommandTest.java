@@ -3,13 +3,15 @@ package hudson.plugins.im.bot;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
+import hudson.maven.AbstractMavenProject;
+import org.junit.Rule;
 import org.junit.Test;
 
-import hudson.maven.AbstractMavenProject;
 import hudson.model.FreeStyleBuild;
 import hudson.model.HealthReport;
 import hudson.model.ItemGroup;
 import hudson.plugins.im.Sender;
+import org.jvnet.hudson.test.JenkinsRule;
 
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertFalse;
@@ -23,6 +25,9 @@ import static org.mockito.Mockito.when;
  * @author kutzi
  */
 public class HealthCommandTest {
+
+	@Rule
+	public JenkinsRule jenkinsRule = new JenkinsRule();
 
 	private final Pattern percentagePattern = Pattern.compile("\\D(\\d+)[%]"); 
 	

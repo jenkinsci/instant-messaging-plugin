@@ -26,17 +26,22 @@ public class HealthCommand extends AbstractMultipleJobCommand {
     @Override
     protected CharSequence getMessageForJob(AbstractProject<?, ?> project) {
         StringBuilder msg = new StringBuilder(32);
+        AbstractBuild<?, ?> lastBuild = project.getLastBuild();
         msg.append(project.getFullDisplayName());
         if (project.isDisabled()) {
             msg.append("(disabled)");
         } else if (project.isBuilding()) {
-            msg.append("(BUILDING: ").append(project.getLastBuild().getDurationString()).append(")");
+            msg.append("(BUILDING");
+            if (lastBuild != null) {
+                msg.append(": ");
+                msg.append(lastBuild.getDurationString());
+            }
+            msg.append(")");
         } else if (project.isInQueue()) {
             msg.append("(in queue)");
         }
         msg.append(": ");
 
-        AbstractBuild<?, ?> lastBuild = project.getLastBuild();
         while ((lastBuild != null) && lastBuild.isBuilding()) {
             lastBuild = lastBuild.getPreviousBuild();
         }

@@ -8,12 +8,8 @@ import java.util.regex.Pattern;
 
 import org.apache.commons.lang.StringUtils;
 
-import hudson.Util;
 import hudson.model.AbstractBuild;
-import hudson.model.Hudson;
-import hudson.tasks.test.TestObject;
-import hudson.tasks.junit.TestResult;
-import hudson.tasks.test.AbstractTestResultAction;
+import org.jenkinsci.plugins.displayurlapi.DisplayURLProvider;
 
 /**
  * Utility class to help message creation
@@ -29,53 +25,14 @@ public class MessageHelper {
 	 * Returns the full URL to the build details page for a given build.
 	 */
 	public static String getBuildURL(AbstractBuild<?, ?> build) {
-		// The hudson's base url
-	    final StringBuilder builder;
-	    if (Hudson.getInstance() != null) {
-	        builder = new StringBuilder(
-				String.valueOf(Hudson.getInstance().getRootUrl()));
-	    } else {
-	        builder = new StringBuilder("null");
-	    }
-
-		// The build's url, escaped for project with space or other specials
-		// characters
-		builder.append(Util.encode(build.getUrl()));
-
-		return builder.toString();
+		return DisplayURLProvider.get().getRunURL(build);
 	}
 
 	/**
 	 * Returns the full URL to the test details page for a given test result;
 	 */
 	public static String getTestUrl(hudson.tasks.test.TestResult result) {
-		String buildUrl = getBuildURL(result.getOwner());
-		@SuppressWarnings("rawtypes")
-        AbstractTestResultAction action = result.getTestResultAction();
-		
-		TestObject parent = result.getParent();
-		TestResult testResultRoot = null;
-		while(parent != null) {
-			if (parent instanceof TestResult) {
-				testResultRoot = (TestResult) parent;
-				break;
-			}
-			parent = parent.getParent();
-		}
-		
-		String testUrl = action.getUrlName()
-			+ (testResultRoot != null ? testResultRoot.getUrl() : "")
-			+ result.getUrl();
-		
-		String[] pathComponents = testUrl.split("/");
-		StringBuilder buf = new StringBuilder();
-		for (String c : pathComponents) {
-		    buf.append(Util.rawEncode(c)).append('/');
-		}
-		// remove last /
-		buf.deleteCharAt(buf.length() - 1);
-		
-        return buildUrl + buf.toString();
+		return DisplayURLProvider.get().getTestUrl(result);
 	}
 
 	/**

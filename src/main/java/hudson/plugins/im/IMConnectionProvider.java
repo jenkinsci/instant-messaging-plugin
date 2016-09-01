@@ -88,11 +88,11 @@ public abstract class IMConnectionProvider implements IMConnectionListener {
         }
     }
 
-	protected IMPublisherDescriptor getDescriptor() {
+	protected synchronized IMPublisherDescriptor getDescriptor() {
 		return this.descriptor;
 	}
 
-	public void setDescriptor(IMPublisherDescriptor desc) {
+	public synchronized void setDescriptor(IMPublisherDescriptor desc) {
 		this.descriptor = desc;
 		
 		if (desc != null && desc.isEnabled()) {
@@ -174,11 +174,12 @@ public abstract class IMConnectionProvider implements IMConnectionListener {
                             this.semaphore.drainPermits();
                             
                             // wait up to timeout time OR until semaphore is released again (happens e.g. if global config was changed)
-                            this.semaphore.tryAcquire(timeout * 60, TimeUnit.SECONDS);
-                            // exponentially increase timeout, but longer than 16 minutes
-                            if (timeout < 15) {
-                            	timeout *= 2;
-                            }
+                            if (!this.semaphore.tryAcquire(timeout * 60, TimeUnit.SECONDS)) {
+								// exponentially increase timeout, but longer than 16 minutes
+								if (timeout < 15) {
+									timeout *= 2;
+								}
+							}
                         } else {
                             // remove any permits which came in in the mean time
                             this.semaphore.drainPermits();

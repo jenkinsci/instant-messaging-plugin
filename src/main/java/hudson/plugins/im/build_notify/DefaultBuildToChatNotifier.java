@@ -30,8 +30,8 @@ public class DefaultBuildToChatNotifier extends SummaryOnlyBuildToChatNotifier {
             sb.append(" (previous build: ")
                 .append(ResultTrend.getResultTrend(previousBuild).getID());
 
-            
-            if (previousBuild.getResult().isWorseThan(Result.SUCCESS)) {
+            Result result = previousBuild.getResult();
+            if (result != null && result.isWorseThan(Result.SUCCESS)) {
                 AbstractBuild<?, ?> lastSuccessfulBuild = build.getPreviousSuccessfulBuild();
                 if (lastSuccessfulBuild != null) {
                     sb.append(" -- last ").append(Result.SUCCESS).append(" ")

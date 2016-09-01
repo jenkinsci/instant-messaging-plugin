@@ -1,5 +1,6 @@
 package hudson.plugins.im;
 
+import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 import hudson.model.Computer;
 import hudson.model.Executor;
 import hudson.model.Run;
@@ -56,7 +57,8 @@ public class JenkinsIsBusyListener extends RunListener {
 		LOGGER.fine("Added connection provider: " + provider);
 	}
 	
-	public synchronized void removeConnectionProvider(IMConnectionProvider provider) {
+	@SuppressFBWarnings("ST_WRITE_TO_STATIC_FROM_INSTANCE_METHOD")
+    public synchronized void removeConnectionProvider(IMConnectionProvider provider) {
 		this.connectionProviders.remove(provider);
 		LOGGER.fine("Removed connection provider: " + provider);
 		
@@ -114,11 +116,11 @@ public class JenkinsIsBusyListener extends RunListener {
             } else if (busyExecutors == totalExecutors) {
                 conn.setPresence(IMPresence.DND, 
                         "Please give me some rest! All " + totalExecutors + " executors are busy, "
-                        + Jenkins.getInstance().getQueue().getItems().length + " job(s) in queue.");
+                        + getJenkins().getQueue().getItems().length + " job(s) in queue.");
             } else {
                 String msg = "Working: " + busyExecutors + " out of " + totalExecutors +
                     " executors are busy.";
-                int queueItems = Jenkins.getInstance().getQueue().getItems().length;
+                int queueItems = getJenkins().getQueue().getItems().length;
                 if (queueItems > 0) {
                     msg += " " + queueItems + " job(s) in queue.";
                 }
@@ -131,7 +133,7 @@ public class JenkinsIsBusyListener extends RunListener {
     
     private int getBusyExecutors() {
         int busyExecutors = 0;
-        Computer[] computers = Jenkins.getInstance().getComputers();
+        Computer[] computers = getJenkins().getComputers();
         for (Computer compi : computers) {
             
             for (Executor executor : compi.getExecutors()) {
@@ -146,12 +148,20 @@ public class JenkinsIsBusyListener extends RunListener {
     
     private int getTotalExecutors() {
         int totalExecutors = 0;
-        Computer[] computers = Jenkins.getInstance().getComputers();
+        Computer[] computers = getJenkins().getComputers();
         for (Computer compi : computers) {
         	if (compi.isOnline()) {
         		totalExecutors += compi.getNumExecutors();
         	}
         }
         return totalExecutors;
+    }
+
+    private Jenkins getJenkins() {
+        Jenkins instance = Jenkins.getInstance();
+        if (instance == null) {
+            throw new IllegalStateException("Jenkins has not started");
+        }
+        return instance;
     }
 }

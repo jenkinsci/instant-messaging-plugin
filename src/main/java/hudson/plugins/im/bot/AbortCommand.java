@@ -4,7 +4,6 @@ import hudson.Extension;
 import hudson.model.AbstractBuild;
 import hudson.model.AbstractProject;
 import hudson.model.Executor;
-import hudson.model.Hudson;
 import hudson.plugins.im.Sender;
 import hudson.security.Permission;
 
@@ -36,7 +35,7 @@ public class AbortCommand extends AbstractSingleJobCommand {
         
         boolean aborted = false;
         if (project.isInQueue()) {
-            aborted = Hudson.getInstance().getQueue().cancel(project);
+            aborted = getJenkins().getQueue().cancel(project);
         }
         
         if (!aborted) {

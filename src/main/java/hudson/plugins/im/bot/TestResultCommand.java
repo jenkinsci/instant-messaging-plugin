@@ -1,5 +1,6 @@
 package hudson.plugins.im.bot;
 
+import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 import hudson.Extension;
 import hudson.model.AbstractBuild;
 import hudson.model.AbstractProject;
@@ -27,6 +28,7 @@ public class TestResultCommand extends AbstractMultipleJobCommand {
         return "test results";
     }
 
+    @SuppressFBWarnings("VA_FORMAT_STRING_USES_NEWLINE")
     @Override
     protected CharSequence getMessageForJob(AbstractProject<?, ?> job) {
         AbstractBuild<?, ?> build = job.getLastCompletedBuild();

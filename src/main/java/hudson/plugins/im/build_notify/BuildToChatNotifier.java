@@ -9,6 +9,7 @@ import hudson.model.Hudson;
 import hudson.model.ResultTrend;
 import hudson.plugins.im.IMPublisher;
 import hudson.plugins.im.tools.MessageHelper;
+import jenkins.model.Jenkins;
 
 import java.io.IOException;
 
@@ -122,13 +123,21 @@ public abstract class BuildToChatNotifier implements Describable<BuildToChatNoti
 
     @Override
     public BuildToChatNotifierDescriptor getDescriptor() {
-        return (BuildToChatNotifierDescriptor) Hudson.getInstance().getDescriptorOrDie(getClass());
+        return (BuildToChatNotifierDescriptor) getJenkins().getDescriptorOrDie(getClass());
     }
 
     /**
      * All the registered {@link BuildToChatNotifier} types.
      */
     public static DescriptorExtensionList<BuildToChatNotifier,BuildToChatNotifierDescriptor> all() {
-        return Hudson.getInstance().<BuildToChatNotifier,BuildToChatNotifierDescriptor>getDescriptorList(BuildToChatNotifier.class);
+        return getJenkins().getDescriptorList(BuildToChatNotifier.class);
+    }
+
+    protected static Jenkins getJenkins() {
+        Jenkins jenkins = Jenkins.getInstance();
+        if (jenkins == null) {
+            throw new IllegalStateException("Jenkins not running");
+        }
+        return jenkins;
     }
 }

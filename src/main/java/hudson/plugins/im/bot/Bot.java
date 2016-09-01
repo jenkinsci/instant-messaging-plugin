@@ -156,7 +156,8 @@ public class Bot implements IMMessageListener {
 	}
     
     private boolean isAuthenticationNeeded() {
-    	return this.authentication != null && Jenkins.getInstance().isUseSecurity();
+		Jenkins jenkins = Jenkins.getInstance();
+    	return this.authentication != null && jenkins != null && jenkins.isUseSecurity();
     }
 
 	private Sender getSender(IMMessage msg) {
