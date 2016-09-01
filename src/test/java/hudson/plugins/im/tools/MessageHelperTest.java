@@ -3,9 +3,18 @@ package hudson.plugins.im.tools;
 import static org.junit.Assert.assertEquals;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
+
+import hudson.maven.reporters.SurefireAggregatedReport;
+import hudson.maven.reporters.SurefireReport;
 import hudson.model.AbstractBuild;
+import hudson.model.FreeStyleBuild;
+import hudson.model.FreeStyleProject;
+import hudson.model.Run;
 import hudson.plugins.im.tools.MessageHelper;
+import hudson.tasks.junit.TestResultAction;
 import hudson.tasks.test.AbstractTestResultAction;
+import hudson.tasks.test.SimpleCaseResult;
+import hudson.tasks.test.TestObject;
 import hudson.tasks.test.TestResult;
 
 import org.junit.Assert;
@@ -13,11 +22,12 @@ import org.junit.Rule;
 import org.junit.Test;
 import org.jvnet.hudson.test.Bug;
 import org.jvnet.hudson.test.JenkinsRule;
+import org.jvnet.hudson.test.MockFolder;
 
 public class MessageHelperTest {
 
 	@Rule
-	public JenkinsRuleWithLocalPort jenkinsRule = new JenkinsRuleWithLocalPort();
+	public JenkinsRuleWithLocalPort rule = new JenkinsRuleWithLocalPort();
 
 	@Test
 	public void testExtractCommandLine() {
@@ -75,20 +85,22 @@ public class MessageHelperTest {
 	
 	@SuppressWarnings({ "rawtypes", "unchecked" })
     @Test
-	public void testUrl() {
+	public void testUrl() throws Exception {
 	    TestResult result = mock(TestResult.class);
-	    AbstractBuild build = mock(AbstractBuild.class);
-	    when(build.getUrl()).thenReturn("/a%20build");
+
+		MockFolder folder = rule.createFolder("my folder");
+		FreeStyleProject project = (FreeStyleProject) folder.createProject(FreeStyleProject.DESCRIPTOR, "my job", false);
+		FreeStyleBuild run = project.scheduleBuild2(0).get();
+
+		AbstractTestResultAction action = mock(AbstractTestResultAction.class);
+	    when(action.getUrlName()).thenReturn("action");
 	    
-	    AbstractTestResultAction action = mock(AbstractTestResultAction.class);
-	    when(action.getUrlName()).thenReturn("/action");
-	    
-	    when(result.getRun()).thenReturn(build);
+	    when(result.getRun()).thenReturn((Run)run);
 	    when(result.getTestResultAction()).thenReturn(action);
 	    when(result.getUrl()).thenReturn("/some id with spaces");
 	    
 	    String testUrl = MessageHelper.getTestUrl(result);
-	    assertEquals("http://localhost:" + jenkinsRule.getLocalPort() + "/jenkins/a%20build/action/some%20id%20with%20spaces", testUrl);
+	    assertEquals("http://localhost:" + rule.getLocalPort() + "jenkins/job/my%20folder/job/my%20job/1/action/some%20id%20with%20spaces", testUrl);
 	}
 
 	static class JenkinsRuleWithLocalPort extends JenkinsRule {
