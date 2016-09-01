@@ -100,7 +100,7 @@ public class MessageHelperTest {
 	    when(result.getUrl()).thenReturn("/some id with spaces");
 	    
 	    String testUrl = MessageHelper.getTestUrl(result);
-	    assertEquals("http://localhost:" + rule.getLocalPort() + "jenkins/job/my%20folder/job/my%20job/1/action/some%20id%20with%20spaces", testUrl);
+	    assertEquals("http://localhost:" + rule.getLocalPort() + "/jenkins/job/my%20folder/job/my%20job/1/action/some%20id%20with%20spaces", testUrl);
 	}
 
 	static class JenkinsRuleWithLocalPort extends JenkinsRule {
