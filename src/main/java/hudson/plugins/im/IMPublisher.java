@@ -1,5 +1,6 @@
 package hudson.plugins.im;
 
+import hudson.FilePath;
 import hudson.Launcher;
 import hudson.Util;
 import hudson.matrix.MatrixAggregatable;
@@ -9,6 +10,8 @@ import hudson.matrix.MatrixBuild;
 import hudson.matrix.MatrixProject;
 import hudson.model.BuildListener;
 import hudson.model.ResultTrend;
+import hudson.model.Run;
+import hudson.model.TaskListener;
 import hudson.model.UserProperty;
 import hudson.model.AbstractBuild;
 import hudson.model.AbstractProject;
@@ -16,9 +19,8 @@ import hudson.model.Fingerprint.RangeSet;
 import hudson.model.User;
 import hudson.plugins.im.build_notify.BuildToChatNotifier;
 import hudson.plugins.im.build_notify.DefaultBuildToChatNotifier;
+import hudson.plugins.im.tools.BuildHelper;
 import hudson.plugins.im.tools.ExceptionHelper;
-import hudson.scm.ChangeLogSet;
-import hudson.scm.ChangeLogSet.Entry;
 import hudson.tasks.BuildStep;
 import hudson.tasks.BuildStepDescriptor;
 import hudson.tasks.BuildStepMonitor;
@@ -26,6 +28,8 @@ import hudson.tasks.Notifier;
 import hudson.tasks.Publisher;
 
 import java.io.IOException;
+import java.lang.reflect.InvocationTargetException;
+import java.lang.reflect.Method;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.HashMap;
@@ -36,9 +40,14 @@ import java.util.Map;
 import java.util.Set;
 import java.util.logging.Logger;
 
+import org.kohsuke.stapler.DataBoundSetter;
 import org.springframework.util.Assert;
 
 import com.google.common.collect.Lists;
+
+import javax.annotation.Nonnull;
+
+import static hudson.plugins.im.tools.BuildHelper.*;
 
 /**
  * The actual Publisher which sends notification messages out to the clients.
@@ -66,6 +75,7 @@ public abstract class IMPublisher extends Notifier implements BuildStep, MatrixA
     private final boolean notifyUpstreamCommitters;
     private BuildToChatNotifier buildToChatNotifier;
     private MatrixJobMultiplier matrixMultiplier = MatrixJobMultiplier.ONLY_CONFIGURATIONS;
+    private String extraMessage = "";
     
     /**
      * @deprecated Only for deserializing old instances
@@ -76,7 +86,7 @@ public abstract class IMPublisher extends Notifier implements BuildStep, MatrixA
 
     /**
      * @deprecated
-     *      as of 1.9. Use {@link #IMPublisher(List, String, boolean, boolean, boolean, boolean, boolean, BuildToChatNotifier)}
+     *      as of 1.9. Use {@link #IMPublisher(List, String, boolean, boolean, boolean, boolean, boolean, BuildToChatNotifier, MatrixJobMultiplier)}
      *      instead.
      */
     @Deprecated
@@ -118,6 +128,9 @@ public abstract class IMPublisher extends Notifier implements BuildStep, MatrixA
         this.notifyCulprits = notifyCulprits;
         this.notifyFixers = notifyFixers;
         this.notifyUpstreamCommitters = notifyUpstreamCommitters;
+        if (buildToChatNotifier == null) {
+            buildToChatNotifier = new DefaultBuildToChatNotifier();
+        }
         this.buildToChatNotifier = buildToChatNotifier;
         this.matrixMultiplier = matrixMultiplier;
     }
@@ -267,114 +280,153 @@ public abstract class IMPublisher extends Notifier implements BuildStep, MatrixA
     public final boolean getNotifyUpstreamCommitters() {
         return notifyUpstreamCommitters;
     }
-    
+
+
+    public String getExtraMessage() {
+        return extraMessage;
+    }
+
+    @DataBoundSetter
+    public void setExtraMessage(String extraMessage) {
+        if (extraMessage == null) {
+            //mostly for deserializing old instances
+            extraMessage = "";
+        }
+        this.extraMessage = extraMessage;
+    }
+
     /**
      * Logs message to the build listener's logger.
      */
-    protected void log(BuildListener listener, String message) {
+    protected void log(TaskListener listener, String message) {
     	listener.getLogger().append(getPluginName()).append(": ").append(message).append("\n");
     }
 
     @Override
     public boolean perform(final AbstractBuild<?,?> build, final Launcher launcher, final BuildListener buildListener)
             throws InterruptedException, IOException {
-        Assert.notNull(build, "Parameter 'build' must not be null.");
-        Assert.notNull(buildListener, "Parameter 'buildListener' must not be null.");
+        internalPerform(build, launcher, buildListener);
+        return true;
+    }
+
+    private void internalPerform(@Nonnull Run<?, ?> run, @Nonnull Launcher launcher, @Nonnull TaskListener taskListener) throws InterruptedException, IOException {
+        Assert.notNull(run, "Parameter 'build' must not be null.");
+        Assert.notNull(taskListener, "Parameter 'buildListener' must not be null.");
         
-        if (build.getProject() instanceof MatrixConfiguration) {
+        if (run.getParent() instanceof MatrixConfiguration) {
             if (getMatrixNotifier() == MatrixJobMultiplier.ONLY_CONFIGURATIONS
                 || getMatrixNotifier() == MatrixJobMultiplier.ALL) {
-                notifyOnBuildEnd(build, buildListener);
+                notifyOnBuildEnd(run, taskListener);
             }
         } else {
-            notifyOnBuildEnd(build, buildListener);
+            notifyOnBuildEnd(run, taskListener);
         }
-        
-        return true;
+    }
+
+//    @Override
+    /**
+     * This would override SimpleBuildStep.perform() if this were to become a Pipeline step,
+     * but that doesn't make sense since it has so much to support normal AbstractBuild
+     * publisher functionality.
+     *
+     * Therefore this class is exactly like SimpleBuildStep but doesn't actually
+     * extend it to avoid having subclasses randomly show up in the Pipeline Snippet Generator
+     * when they don't fully support it.
+     *
+     * @param run
+     * @param workspace
+     * @param launcher
+     * @param taskListener
+     * @throws InterruptedException
+     * @throws IOException
+     */
+    public void perform(@Nonnull Run<?, ?> run, @Nonnull FilePath workspace, @Nonnull Launcher launcher, @Nonnull TaskListener taskListener) throws InterruptedException, IOException {
+        taskListener.getLogger().println("IMPublisher: sending chat message, strategy " + strategy + ", targets: " + this.getTargets());
+        internalPerform(run, launcher, taskListener);
     }
 
     /**
      * Sends notification at build end including maybe notifications of culprits, fixers or so.
      */
-    /* package for testing */ void notifyOnBuildEnd(final AbstractBuild<?, ?> build,
-            final BuildListener buildListener) throws IOException,
+    /* package for testing */ void notifyOnBuildEnd(final Run<?, ?> run,
+            final TaskListener listener) throws IOException,
             InterruptedException {
-        if (getNotificationStrategy().notificationWanted(build)) {
-            notifyChatsOnBuildEnd(build, buildListener);
+        if (getNotificationStrategy().notificationWanted(run)) {
+            notifyChatsOnBuildEnd(run, listener);
         }
 
-        ResultTrend resultTrend = ResultTrend.getResultTrend(build);
+        ResultTrend resultTrend = getResultTrend(run);
 		if (resultTrend == ResultTrend.STILL_FAILING || resultTrend == ResultTrend.STILL_UNSTABLE || resultTrend == ResultTrend.NOW_UNSTABLE) {
             if (this.notifySuspects) {
-            	log(buildListener, "Notifying suspects");
-            	final String message = getBuildToChatNotifier().suspectMessage(this, build, buildListener, false);
+            	log(listener, "Notifying suspects");
+            	final String message = getBuildToChatNotifier().suspectMessage(this, run, listener, false);
             	
-            	for (IMMessageTarget target : calculateIMTargets(getCommitters(build), buildListener)) {
+            	for (IMMessageTarget target : calculateIMTargets(BuildHelper.getCommitters(run, listener), listener)) {
             		try {
-            			log(buildListener, "Sending notification to suspect: " + target.toString());
-            			sendNotification(message, target, buildListener);
+            			log(listener, "Sending notification to suspect: " + target.toString());
+            			sendNotification(message, target, listener);
             		} catch (RuntimeException e) {
-            			log(buildListener, "There was an error sending suspect notification to: " + target.toString());
+            			log(listener, "There was an error sending suspect notification to: " + target.toString());
             		}
             	}
             }
             
             if (this.notifyCulprits) {
-            	log(buildListener, "Notifying culprits");
-            	final String message = getBuildToChatNotifier().culpritMessage(this, build, buildListener);
+            	log(listener, "Notifying culprits");
+            	final String message = getBuildToChatNotifier().culpritMessage(this, run, listener);
             	
-            	for (IMMessageTarget target : calculateIMTargets(getCulpritsOnly(build), buildListener)) {
+            	for (IMMessageTarget target : calculateIMTargets(getCulpritsOnly(run, listener), listener)) {
             		try {
-            			log(buildListener, "Sending notification to culprit: " + target.toString());
-            			sendNotification(message, target, buildListener);
+            			log(listener, "Sending notification to culprit: " + target.toString());
+            			sendNotification(message, target, listener);
             		} catch (RuntimeException e) {
-            			log(buildListener, "There was an error sending culprit notification to: " + target.toString());
+            			log(listener, "There was an error sending culprit notification to: " + target.toString());
             		}
             	}
             }
         } else if (resultTrend == ResultTrend.FAILURE || resultTrend == ResultTrend.UNSTABLE) {
             boolean committerNotified = false;
             if (this.notifySuspects) {
-                log(buildListener, "Notifying suspects");
-                String message = getBuildToChatNotifier().suspectMessage(this, build, buildListener, true);
+                log(listener, "Notifying suspects");
+                String message = getBuildToChatNotifier().suspectMessage(this, run, listener, true);
                 
-                for (IMMessageTarget target : calculateIMTargets(getCommitters(build), buildListener)) {
+                for (IMMessageTarget target : calculateIMTargets(BuildHelper.getCommitters(run, listener), listener)) {
                     try {
-                        log(buildListener, "Sending notification to suspect: " + target.toString());
-                        sendNotification(message, target, buildListener);
+                        log(listener, "Sending notification to suspect: " + target.toString());
+                        sendNotification(message, target, listener);
                         committerNotified = true;
                     } catch (RuntimeException e) {
-                        log(buildListener, "There was an error sending suspect notification to: " + target.toString());
+                        log(listener, "There was an error sending suspect notification to: " + target.toString());
                     }
                 }
             }
             
             if (this.notifyUpstreamCommitters && !committerNotified) {
-                notifyUpstreamCommitters(build, buildListener);
+                notifyUpstreamCommitters(run, listener);
             }
         }
         
         if (this.notifyFixers && resultTrend == ResultTrend.FIXED) {
-        	buildListener.getLogger().append("Notifying fixers\n");
-        	final String message = getBuildToChatNotifier().fixerMessage(this, build, buildListener);
+        	listener.getLogger().append("Notifying fixers\n");
+        	final String message = getBuildToChatNotifier().fixerMessage(this, run, listener);
         	
-        	for (IMMessageTarget target : calculateIMTargets(getCommitters(build), buildListener)) {
+        	for (IMMessageTarget target : calculateIMTargets(BuildHelper.getCommitters(run, listener), listener)) {
         		try {
-        			log(buildListener, "Sending notification to fixer: " + target.toString());
-        			sendNotification(message, target, buildListener);
+        			log(listener, "Sending notification to fixer: " + target.toString());
+        			sendNotification(message, target, listener);
         		} catch (RuntimeException e) {
-        			log(buildListener, "There was an error sending fixer notification to: " + target.toString());
+        			log(listener, "There was an error sending fixer notification to: " + target.toString());
         		}
         	}
         }
     }
 
-	private void sendNotification(String message, IMMessageTarget target, BuildListener buildListener)
+	private void sendNotification(String message, IMMessageTarget target, TaskListener listener)
 			throws IMException {
 		IMConnection imConnection = getIMConnection();
 		if (imConnection instanceof DummyConnection) {
 			// quite hacky
-			log(buildListener, "[ERROR] not connected. Cannot send message to '" + target + "'");
+			log(listener, "[ERROR] not connected. Cannot send message to '" + target + "'");
 		} else {
 			getIMConnection().send(target, message);
 		}
@@ -385,21 +437,21 @@ public abstract class IMPublisher extends Notifier implements BuildStep, MatrixA
      * If no committers are found in the immediate upstream builds, then look one level higher.
      * Repeat until a committer is found or no more upstream builds are found. 
      */
-	private void notifyUpstreamCommitters(final AbstractBuild<?, ?> build,
-			final BuildListener buildListener) {
+	private void notifyUpstreamCommitters(final Run<?, ?> run,
+			final TaskListener listener) {
         
-        Map<User, AbstractBuild<?,?>> committers = getNearestUpstreamCommitters(build);
+        Map<User, AbstractBuild<?,?>> committers = getNearestUpstreamCommitters(run, listener);
 			        
         
         for (Map.Entry<User, AbstractBuild<?, ?>> entry : committers.entrySet()) {
-            String message = getBuildToChatNotifier().upstreamCommitterMessage(this, build, buildListener, entry.getValue());
+            String message = getBuildToChatNotifier().upstreamCommitterMessage(this, run, listener, entry.getValue());
             
-            IMMessageTarget target = calculateIMTarget(entry.getKey(), buildListener);
+            IMMessageTarget target = calculateIMTarget(entry.getKey(), listener);
             try {
-                log(buildListener, "Sending notification to upstream committer: " + target.toString());
-                sendNotification(message, target, buildListener);
+                log(listener, "Sending notification to upstream committer: " + target.toString());
+                sendNotification(message, target, listener);
             } catch (IMException e) {
-                log(buildListener, "There was an error sending upstream committer notification to: " + target.toString());
+                log(listener, "There was an error sending upstream committer notification to: " + target.toString());
             }
         }
 	}
@@ -410,8 +462,13 @@ public abstract class IMPublisher extends Notifier implements BuildStep, MatrixA
      * Repeat until a committer is found or no more upstream builds are found. 
      */
     @SuppressWarnings("rawtypes")
-    Map<User, AbstractBuild<?,?>> getNearestUpstreamCommitters(AbstractBuild<?, ?> build) {
-        Map<AbstractProject, List<AbstractBuild>> upstreamBuilds = getUpstreamBuildsSinceLastStable(build);
+    Map<User, AbstractBuild<?,?>> getNearestUpstreamCommitters(Run<?, ?> run, TaskListener listener) {
+        //currently not supporting non-abstractprojects...
+        if (!(run instanceof AbstractBuild)) {
+            return Collections.emptyMap();
+        }
+
+        Map<AbstractProject, List<AbstractBuild>> upstreamBuilds = getUpstreamBuildsSinceLastStable(run);
         Map<User, AbstractBuild<?,?>> upstreamCommitters = new HashMap<User, AbstractBuild<?,?>>();
         
         while (upstreamCommitters.isEmpty() && !upstreamBuilds.isEmpty()) {
@@ -426,11 +483,11 @@ public abstract class IMPublisher extends Notifier implements BuildStep, MatrixA
                 
                     if (upstreamBuild != null) {
                         
-                        if (! downstreamIsFirstInRangeTriggeredByUpstream(upstreamBuild, build)) {
+                        if (! downstreamIsFirstInRangeTriggeredByUpstream(upstreamBuild, (AbstractBuild)run)) {
                             continue;
                         }
                         
-                        Set<User> committers = getCommitters(upstreamBuild);
+                        Set<User> committers = BuildHelper.getCommitters(upstreamBuild, listener);
                         for (User committer : committers) {
                             upstreamCommitters.put(committer, upstreamBuild);
                         }
@@ -445,24 +502,29 @@ public abstract class IMPublisher extends Notifier implements BuildStep, MatrixA
     }
     
     @SuppressWarnings("rawtypes")
-    private Map<AbstractProject, List<AbstractBuild>> getUpstreamBuildsSinceLastStable(AbstractBuild<?,?> currentBuild) {
+    private Map<AbstractProject, List<AbstractBuild>> getUpstreamBuildsSinceLastStable(Run<?,?> run) {
     	// may be null:
-    	AbstractBuild<?, ?> previousSuccessfulBuild = currentBuild.getPreviousSuccessfulBuild();
+    	Run<?, ?> previousSuccessfulBuild = run.getPreviousSuccessfulBuild();
     	
     	if (previousSuccessfulBuild == null) {
     	    return Collections.emptyMap();
     	}
     	
     	Map<AbstractProject, List<AbstractBuild>> result = new HashMap<AbstractProject, List<AbstractBuild>>();
-    	
-    	
-    	Set<AbstractProject> upstreamProjects = currentBuild.getUpstreamBuilds().keySet();
-    	
-    	for (AbstractProject upstreamProject : upstreamProjects) {
-    	    result.put(upstreamProject, 
-    	            getUpstreamBuilds(upstreamProject, previousSuccessfulBuild, currentBuild));
-    	}
-    	
+
+    	if (run instanceof AbstractBuild) {
+            AbstractBuild currentBuild = (AbstractBuild) run;
+            Set<AbstractProject> upstreamProjects = currentBuild.getUpstreamBuilds().keySet();
+
+            for (AbstractProject upstreamProject : upstreamProjects) {
+                result.put(upstreamProject,
+                        getUpstreamBuilds(upstreamProject, (AbstractBuild)previousSuccessfulBuild, currentBuild));
+            }
+        } else {
+    	    // probably a WorkflowRun, not yet supported, too hard to replicate the above.
+            return Collections.emptyMap();
+        }
+
     	return result;
     }
 
@@ -583,8 +645,8 @@ public abstract class IMPublisher extends Notifier implements BuildStep, MatrixA
      * Notify all registered chats about the build result.
      * When the completion message is null or empty, no message is sent.
      */
-	private void notifyChatsOnBuildEnd(final AbstractBuild<?, ?> build, final BuildListener buildListener) throws IOException, InterruptedException {
-        String msg = buildToChatNotifier.buildCompletionMessage(this,build,buildListener);
+	private void notifyChatsOnBuildEnd(final Run<?, ?> run, final TaskListener buildListener) throws IOException, InterruptedException {
+        String msg = buildToChatNotifier.buildCompletionMessage(this,run,buildListener);
         if (Util.fixEmpty(msg) == null)  {
             return;
         }
@@ -598,26 +660,31 @@ public abstract class IMPublisher extends Notifier implements BuildStep, MatrixA
 		    }
 		}
 	}
-	
-	private static Set<User> getCommitters(AbstractBuild<?, ?> build) {
-		Set<User> committers = new HashSet<User>();
-		ChangeLogSet<? extends Entry> changeSet = build.getChangeSet();
-		for (Entry entry : changeSet) {
-			committers.add(entry.getAuthor());
-		}
-		return committers;
-	}
-	
-	/**
+
+
+    /**
 	 * Returns the culprits WITHOUT the committers to the current build.
 	 */
-	private static Set<User> getCulpritsOnly(AbstractBuild<?, ?> build) {
-		Set<User> culprits = new HashSet<User>(build.getCulprits());
-		culprits.removeAll(getCommitters(build));
+	private static Set<User> getCulpritsOnly(Run<?, ?> run, TaskListener listener) {
+        Set c = null;
+        if (run instanceof AbstractBuild) {
+            c = ((AbstractBuild) run).getCulprits();
+        } else {
+            //the hard way, possibly a WorkflowRun
+            try {
+                Method getCulprits = run.getClass().getMethod("getCulprits");
+                c = (Set<User>) getCulprits.invoke(run);
+            } catch (NoSuchMethodException  | InvocationTargetException | IllegalAccessException e) {
+                listener.error("Failed to invoke getCulprits() method, cannot get culprits: " + run.getClass(), e);
+            }
+        }
+
+        Set<User> culprits = c == null ? new HashSet<User>() : new HashSet<User>(c);
+		culprits.removeAll(BuildHelper.getCommitters(run, listener));
 		return culprits;
 	}
 	
-	private Collection<IMMessageTarget> calculateIMTargets(Set<User> targets, BuildListener listener) {
+	private Collection<IMMessageTarget> calculateIMTargets(Set<User> targets, TaskListener listener) {
 		Set<IMMessageTarget> suspects = new HashSet<IMMessageTarget>();
 		
 		String defaultIdSuffix = ((IMPublisherDescriptor)getDescriptor()).getDefaultIdSuffix();
@@ -632,7 +699,7 @@ public abstract class IMPublisher extends Notifier implements BuildStep, MatrixA
 		return suspects;
 	}
 
-    private IMMessageTarget calculateIMTarget(User target, BuildListener listener) {
+    private IMMessageTarget calculateIMTarget(User target, TaskListener listener) {
         
         String defaultIdSuffix = ((IMPublisherDescriptor)getDescriptor()).getDefaultIdSuffix();
         

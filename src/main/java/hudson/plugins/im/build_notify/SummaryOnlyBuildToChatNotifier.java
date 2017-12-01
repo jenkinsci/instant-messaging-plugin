@@ -4,6 +4,8 @@ import hudson.Extension;
 import hudson.model.AbstractBuild;
 import hudson.model.BuildListener;
 import hudson.model.ResultTrend;
+import hudson.model.Run;
+import hudson.model.TaskListener;
 import hudson.plugins.im.IMPublisher;
 import hudson.plugins.im.tools.BuildHelper;
 import hudson.plugins.im.tools.MessageHelper;
@@ -25,22 +27,24 @@ public class SummaryOnlyBuildToChatNotifier extends BuildToChatNotifier {
 
     @Override
     public String buildStartMessage(IMPublisher publisher, AbstractBuild<?, ?> build, BuildListener listener) throws IOException, InterruptedException {
-        return Messages.SummaryOnlyBuildToChatNotifier_StartMessage(build.getDisplayName(),getProjectName(build));
+        return Messages.SummaryOnlyBuildToChatNotifier_StartMessage(build.getDisplayName(),getProjectName(build), publisher.getExtraMessage());
     }
 
     @Override
-    public String buildCompletionMessage(IMPublisher publisher, AbstractBuild<?, ?> build, BuildListener listener) throws IOException, InterruptedException {
+    public String buildCompletionMessage(IMPublisher publisher, Run<?, ?> run, TaskListener listener) throws IOException, InterruptedException {
         final StringBuilder sb;
-        if (BuildHelper.isFix(build)) {
+        if (isFix(run)) {
             sb = new StringBuilder(Messages.SummaryOnlyBuildToChatNotifier_BuildIsFixed());
         } else {
             sb = new StringBuilder();
         }
+        ResultTrend result = getResultTrend(run);
         sb.append(Messages.SummaryOnlyBuildToChatNotifier_Summary(
-                getProjectName(build), build.getDisplayName(),
-                ResultTrend.getResultTrend(build).getID(),
-                build.getTimestampString(),
-                MessageHelper.getBuildURL(build)));
+                getProjectName(run), run.getDisplayName(),
+                result.getID(),
+                run.getTimestampString(),
+                MessageHelper.getBuildURL(run),
+                publisher.getExtraMessage()));
 
         return sb.toString();
     }

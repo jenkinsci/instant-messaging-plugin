@@ -12,6 +12,11 @@
        </j:forEach>
   </select>
   </f:entry>
+
+  <f:entry title="Extra Message" description="Additional arbitrary text to add to the notification">
+    <f:textbox name="${descriptor.paramNames.extraMessage}" value="${instance.extraMessage}" />
+  </f:entry>
+
   <f:entry title="Notify on build starts" description="Whether to send notifications to channels when a build starts">
     <f:checkbox name="${descriptor.paramNames.notifyStart}" checked="${instance.notifyOnStart}"/>
   </f:entry>

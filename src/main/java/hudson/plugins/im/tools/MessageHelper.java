@@ -6,10 +6,10 @@ import java.util.Collections;
 import java.util.List;
 import java.util.regex.Pattern;
 
+import hudson.model.Run;
 import org.apache.commons.lang.StringUtils;
 
 import hudson.Util;
-import hudson.model.AbstractBuild;
 import hudson.model.Hudson;
 import hudson.tasks.test.TestObject;
 import hudson.tasks.junit.TestResult;
@@ -28,7 +28,7 @@ public class MessageHelper {
 	/**
 	 * Returns the full URL to the build details page for a given build.
 	 */
-	public static String getBuildURL(AbstractBuild<?, ?> build) {
+	public static String getBuildURL(Run<?, ?> run) {
 		// The hudson's base url
 	    final StringBuilder builder;
 	    if (Hudson.getInstance() != null) {
@@ -40,7 +40,7 @@ public class MessageHelper {
 
 		// The build's url, escaped for project with space or other specials
 		// characters
-		builder.append(Util.encode(build.getUrl()));
+		builder.append(Util.encode(run.getUrl()));
 
 		return builder.toString();
 	}

@@ -4,6 +4,17 @@ import hudson.model.AbstractBuild;
 import hudson.model.Run;
 import hudson.model.Result;
 import hudson.model.ResultTrend;
+import hudson.model.TaskListener;
+import hudson.model.User;
+import hudson.scm.ChangeLogSet;
+
+import java.lang.reflect.InvocationTargetException;
+import java.lang.reflect.Method;
+import java.util.Collections;
+import java.util.HashSet;
+import java.util.LinkedList;
+import java.util.List;
+import java.util.Set;
 
 /**
  * Helper class to work with Hudson builds.
@@ -70,6 +81,31 @@ public class BuildHelper {
 			return previousResult != null && previousResult.isWorseThan(Result.SUCCESS);
         }
         return false;
+    }
+
+
+    /**
+     * Supports calling ResultTrend.getResultTrend() before there is a result
+     * which would otherwise result in an NPE
+     * @return NOT_BUILT if result isn't set (yet)
+     */
+    public static ResultTrend getResultTrend(Run<?, ?> run) {
+        if (run.getResult() == null) {
+            return ResultTrend.NOT_BUILT;
+        }
+        return ResultTrend.getResultTrend(run);
+    }
+
+    /**
+     * This version uses ResultTrend
+     *
+     * Returns true if this build represents a 'fix'.
+     * I.e. it is the first successful build after previous
+     * 'failed' and/or 'unstable' builds.
+     * Ignores 'aborted' and 'not built' builds.
+     */
+    public static boolean isFix(Run<?, ?> run) {
+        return getResultTrend(run) == ResultTrend.FIXED;
     }
 
     /**
@@ -188,7 +224,65 @@ public class BuildHelper {
      * Returns the name of the project the build belongs to in a human readable
      * format.
      */
-    public static String getProjectName(AbstractBuild<?, ?> build) {
-    	return build.getProject().getFullDisplayName();
+    public static String getProjectName(Run<?, ?> run) {
+    	return run.getParent().getFullDisplayName();
     }
+
+
+    /**
+     * Supports retrieving changelogsets from both AbstractBuild and from generic Run subclasses
+     * @param run
+     * @param listener
+     * @return
+     */
+    public static List<ChangeLogSet<ChangeLogSet.Entry>> getChangelogSets(Run<?, ?> run, TaskListener listener) {
+        if (run instanceof AbstractBuild) {
+            return getChangelogSetsFromAbstractBuild((AbstractBuild) run);
+        }
+        return getChangelogSetsTheHardWay(run, listener);
+    }
+
+
+    public static Set<User> getCommitters(Run<?, ?> run, TaskListener listener) {
+        List<ChangeLogSet<ChangeLogSet.Entry>> changelogSets = getChangelogSets(run, listener);
+        final Set<User> users = new HashSet<>();
+        for (ChangeLogSet set : changelogSets) {
+            addChangeSetUsers(set, users);
+        }
+        return users;
+    }
+
+    public static List<ChangeLogSet<ChangeLogSet.Entry>> getChangelogSetsFromAbstractBuild(AbstractBuild build) {
+        List<ChangeLogSet<ChangeLogSet.Entry>> result = new LinkedList();
+        result.add(build.getChangeSet());
+        return result;
+    }
+
+
+    public static List<ChangeLogSet<ChangeLogSet.Entry>> getChangelogSetsTheHardWay(final Run<?, ?> run, TaskListener listener) {
+        final List<ChangeLogSet<ChangeLogSet.Entry>> result = Collections.emptyList();
+        // NOTE: code based on email-ext RecipientProviderUtilities.java, may not be needed down the line
+        try {
+            Method getChangeSets = run.getClass().getMethod("getChangeSets");
+            if (List.class.isAssignableFrom(getChangeSets.getReturnType())) {
+                result.addAll((List<ChangeLogSet<ChangeLogSet.Entry>>) getChangeSets.invoke(run));
+            }
+        } catch (NoSuchMethodException  | InvocationTargetException | IllegalAccessException e) {
+            listener.error("Exception getting changesets for %s: %s", run, e);
+        }
+        return result;
+    }
+
+    /**
+     * Stolen from email-ext
+     */
+    private static void addChangeSetUsers(ChangeLogSet<?> changeLogSet, Set<User> users) {
+        final Set<User> changeAuthors = new HashSet<User>();
+        for (final ChangeLogSet.Entry change : changeLogSet) {
+            final User changeAuthor = change.getAuthor();
+            changeAuthors.add(changeAuthor);
+        }
+        users.addAll(changeAuthors);
+    }
+
 }
