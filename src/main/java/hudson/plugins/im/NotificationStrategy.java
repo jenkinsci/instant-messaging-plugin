@@ -37,7 +37,7 @@ public enum NotificationStrategy {
 		 */
 		@Override
 		public boolean notificationWanted(final Run<?, ?> run) {
-			return run.getResult() != Result.SUCCESS;
+			return !isSuccessOrInProgress(run);
 
 		}
 	},
@@ -51,10 +51,10 @@ public enum NotificationStrategy {
 		 */
 		@Override
 		public boolean notificationWanted(final Run<?, ?> run) {
-            if (run.getResult() != Result.SUCCESS) {
+            if (!isSuccessOrInProgress(run)) {
                 return true;
             }
-            return BuildHelper.isFix(run);
+            return isFix(run);
 		}
 	},
 

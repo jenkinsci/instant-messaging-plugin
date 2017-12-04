@@ -10,6 +10,7 @@ import hudson.scm.ChangeLogSet;
 
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
+import java.util.ArrayList;
 import java.util.Collections;
 import java.util.HashSet;
 import java.util.LinkedList;
@@ -109,6 +110,16 @@ public class BuildHelper {
     }
 
     /**
+     * In the context of a pipeline job,
+     * the step will potentially be used before the result has been set
+     * In that case it can be considered a SUCCESS until proven otherwise.
+     * @return what the name says
+     */
+    public static boolean isSuccessOrInProgress(Run<?, ?> run) {
+        return run.getResult() == null || run.getResult() == Result.SUCCESS;
+    }
+
+    /**
      * Does what the name says.
      * 
      * @deprecated use {@link ResultTrend#FAILURE} || {@link ResultTrend#UNSTABLE}!
@@ -118,7 +129,7 @@ public class BuildHelper {
     	return build.getResult() == Result.FAILURE
     		|| build.getResult() == Result.UNSTABLE;
     }
-    
+
     /**
      * @deprecated use {@link ResultTrend#STILL_FAILING} || {@link ResultTrend#STILL_UNSTABLE}!
      */
@@ -260,12 +271,12 @@ public class BuildHelper {
 
 
     public static List<ChangeLogSet<ChangeLogSet.Entry>> getChangelogSetsTheHardWay(final Run<?, ?> run, TaskListener listener) {
-        final List<ChangeLogSet<ChangeLogSet.Entry>> result = Collections.emptyList();
+        List<ChangeLogSet<ChangeLogSet.Entry>> result = Collections.emptyList();
         // NOTE: code based on email-ext RecipientProviderUtilities.java, may not be needed down the line
         try {
             Method getChangeSets = run.getClass().getMethod("getChangeSets");
             if (List.class.isAssignableFrom(getChangeSets.getReturnType())) {
-                result.addAll((List<ChangeLogSet<ChangeLogSet.Entry>>) getChangeSets.invoke(run));
+                result = new ArrayList<ChangeLogSet<ChangeLogSet.Entry>>((List<ChangeLogSet<ChangeLogSet.Entry>>) getChangeSets.invoke(run));
             }
         } catch (NoSuchMethodException  | InvocationTargetException | IllegalAccessException e) {
             listener.error("Exception getting changesets for %s: %s", run, e);
