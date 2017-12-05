@@ -24,11 +24,14 @@ import hudson.tasks.test.AbstractTestResultAction;
 public class MessageHelper {
 	private final static Pattern SPACE_PATTERN = Pattern.compile("\\s");
 	private final static String QUOTE = "\"";
-	
+
 	/**
 	 * Returns the full URL to the build details page for a given build.
 	 */
 	public static String getBuildURL(Run<?, ?> run) {
+		if (run == null) {
+			return "?";
+		}
 		// The hudson's base url
 	    final StringBuilder builder;
 	    if (Hudson.getInstance() != null) {

@@ -670,7 +670,8 @@ public abstract class IMPublisher extends Notifier implements BuildStep, MatrixA
         if (run instanceof AbstractBuild) {
             c = ((AbstractBuild) run).getCulprits();
         } else {
-            //the hard way, possibly a WorkflowRun
+            //the hard way, possibly a WorkflowRun.  In the future (when depending on Jenkins 2.60+),
+            // cast to RunWithSCM instead.
             try {
                 Method getCulprits = run.getClass().getMethod("getCulprits");
                 c = (Set<User>) getCulprits.invoke(run);
