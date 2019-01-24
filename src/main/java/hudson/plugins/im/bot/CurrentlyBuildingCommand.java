@@ -117,7 +117,7 @@ public class CurrentlyBuildingCommand extends BotCommand {
 		if (countJobsInProgess == 0) {
 			msg.append("\n- No jobs are running.");
 		} else if (countJobsInPattern == 0 && filterPattern != null) {
-			msg.append("\n- None of the running matched the filter.");
+			msg.append("\n- None of the running jobs matched the filter.");
 		}
 
 		if (filterPattern != null) {
