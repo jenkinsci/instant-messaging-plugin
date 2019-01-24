@@ -198,6 +198,10 @@ import org.apache.commons.lang.ArrayUtils;
     }
 
     private String checkPermission(Sender sender, AbstractProject<?, ?> project) {
+        if (project == null) {
+            return "ERROR in checkPermission() : project not specified";
+        }
+
         // This checks the permissions of "current user" in a context of
         // the call, whatever that might be for an IM session, if anything...
         if (project.hasPermission(Item.BUILD)) {
@@ -238,18 +242,36 @@ import org.apache.commons.lang.ArrayUtils;
         }
         */
 
-        // FIXME: This tests if the matched user account has a generic right
-        // to build anything, not necessarily for this project, if it is
-        // specially constrained.
         if ( senderUser != null ) {
-            if (Jenkins.getInstance().getAuthorizationStrategy().getACL(senderUser).hasPermission(senderUser.impersonate(), Item.BUILD)) {
+            // This check is hopefully equivalent to legacy one defined above,
+            // project.hasPermission(Item.BUILD), but for an arbitrary username
+            if (Jenkins.getInstance().getAuthorizationStrategy().getACL(project).hasPermission(senderUser.impersonate(), Item.BUILD)) {
+                System.err.println("IM BuildCommand authorized Jenkins user '" +
+                        senderUser.getId() + "' (IM ID '" + sender.getNickname() +
+                        "' / '" + sender.getId() + "') to build '" + project.getName() +
+                        "' (specific project matched, or user may generally build " +
+                        "Items and the project does not constrain further)");
                 return null; // OK
-            } else {
-                return sender.getNickname() + " (" + sender.getId() +
-                        " aka " + senderUser.getId() + "): " +
-                        "you're not allowed to build job " +
-                        project.getDisplayName() + "!";
             }
+
+            /*
+            // FIXME: This block tests if the matched user account has a generic
+            // right to build anything, not necessarily for this project, if it
+            // is specially constrained.
+            if (Jenkins.getInstance().getAuthorizationStrategy().getACL(senderUser).hasPermission(senderUser.impersonate(), Item.BUILD)) {
+                System.err.println("IM BuildCommand authorized Jenkins user '" +
+                        senderUser.getId() + "' (IM ID '" + sender.getNickname() +
+                        "' / '" + sender.getId() + "') to build '" + project.getName() +
+                        "' (user may generally build Items, " +
+                        "and project constraints were not evaluated)");
+                return null; // OK
+            }
+            */
+
+            return sender.getNickname() + " (" + sender.getId() +
+                    " aka " + senderUser.getId() + "): " +
+                    "you're not allowed to build job " +
+                    project.getDisplayName() + "!";
         }
 
         return sender.getNickname() + " (" + sender.getId() + "): " +
