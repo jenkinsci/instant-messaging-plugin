@@ -51,15 +51,17 @@ public class CurrentlyBuildingCommand extends BotCommand {
 						break;
 					}
 					for (int i = 2; i < args.length; i++) {
-						if (i>2) {
+						if (2 == i) {
+							// avoid appending to null
+							filterRegex = args[i];
+						} else {
 							// We can not really assume what the user
 							// entered if there were e.g. several
 							// whitespaces trimmed by line-parser.
 							// So if they meant modifiers (brackets,
 							// counts), they should spell them out.
-							filterRegex += " ";
+							filterRegex += " " + args[i];
 						}
-						filterRegex += args[i];
 					}
 					msg.append("\n- NOTE: got argument for currentlyBuilding: applying regex filter to reported strings: " + filterRegex);
 					filterPattern = Pattern.compile(filterRegex);
