@@ -86,6 +86,28 @@
             <version>1.7</version>
         </dependency>
         <dependency>
+            <groupId>org.jenkins-ci.main</groupId>
+            <artifactId>maven-plugin</artifactId>
+            <!-- needs hudson.model.User with getById() -->
+            <version>2.3</version>
+        </dependency>
+        <dependency>
+            <groupId>org.jenkins-ci.main</groupId>
+            <artifactId>jenkins-war</artifactId>
+            <type>war</type>
+            <!-- needs hudson.model.User with getById() -->
+            <version>2.3</version>
+            <scope>test</scope>
+        </dependency>
+        <dependency>
+            <groupId>org.jenkins-ci.main</groupId>
+            <artifactId>jenkins-core</artifactId>
+            <!-- needs hudson.model.User with getById() -->
+            <version>2.3</version>
+            <scope>provided</scope>
+        </dependency>
+
+        <dependency>
             <groupId>commons-lang</groupId>
             <artifactId>commons-lang</artifactId>
             <version>2.4</version>
@@ -104,7 +126,7 @@
         <connection>scm:git:git@github.com:jenkinsci/instant-messaging-plugin.git</connection>
         <developerConnection>scm:git:git@github.com:jenkinsci/instant-messaging-plugin.git</developerConnection>
         <url>http://fisheye.jenkins-ci.org/browse/Jenkins/trunk/trunk/hudson/plugins/instant-messaging</url>
-      <tag>HEAD</tag>
+        <tag>HEAD</tag>
     </scm>
 
     <pluginRepositories>
