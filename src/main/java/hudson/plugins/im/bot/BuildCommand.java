@@ -144,7 +144,8 @@ import org.apache.commons.lang.ArrayUtils;
                     }
                 }
             } else {
-                return giveSyntax(sender.getNickname(), args[0]);
+                return giveSyntax(sender.getNickname(), args[0]) +
+                        " (or, did you type the project name correctly?)";
             }
         } else {
             return sender.getNickname() + ": Error, syntax is: '" + args[0] +  SYNTAX + "'";
