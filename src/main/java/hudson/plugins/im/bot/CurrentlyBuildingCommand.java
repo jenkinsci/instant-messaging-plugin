@@ -46,7 +46,11 @@ public class CurrentlyBuildingCommand extends BotCommand {
 		if (args.length >= 2) {
 			switch (args[1]) {
 				case "~":
-					for (int i = 2; i <= args.length; i++) {
+					if (args.length < 3) {
+						msg.append("\n- WARNING: got filtering argument for currentlyBuilding, but no filter value - so none was applied\n");
+						break;
+					}
+					for (int i = 2; i < args.length; i++) {
 						if (i>2) {
 							// We can not really assume what the user
 							// entered if there were e.g. several
@@ -62,6 +66,7 @@ public class CurrentlyBuildingCommand extends BotCommand {
 					break;
 				default:
 					msg.append("\n- WARNING: got unsupported argument for currentlyBuilding, no filter was applied\n");
+					break;
 			}
 		}
 
