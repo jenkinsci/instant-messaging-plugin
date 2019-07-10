@@ -8,10 +8,12 @@ import hudson.model.Hudson;
 import hudson.model.Item;
 import hudson.model.Queue.Executable;
 import hudson.model.queue.SubTask;
+import hudson.model.Run;
 import hudson.plugins.im.IMChat;
 import hudson.plugins.im.IMException;
 import hudson.plugins.im.IMMessage;
 import hudson.plugins.im.Sender;
+import jenkins.model.JenkinsLocationConfiguration;
 
 import java.util.Arrays;
 import java.util.Collection;
@@ -43,15 +45,20 @@ public class CurrentlyBuildingCommand extends BotCommand {
 		StringBuffer msg = new StringBuffer();
 		String filterRegex = null;
 		Pattern filterPattern = null;
-		if (args.length >= 2) {
-			switch (args[1]) {
-				case "~":
-					if (args.length < 3) {
+		boolean reportUrls = false;
+		for (int a = 1 ; args.length >= a; a++) {
+			switch (args[a]) {
+				case "@":
+					msg.append("\n- NOTE: got @ argument for currentlyBuilding: will add URLs to reported strings");
+					reportUrls = true;
+					break;
+				case "~": // the rest of line is the regex expression
+					if ( (args.length - a) < 1) {
 						msg.append("\n- WARNING: got filtering argument for currentlyBuilding, but no filter value - so none was applied\n");
 						break;
 					}
-					for (int i = 2; i < args.length; i++) {
-						if (2 == i) {
+					for (int i = (a + 1); i < args.length; i++) {
+						if ( (a + 1) == i) {
 							// avoid appending to null
 							filterRegex = args[i];
 						} else {
@@ -63,12 +70,23 @@ public class CurrentlyBuildingCommand extends BotCommand {
 							filterRegex += " " + args[i];
 						}
 					}
-					msg.append("\n- NOTE: got argument for currentlyBuilding: applying regex filter to reported strings: " + filterRegex);
+					msg.append("\n- NOTE: got ~ argument for currentlyBuilding: applying regex filter to reported strings: " + filterRegex);
 					filterPattern = Pattern.compile(filterRegex);
 					break;
 				default:
-					msg.append("\n- WARNING: got unsupported argument for currentlyBuilding, no filter was applied\n");
+					msg.append("\n- WARNING: got unsupported argument '" + args[a] + "' for currentlyBuilding, ignored; no filter was applied\n");
 					break;
+			}
+		}
+
+		String rootUrl = null;
+		if (reportUrls) {
+			JenkinsLocationConfiguration cfg = JenkinsLocationConfiguration.get();
+			if (cfg != null) {
+				rootUrl = cfg.getUrl();
+			}
+			if (rootUrl == null) {
+				msg.append("\n- WARNING: Could not determine Jenkins URL for reporting.\n");
 			}
 		}
 
@@ -92,7 +110,26 @@ public class CurrentlyBuildingCommand extends BotCommand {
 					msgLine.append("#");
 					msgLine.append(executor.getNumber());
 					msgLine.append(": ");
-					msgLine.append(item != null ? item.getFullDisplayName() : task.getDisplayName());
+					if (item == null) {
+						msgLine.append(task.getDisplayName());
+					} else {
+						msgLine.append(item.getFullDisplayName());
+						if (task instanceof Run) {
+							Run r = (Run) task;
+							msgLine.append("#");
+							msgLine.append(r.getNumber());
+						}
+						if (reportUrls) {
+							String relativeUrl = item.getUrl();
+							if (!relativeUrl.equals(null) && !relativeUrl.equals("")) {
+								if (task instanceof Run) {
+									relativeUrl += "/console";
+								}
+								msgLine.append(" @ ");
+								msgLine.append(rootUrl + relativeUrl);
+							}
+						}
+					}
 
 					if (filterPattern != null) {
 						Matcher matcher = filterPattern.matcher(msgLine);
