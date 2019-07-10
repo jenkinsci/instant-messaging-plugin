@@ -2,10 +2,10 @@ package hudson.plugins.im.bot;
 
 import hudson.Extension;
 import hudson.Util;
-import hudson.model.Item;
 import hudson.model.Computer;
 import hudson.model.Executor;
 import hudson.model.Hudson;
+import hudson.model.Item;
 import hudson.model.Queue.Executable;
 import hudson.model.queue.SubTask;
 import hudson.plugins.im.IMChat;
