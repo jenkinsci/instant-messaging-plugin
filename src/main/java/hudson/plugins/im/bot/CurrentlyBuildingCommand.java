@@ -31,8 +31,8 @@ import jenkins.model.Jenkins;
  */
 @Extension
 public class CurrentlyBuildingCommand extends BotCommand {
-	private static final String SYNTAX = " [~ regex pattern]";
-	private static final String HELP = SYNTAX + " - list jobs which are currently in progress, with optional filter on reported lines";
+	private static final String SYNTAX = " [@] [~ regex pattern]";
+	private static final String HELP = SYNTAX + " - list jobs which are currently in progress, with optional '@' display of URLs to the build console and/or '~ regex' filter on reported lines";
 
 	@Override
 	public Collection<String> getCommandNames() {
