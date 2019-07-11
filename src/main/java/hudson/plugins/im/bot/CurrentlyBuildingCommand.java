@@ -48,6 +48,7 @@ public class CurrentlyBuildingCommand extends BotCommand {
 		boolean reportUrls = false;
 		// We are interested in args to the command, if any,
 		// so starting from args[1] when (args.length >= 2)
+		argsloop: // label for break to know which statement to abort
 		for (int a = 1 ; args.length > a; a++) {
 			switch (args[a]) {
 				case "@":
@@ -56,8 +57,8 @@ public class CurrentlyBuildingCommand extends BotCommand {
 					break;
 				case "~": // the rest of line is the regex expression
 					if ( (args.length - a) < 1) {
-						msg.append("\n- WARNING: got filtering argument for currentlyBuilding, but no filter value - so none was applied\n");
-						break;
+						msg.append("\n- WARNING: got ~ filtering argument for currentlyBuilding, but no filter value - so none was applied\n");
+						break argsloop;
 					}
 					for (int i = (a + 1); i < args.length; i++) {
 						if ( (a + 1) == i) {
@@ -72,9 +73,13 @@ public class CurrentlyBuildingCommand extends BotCommand {
 							filterRegex += " " + args[i];
 						}
 					}
-					msg.append("\n- NOTE: got ~ argument for currentlyBuilding: applying regex filter to reported strings: " + filterRegex);
-					filterPattern = Pattern.compile(filterRegex);
-					break;
+					if ( filterRegex.equals(null) ) {
+						msg.append("\n- WARNING: got ~ filtering argument for currentlyBuilding, but failed to extract a filter value (maybe a bug in instant-messaging-plugin) - so none was applied\n");
+					} else {
+						msg.append("\n- NOTE: got ~ filtering argument for currentlyBuilding: applying regex filter to reported strings: " + filterRegex);
+						filterPattern = Pattern.compile(filterRegex);
+					}
+					break argsloop;
 				default:
 					msg.append("\n- WARNING: got unsupported argument '" + args[a] + "' for currentlyBuilding, ignored; no filter was applied\n");
 					break;
