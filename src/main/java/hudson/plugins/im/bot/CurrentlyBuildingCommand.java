@@ -2,10 +2,12 @@ package hudson.plugins.im.bot;
 
 import hudson.Extension;
 import hudson.Util;
+import hudson.model.Build;
 import hudson.model.Computer;
 import hudson.model.Executor;
 import hudson.model.Hudson;
 import hudson.model.Item;
+import hudson.model.Job;
 import hudson.model.Queue.Executable;
 import hudson.model.queue.SubTask;
 import hudson.model.Run;
@@ -94,6 +96,8 @@ public class CurrentlyBuildingCommand extends BotCommand {
 			}
 			if (rootUrl == null) {
 				msg.append("\n- WARNING: Could not determine Jenkins URL for reporting.\n");
+			} else {
+				rootUrl = rootUrl.replaceFirst("/*$", "");
 			}
 		}
 
@@ -104,6 +108,11 @@ public class CurrentlyBuildingCommand extends BotCommand {
 				Executable currentExecutable = executor.getCurrentExecutable();
 				if (currentExecutable != null) {
 					countJobsInProgess++;
+
+					Build currentExecutableBuild = null;
+					if (currentExecutable instanceof Build) {
+						currentExecutableBuild = (Build) currentExecutable;
+					}
 
 					SubTask task = currentExecutable.getParent();
 					Item item = null;
@@ -118,23 +127,43 @@ public class CurrentlyBuildingCommand extends BotCommand {
 					msgLine.append(executor.getNumber());
 					msgLine.append(": ");
 					if (item == null) {
+						// Display name of a running subtask (one or more per build,
+						// depending on parallelism) includes its build number
+						// e.g. in pipeline originated items.
 						msgLine.append(task.getDisplayName());
 					} else {
-						msgLine.append(item.getFullDisplayName());
+						if (currentExecutableBuild != null) {
+							// A legacy freestyle job build is running.
+							// Its higher-level Executable has the number.
+							msgLine.append(currentExecutableBuild.getFullDisplayName());
+						} else
 						if (task instanceof Run) {
 							Run r = (Run) task;
+							msgLine.append(item.getFullDisplayName());
 							msgLine.append("#");
 							msgLine.append(r.getNumber());
 						}
-						if (reportUrls) {
-							String relativeUrl = item.getUrl();
+					}
+
+					if (reportUrls) {
+						String relativeUrl = null;
+						if (currentExecutableBuild != null) {
+							relativeUrl = currentExecutableBuild.getUrl();
 							if (!relativeUrl.equals(null) && !relativeUrl.equals("")) {
-								if (task instanceof Run) {
-									relativeUrl += "/console";
-								}
-								msgLine.append(" @ ");
-								msgLine.append(rootUrl + relativeUrl);
+								relativeUrl = relativeUrl.replaceFirst("/*$", "") + "/console";
 							}
+						} else
+						if ( item != null ) {
+							relativeUrl = item.getUrl();
+//						} else {
+//							relativeUrl = task.getUrl();
+						}
+						if (!relativeUrl.equals(null) && !relativeUrl.equals("")) {
+//							if ( (task instanceof Run) || (task instanceof Job) ) {
+//								relativeUrl = relativeUrl.replaceFirst("/*$", "") + "/console";
+//							}
+							msgLine.append(" @ ");
+							msgLine.append(rootUrl + relativeUrl);
 						}
 					}
 
