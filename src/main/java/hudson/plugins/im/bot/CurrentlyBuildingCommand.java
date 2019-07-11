@@ -33,8 +33,8 @@ import jenkins.model.Jenkins;
  */
 @Extension
 public class CurrentlyBuildingCommand extends BotCommand {
-	private static final String SYNTAX = " [@] [~ regex pattern]";
-	private static final String HELP = SYNTAX + " - list jobs which are currently in progress, with optional '@' display of URLs to the build console and/or '~ regex' filter on reported lines";
+	private static final String SYNTAX = " [@] [?] [~ regex pattern]";
+	private static final String HELP = SYNTAX + " - list jobs which are currently in progress, with optional '@' display of URLs to the build (console log if possible) and/or '~ regex' filter on reported lines; '?' enables debugging of the command itself";
 
 	@Override
 	public Collection<String> getCommandNames() {
@@ -48,6 +48,7 @@ public class CurrentlyBuildingCommand extends BotCommand {
 		String filterRegex = null;
 		Pattern filterPattern = null;
 		boolean reportUrls = false;
+		boolean cbDebug = false;
 		// We are interested in args to the command, if any,
 		// so starting from args[1] when (args.length >= 2)
 		argsloop: // label for break to know which statement to abort
@@ -56,6 +57,10 @@ public class CurrentlyBuildingCommand extends BotCommand {
 				case "@":
 					msg.append("\n- NOTE: got @ argument for currentlyBuilding: will add URLs to reported strings");
 					reportUrls = true;
+					break;
+				case "?":
+					msg.append("\n- NOTE: got ? argument for currentlyBuilding: will add debug about detected Executable and SubTask class objects");
+					cbDebug = true;
 					break;
 				case "~": // the rest of line is the regex expression
 					if ( (args.length - a) < 1) {
@@ -155,13 +160,8 @@ public class CurrentlyBuildingCommand extends BotCommand {
 						} else
 						if ( item != null ) {
 							relativeUrl = item.getUrl();
-//						} else {
-//							relativeUrl = task.getUrl();
 						}
 						if (!relativeUrl.equals(null) && !relativeUrl.equals("")) {
-//							if ( (task instanceof Run) || (task instanceof Job) ) {
-//								relativeUrl = relativeUrl.replaceFirst("/*$", "") + "/console";
-//							}
 							msgLine.append(" @ ");
 							msgLine.append(rootUrl + relativeUrl);
 						}
@@ -183,6 +183,28 @@ public class CurrentlyBuildingCommand extends BotCommand {
 					msg.append(", Estimated remaining time: ");
 					msg.append(executor.getEstimatedRemainingTime());
 					msg.append(")");
+
+					if (cbDebug) {
+						msg.append("\n=== currExec class: ");
+						msg.append(Arrays.asList(currentExecutable.getClass().getName()));
+
+						msg.append("\n=== currExec interfaces: ");
+						msg.append(Arrays.asList(currentExecutable.getClass().getInterfaces()));
+
+						msg.append("\n=== currExec classes: ");
+						msg.append(Arrays.asList(currentExecutable.getClass().getClasses()));
+
+						msg.append("\n=== currTask class: ");
+						msg.append(Arrays.asList(task.getClass().getName()));
+
+						msg.append("\n=== currTask interfaces: ");
+						msg.append(Arrays.asList(task.getClass().getInterfaces()));
+
+						msg.append("\n=== currTask classes: ");
+						msg.append(Arrays.asList(task.getClass().getClasses()));
+
+						msg.append("\n");
+					}
 				}
 			}
 		}
