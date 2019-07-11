@@ -46,7 +46,9 @@ public class CurrentlyBuildingCommand extends BotCommand {
 		String filterRegex = null;
 		Pattern filterPattern = null;
 		boolean reportUrls = false;
-		for (int a = 1 ; args.length >= a; a++) {
+		// We are interested in args to the command, if any,
+		// so starting from args[1] when (args.length >= 2)
+		for (int a = 1 ; args.length > a; a++) {
 			switch (args[a]) {
 				case "@":
 					msg.append("\n- NOTE: got @ argument for currentlyBuilding: will add URLs to reported strings");
