@@ -80,7 +80,7 @@ public class CurrentlyBuildingCommand extends BotCommand {
 							filterRegex += " " + args[i];
 						}
 					}
-					if ( filterRegex.equals(null) ) {
+					if ( filterRegex == null ) {
 						msg.append("\n- WARNING: got ~ filtering argument for currentlyBuilding, but failed to extract a filter value (maybe a bug in instant-messaging-plugin) - so none was applied\n");
 					} else {
 						msg.append("\n- NOTE: got ~ filtering argument for currentlyBuilding: applying regex filter to reported strings: " + filterRegex);
@@ -157,14 +157,14 @@ public class CurrentlyBuildingCommand extends BotCommand {
 						String relativeUrl = null;
 						if (currentExecutableBuild != null) {
 							relativeUrl = currentExecutableBuild.getUrl();
-							if (!relativeUrl.equals(null) && !relativeUrl.equals("")) {
+							if (relativeUrl != null && !relativeUrl.equals("")) {
 								relativeUrl = relativeUrl.replaceFirst("/*$", "") + "/console";
 							}
 						} else
 						if ( item != null ) {
 							relativeUrl = item.getUrl();
 						}
-						if (!relativeUrl.equals(null) && !relativeUrl.equals("")) {
+						if (relativeUrl != null  && !relativeUrl.equals("")) {
 							msgLine.append(" @ ");
 							msgLine.append(rootUrl + relativeUrl);
 						}
