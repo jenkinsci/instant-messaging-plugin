@@ -53,6 +53,7 @@ public class CurrentlyBuildingCommand extends BotCommand {
 		// so starting from args[1] when (args.length >= 2)
 		argsloop: // label for break to know which statement to abort
 		for (int a = 1 ; args.length > a; a++) {
+                        if (cbDebug) { chat.sendMessage("a=" + a + "  arg='" + args[a] + "' len=" + args.length +"\n"); }
 			switch (args[a]) {
 				case "@":
 					msg.append("\n- NOTE: got @ argument for currentlyBuilding: will add URLs to reported strings");
