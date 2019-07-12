@@ -102,7 +102,10 @@ public class CurrentlyBuildingCommand extends BotCommand {
 			if (rootUrl == null) {
 				msg.append("\n- WARNING: Could not determine Jenkins URL for reporting.\n");
 			} else {
-				rootUrl = rootUrl.replaceFirst("/*$", "");
+				// Ensure one slash at the end of hostname/port
+				// when we concatenate with relative job URLs
+				// later (no leading slash there).
+				rootUrl = rootUrl.replaceFirst("/*$", "") + "/";
 			}
 		}
 
