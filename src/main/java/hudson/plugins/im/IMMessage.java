@@ -10,7 +10,7 @@ public class IMMessage {
     private final String from;
     private final String to;
     private final String body;
-	private boolean authorized;
+    private boolean authorized;
 
     /**
      * Constructor.
@@ -55,6 +55,6 @@ public class IMMessage {
     }
 
     public boolean isAuthorized() {
-    	return this.authorized ;
+        return this.authorized ;
     }
 }

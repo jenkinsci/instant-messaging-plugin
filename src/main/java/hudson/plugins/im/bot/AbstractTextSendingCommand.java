@@ -15,13 +15,13 @@ import java.util.logging.Logger;
  */
 public abstract class AbstractTextSendingCommand extends BotCommand {
 
-	private static final Logger LOGGER = Logger.getLogger(AbstractTextSendingCommand.class.getName());
+    private static final Logger LOGGER = Logger.getLogger(AbstractTextSendingCommand.class.getName());
 
-	private JobProvider jobProvider = new DefaultJobProvider();
+    private JobProvider jobProvider = new DefaultJobProvider();
 
-	protected JobProvider getJobProvider() {
-	    return this.jobProvider;
-	}
+    protected JobProvider getJobProvider() {
+        return this.jobProvider;
+    }
 
 
     // for testing
@@ -29,30 +29,30 @@ public abstract class AbstractTextSendingCommand extends BotCommand {
         this.jobProvider = jobProvider;
     }
 
-	/**
-	 * {@inheritDoc}
-	 */
-	public final void executeCommand(Bot bot, IMChat chat, IMMessage message,
+    /**
+     * {@inheritDoc}
+     */
+    public final void executeCommand(Bot bot, IMChat chat, IMMessage message,
                                      Sender sender, String[] args) throws IMException {
-		String reply;
-		try {
-			reply = getReply(bot, sender, args);
-		} catch (RuntimeException e) {
-			LOGGER.warning(ExceptionHelper.dump(e));
-			reply = sender.getNickname() + ": Error " + e.toString();
-		}
-		chat.sendMessage(reply);
-	}
+        String reply;
+        try {
+            reply = getReply(bot, sender, args);
+        } catch (RuntimeException e) {
+            LOGGER.warning(ExceptionHelper.dump(e));
+            reply = sender.getNickname() + ": Error " + e.toString();
+        }
+        chat.sendMessage(reply);
+    }
 
-	/**
-	 * Gets the text reply
-	 *
-	 * @param bot
+    /**
+     * Gets the text reply
+     *
+     * @param bot
      *      The bot for which this command is currently operating. Never be null.
      * @param sender the command sender
      * @param args arguments passed to the command, where <code>args[0]</code> is the command name itself   @throws RuntimeException in case of invalid args. This is automatically caught and reported to the sender
-	 */
-	protected abstract String getReply(Bot bot, Sender sender, String args[]);
+     */
+    protected abstract String getReply(Bot bot, Sender sender, String args[]);
 
     protected String getErrorReply(Sender sender, CommandException e) {
         final StringBuilder reply;

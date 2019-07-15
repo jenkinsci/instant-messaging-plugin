@@ -13,5 +13,5 @@ public interface IMConnectionListener {
      *
      * @param e the exception which caused the close. May be null.
      */
-	void connectionBroken(Exception e);
+    void connectionBroken(Exception e);
 }

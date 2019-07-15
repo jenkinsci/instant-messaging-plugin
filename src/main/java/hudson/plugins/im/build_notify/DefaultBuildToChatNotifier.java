@@ -67,7 +67,7 @@ public class DefaultBuildToChatNotifier extends SummaryOnlyBuildToChatNotifier {
     @Extension(ordinal=100)
     public static class DescriptorImpl extends BuildToChatNotifierDescriptor {
         @Override
-		public String getDisplayName() {
+        public String getDisplayName() {
             return "Summary + SCM changes";
         }
     }

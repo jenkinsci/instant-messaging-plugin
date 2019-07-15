@@ -23,89 +23,89 @@ import hudson.tasks.test.AbstractTestResultAction;
  * @author kutzi
  */
 public class PrintFailingTestsBuildToChatNotifier extends
-		DefaultBuildToChatNotifier {
+        DefaultBuildToChatNotifier {
 
-	@DataBoundConstructor
-	public PrintFailingTestsBuildToChatNotifier() {
-	}
+    @DataBoundConstructor
+    public PrintFailingTestsBuildToChatNotifier() {
+    }
 
-	@Override
-	public String buildCompletionMessage(IMPublisher publisher,
-			AbstractBuild<?, ?> build, BuildListener listener)
-			throws IOException, InterruptedException {
-		String msg = super.buildCompletionMessage(publisher, build, listener);
-		return msg + getFailedTestsReport(build);
-	}
+    @Override
+    public String buildCompletionMessage(IMPublisher publisher,
+            AbstractBuild<?, ?> build, BuildListener listener)
+            throws IOException, InterruptedException {
+        String msg = super.buildCompletionMessage(publisher, build, listener);
+        return msg + getFailedTestsReport(build);
+    }
 
 
 
-	@Override
-	public String culpritMessage(IMPublisher publisher,
-			AbstractBuild<?, ?> build, BuildListener listener) {
-		String msg = super.culpritMessage(publisher, build, listener);
-		return msg + getFailedTestsReport(build);
-	}
+    @Override
+    public String culpritMessage(IMPublisher publisher,
+            AbstractBuild<?, ?> build, BuildListener listener) {
+        String msg = super.culpritMessage(publisher, build, listener);
+        return msg + getFailedTestsReport(build);
+    }
 
-	@Override
-	public String suspectMessage(IMPublisher publisher,
-			AbstractBuild<?, ?> build, BuildListener listener,
-			boolean firstFailure) {
-		String msg = super.suspectMessage(publisher, build, listener, firstFailure);
-		return msg + getFailedTestsReport(build);
-	}
+    @Override
+    public String suspectMessage(IMPublisher publisher,
+            AbstractBuild<?, ?> build, BuildListener listener,
+            boolean firstFailure) {
+        String msg = super.suspectMessage(publisher, build, listener, firstFailure);
+        return msg + getFailedTestsReport(build);
+    }
 
-	@Override
-	public String upstreamCommitterMessage(IMPublisher publisher,
-			AbstractBuild<?, ?> build, BuildListener listener,
-			AbstractBuild<?, ?> upstreamBuild) {
-		String msg = super
-				.upstreamCommitterMessage(publisher, build, listener, upstreamBuild);
-		return msg + getFailedTestsReport(build);
-	}
+    @Override
+    public String upstreamCommitterMessage(IMPublisher publisher,
+            AbstractBuild<?, ?> build, BuildListener listener,
+            AbstractBuild<?, ?> upstreamBuild) {
+        String msg = super
+                .upstreamCommitterMessage(publisher, build, listener, upstreamBuild);
+        return msg + getFailedTestsReport(build);
+    }
 
-	private CharSequence getFailedTestsReport(AbstractBuild<?, ?> build) {
+    private CharSequence getFailedTestsReport(AbstractBuild<?, ?> build) {
 
-		AbstractTestResultAction testResultAction = build.getAction(AbstractTestResultAction.class);
-		if (testResultAction == null || testResultAction.getFailCount() == 0) {
-			return "";
-		}
+        AbstractTestResultAction testResultAction = build.getAction(AbstractTestResultAction.class);
+        if (testResultAction == null || testResultAction.getFailCount() == 0) {
+            return "";
+        }
 
-		StringBuilder buf = new StringBuilder();
-		List<CaseResult> failedTests = testResultAction.getFailedTests();
-		Collections.sort(failedTests, new Comparator<CaseResult>() {
-			@Override
-			public int compare(CaseResult o1, CaseResult o2) {
-				if (o1.getAge() < o2.getAge()) {
-					return -1;
-				} else if (o2.getAge() < o1.getAge()) {
-					return 1;
-				}
-				return o1.getFullName().compareTo(o2.getFullName());
-			}
-		});
+        StringBuilder buf = new StringBuilder();
+        List<CaseResult> failedTests = testResultAction.getFailedTests();
+        Collections.sort(failedTests, new Comparator<CaseResult>() {
+            @Override
+            public int compare(CaseResult o1, CaseResult o2) {
+                if (o1.getAge() < o2.getAge()) {
+                    return -1;
+                } else if (o2.getAge() < o1.getAge()) {
+                    return 1;
+                }
+                return o1.getFullName().compareTo(o2.getFullName());
+            }
+        });
 
-		final int maxNumberOfTestsToPrint = 5;
-		buf.append("\nFailed tests:\n");
-		for (int i=0; i < Math.min(maxNumberOfTestsToPrint, failedTests.size()); i++) {
-			CaseResult test = failedTests.get(i);
-			buf.append(test.getFullName())
-				.append(": ")
-				.append(MessageHelper.getTestUrl(test))
-				.append("\n");
-		}
+        final int maxNumberOfTestsToPrint = 5;
+        buf.append("\nFailed tests:\n");
+        for (int i=0; i < Math.min(maxNumberOfTestsToPrint, failedTests.size()); i++) {
+            CaseResult test = failedTests.get(i);
+            buf.append(test.getFullName())
+                .append(": ")
+                .append(MessageHelper.getTestUrl(test))
+                .append("\n");
+        }
 
-		int more = failedTests.size() - maxNumberOfTestsToPrint;
-		if (more > 0) {
-			buf.append("(").append(more).append(" more)");
-		}
+        int more = failedTests.size() - maxNumberOfTestsToPrint;
+        if (more > 0) {
+            buf.append("(").append(more).append(" more)");
+        }
 
-		return buf;
-	}
+        return buf;
+    }
 
-	@Extension
+    @Extension
     public static class DescriptorImpl extends BuildToChatNotifierDescriptor {
         @Override
-		public String getDisplayName() {
+        public String getDisplayName() {
             return "Summary, SCM changes and failed tests";
         }
     }

@@ -67,7 +67,7 @@ public class BuildHelper {
         AbstractBuild<?, ?> previousBuild = getPreviousNonAbortedBuild(build);
         if (previousBuild != null) {
             Result previousResult = previousBuild.getResult();
-			return previousResult != null && previousResult.isWorseThan(Result.SUCCESS);
+            return previousResult != null && previousResult.isWorseThan(Result.SUCCESS);
         }
         return false;
     }
@@ -79,8 +79,8 @@ public class BuildHelper {
      */
     @Deprecated
     public static boolean isFailureOrUnstable(AbstractBuild<?,?> build) {
-    	return build.getResult() == Result.FAILURE
-    		|| build.getResult() == Result.UNSTABLE;
+        return build.getResult() == Result.FAILURE
+            || build.getResult() == Result.UNSTABLE;
     }
 
     /**
@@ -189,6 +189,6 @@ public class BuildHelper {
      * format.
      */
     public static String getProjectName(AbstractBuild<?, ?> build) {
-    	return build.getProject().getFullDisplayName();
+        return build.getProject().getFullDisplayName();
     }
 }

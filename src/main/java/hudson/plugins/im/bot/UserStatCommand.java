@@ -22,53 +22,53 @@ public class UserStatCommand extends AbstractTextSendingCommand {
     }
 
     @Override
-	protected String getReply(Bot bot, Sender sender, String[] args) {
-		if (args.length < 2) {
-		    return giveSyntax(sender.getNickname(), args[0]);
-		}
-		String userName = args[1];
-		User user = User.get(userName, false);
-		if (user != null) {
+    protected String getReply(Bot bot, Sender sender, String[] args) {
+        if (args.length < 2) {
+            return giveSyntax(sender.getNickname(), args[0]);
+        }
+        String userName = args[1];
+        User user = User.get(userName, false);
+        if (user != null) {
 
-		    String checkPermission = checkPermission(user, sender);
-		    if (checkPermission != null) {
-		        return checkPermission;
-		    }
+            String checkPermission = checkPermission(user, sender);
+            if (checkPermission != null) {
+                return checkPermission;
+            }
 
-			StringBuilder buf = new StringBuilder();
-			buf.append(userName).append(":");
+            StringBuilder buf = new StringBuilder();
+            buf.append(userName).append(":");
 
-			if (!userName.equals(user.getFullName())) {
-				buf.append("\n").append("Full name: ").append(user.getFullName());
-			}
+            if (!userName.equals(user.getFullName())) {
+                buf.append("\n").append("Full name: ").append(user.getFullName());
+            }
 
-			if (user.getDescription() != null) {
-				buf.append("\n").append("Description: ").append(user.getDescription());
-			}
+            if (user.getDescription() != null) {
+                buf.append("\n").append("Description: ").append(user.getDescription());
+            }
 
-			Mailer.UserProperty mailProperty = user.getProperty(Mailer.UserProperty.class);
-			if (mailProperty != null) {
-				buf.append("\n").append("E-mail: ").append(mailProperty.getAddress());
-			}
+            Mailer.UserProperty mailProperty = user.getProperty(Mailer.UserProperty.class);
+            if (mailProperty != null) {
+                buf.append("\n").append("E-mail: ").append(mailProperty.getAddress());
+            }
 
-//			if (Hudson.getInstance().getPlugin("jabber") != null) {
+//            if (Hudson.getInstance().getPlugin("jabber") != null) {
 //
-//			}
+//            }
 
-			if (Hudson.getInstance().getPlugin("ci-game") != null) {
-				UserScoreProperty property = user.getProperty(UserScoreProperty.class);
-				if (property != null) {
-					int score = (int) property.getScore();
-					buf.append("\n").append("Current score in continuous integration game: ").append(score);
-				}
-			}
-			return buf.toString();
-		} else {
-			return sender.getNickname() + ": don't know a user named " + userName;
-		}
-	}
+            if (Hudson.getInstance().getPlugin("ci-game") != null) {
+                UserScoreProperty property = user.getProperty(UserScoreProperty.class);
+                if (property != null) {
+                    int score = (int) property.getScore();
+                    buf.append("\n").append("Current score in continuous integration game: ").append(score);
+                }
+            }
+            return buf.toString();
+        } else {
+            return sender.getNickname() + ": don't know a user named " + userName;
+        }
+    }
 
-	private String checkPermission(User user, Sender sender) {
+    private String checkPermission(User user, Sender sender) {
         if (!user.hasPermission(Hudson.READ)) {
             return sender.getNickname() + ": you may not read that user!";
         }
@@ -76,12 +76,12 @@ public class UserStatCommand extends AbstractTextSendingCommand {
     }
 
     @Override
-	public String getHelp() {
-		return HELP;
-	}
+    public String getHelp() {
+        return HELP;
+    }
 
-	private String giveSyntax(String sender, String cmd) {
-		return sender + ": syntax is: '" + cmd +  SYNTAX + "'";
-	}
+    private String giveSyntax(String sender, String cmd) {
+        return sender + ": syntax is: '" + cmd +  SYNTAX + "'";
+    }
 
 }

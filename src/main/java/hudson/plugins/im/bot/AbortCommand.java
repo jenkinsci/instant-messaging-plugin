@@ -23,9 +23,9 @@ public class AbortCommand extends AbstractSingleJobCommand {
         return Collections.singleton("abort");
     }
 
-	public String getHelp() {
-		return " <job> - specify which job to abort";
-	}
+    public String getHelp() {
+        return " <job> - specify which job to abort";
+    }
 
     @Override
     protected CharSequence getMessageForJob(AbstractProject<?, ?> project, Sender sender, String[] args) throws CommandException {

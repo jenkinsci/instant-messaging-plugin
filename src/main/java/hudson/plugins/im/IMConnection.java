@@ -43,7 +43,7 @@ public interface IMConnection
      */
     void setPresence(IMPresence presence, String statusMessage) throws IMException;
 
-	void addConnectionListener(IMConnectionListener listener);
+    void addConnectionListener(IMConnectionListener listener);
 
-	void removeConnectionListener(IMConnectionListener listener);
+    void removeConnectionListener(IMConnectionListener listener);
 }

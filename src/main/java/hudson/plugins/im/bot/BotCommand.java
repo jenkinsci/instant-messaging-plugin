@@ -35,25 +35,25 @@ public abstract class BotCommand implements ExtensionPoint {
      */
     public abstract Collection<String> getCommandNames();
 
-	/**
-	 * Execute a command.
-	 *
-	 * @param bot
+    /**
+     * Execute a command.
+     *
+     * @param bot
      *      The bot for which this command runs. Never null.
      * @param chat the {@link IMChat} object, may be used to send reply messages
      * @param message the original {@link IMMessage}
      * @param sender the command sender
      * @param args arguments passed to the command, where <code>args[0]</code> is the command name itself
      * @throws IMException if anything goes wrong while communicating with the remote IM server
-	 */
-	public abstract void executeCommand(Bot bot, IMChat chat, IMMessage message,
+     */
+    public abstract void executeCommand(Bot bot, IMChat chat, IMMessage message,
                                         Sender sender, String[] args) throws IMException;
 
-	/**
-	 * Return the command usage text.
-	 * @return the command usage text
-	 */
-	public abstract String getHelp();
+    /**
+     * Return the command usage text.
+     * @return the command usage text
+     */
+    public abstract String getHelp();
 
     /**
      * Returns all the registered {@link BotCommand}s.

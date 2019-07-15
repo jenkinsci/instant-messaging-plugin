@@ -14,44 +14,44 @@ public class GroupChatIMMessageTarget implements IMMessageTarget {
      * @deprecated replaced by name
      */
     @Deprecated
-	private transient String value;
+    private transient String value;
 
     private String name;
-	private String password;
-	private boolean notificationOnly;
+    private String password;
+    private boolean notificationOnly;
 
-	/**
-	 * @deprecated use {@link GroupChatIMMessageTarget#GroupChatIMMessageTarget(String, String, boolean)}!
-	 */
-	@Deprecated
+    /**
+     * @deprecated use {@link GroupChatIMMessageTarget#GroupChatIMMessageTarget(String, String, boolean)}!
+     */
+    @Deprecated
     public GroupChatIMMessageTarget(final String name) {
         this(name, null, false);
     }
 
     public GroupChatIMMessageTarget(String name, String password, boolean notificationOnly) {
-    	Assert.notNull(name, "Parameter 'name' must not be null.");
-    	this.name = name;
-    	this.password = password;
-    	this.notificationOnly = notificationOnly;
+        Assert.notNull(name, "Parameter 'name' must not be null.");
+        this.name = name;
+        this.password = password;
+        this.notificationOnly = notificationOnly;
     }
 
     public String getName() {
-		return name;
-	}
+        return name;
+    }
 
-	public String getPassword() {
-		return password;
-	}
+    public String getPassword() {
+        return password;
+    }
 
-	public boolean hasPassword() {
-		return Util.fixEmpty(this.password) != null;
-	}
+    public boolean hasPassword() {
+        return Util.fixEmpty(this.password) != null;
+    }
 
-	public boolean isNotificationOnly() {
-	    return this.notificationOnly;
-	}
+    public boolean isNotificationOnly() {
+        return this.notificationOnly;
+    }
 
-	@Override
+    @Override
     public int hashCode() {
         final int prime = 31;
         int result = 1;
@@ -91,14 +91,14 @@ public class GroupChatIMMessageTarget implements IMMessageTarget {
         return this.name;
     }
 
-	/**
-	 * Deserialize old instances.
-	 */
-	private Object readResolve() {
-		if (this.value != null && this.name == null) {
-			this.name = this.value;
-		}
-		this.value = null;
-		return this;
-	}
+    /**
+     * Deserialize old instances.
+     */
+    private Object readResolve() {
+        if (this.value != null && this.name == null) {
+            this.name = this.value;
+        }
+        this.value = null;
+        return this;
+    }
 }

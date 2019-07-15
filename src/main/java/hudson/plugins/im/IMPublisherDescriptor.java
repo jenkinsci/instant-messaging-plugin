@@ -15,20 +15,20 @@ public interface IMPublisherDescriptor {
      */
     public ParameterNames getParamNames();
 
-	/**
-	 * Returns <code>true</code> iff the plugin is globally enabled.
-	 */
-	boolean isEnabled();
+    /**
+     * Returns <code>true</code> iff the plugin is globally enabled.
+     */
+    boolean isEnabled();
 
-	/**
-	 * Returns an informal, short description of the concrete plugin.
-	 */
-	String getPluginDescription();
+    /**
+     * Returns an informal, short description of the concrete plugin.
+     */
+    String getPluginDescription();
 
-	/**
-	 * Returns if the plugin should expose its presence on the IM network.
-	 * I.e. if it should report as 'available' or that like.
-	 */
+    /**
+     * Returns if the plugin should expose its presence on the IM network.
+     * I.e. if it should report as 'available' or that like.
+     */
     boolean isExposePresence();
 
     /**
