@@ -16,7 +16,7 @@ import org.apache.commons.lang.ArrayUtils;
 
 /**
  * {@link BotCommand} to create a command alias.
- * 
+ *
  * @author kutzi
  */
 @Extension
@@ -62,7 +62,7 @@ public class SetAliasCommand extends AbstractTextSendingCommand {
 			if (args.length > 3) {
 				cmdArguments = MessageHelper.copyOfRange(args, 3, args.length);
 			}
-			
+
 			AliasCommand aliasCmd = new AliasCommand(cmd, cmdName, cmdArguments);
 			try {
 				bot.addAlias(alias, aliasCmd);
@@ -91,7 +91,7 @@ public class SetAliasCommand extends AbstractTextSendingCommand {
 			this.commandName = commandName;
 			this.arguments = arguments;
 		}
-		
+
         @Override
         public Collection<String> getCommandNames() {
             return Collections.singleton(commandName);
@@ -100,10 +100,10 @@ public class SetAliasCommand extends AbstractTextSendingCommand {
 		public void executeCommand(Bot bot, IMChat chat, IMMessage message,
                                    Sender sender, String[] args) throws IMException {
 			String[] dynamicArgs = MessageHelper.copyOfRange(args, 1, args.length);
-			
+
 			String[] allArgs = MessageHelper.concat(new String[] {this.commandName}, this.arguments, dynamicArgs);
 			System.out.println("Args: " + Arrays.toString(allArgs));
-			
+
 			this.command.executeCommand(bot, chat, message, sender, allArgs);
 		}
 

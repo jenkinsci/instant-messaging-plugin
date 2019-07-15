@@ -19,14 +19,14 @@ import jenkins.model.Jenkins;
 
 @SuppressWarnings({ "unchecked", "rawtypes" })
 public class JenkinsIsBusyListener extends RunListener {
-	
+
 	private static final Logger LOGGER = Logger.getLogger(JenkinsIsBusyListener.class.getName());
-	
+
 	private static JenkinsIsBusyListener INSTANCE;
-	
+
 	private transient final List<IMConnectionProvider> connectionProviders = new ArrayList<IMConnectionProvider>();
 	private transient final ScheduledExecutorService executor = Executors.newSingleThreadScheduledExecutor(new NamingThreadFactory(new DaemonThreadFactory(), JenkinsIsBusyListener.class.getSimpleName()));
-	
+
 	private transient int lastBusyExecutors = -1;
 	private transient int lastTotalExecutors = -1;
 
@@ -39,7 +39,7 @@ public class JenkinsIsBusyListener extends RunListener {
     	}
     	return INSTANCE;
     }
-	
+
 	private JenkinsIsBusyListener() {
         super(Run.class);
         this.executor.scheduleAtFixedRate(new Runnable() {
@@ -50,16 +50,16 @@ public class JenkinsIsBusyListener extends RunListener {
         }, 10, 60, TimeUnit.SECONDS);
         LOGGER.info("Executor busy listener created");
     }
-	
+
 	public synchronized void addConnectionProvider(IMConnectionProvider provider) {
 		this.connectionProviders.add(provider);
 		LOGGER.fine("Added connection provider: " + provider);
 	}
-	
+
 	public synchronized void removeConnectionProvider(IMConnectionProvider provider) {
 		this.connectionProviders.remove(provider);
 		LOGGER.fine("Removed connection provider: " + provider);
-		
+
 		if (this.connectionProviders.isEmpty()) {
 			LOGGER.info("Last connection provider removed. Unregistering this instance.");
 			unregister();
@@ -71,7 +71,7 @@ public class JenkinsIsBusyListener extends RunListener {
     public void onCompleted(Run r, TaskListener listener) {
         updateLater();
     }
-    
+
 	@Override
     public void onDeleted(Run r) {
 	    updateLater();
@@ -81,7 +81,7 @@ public class JenkinsIsBusyListener extends RunListener {
     public void onStarted(Run r, TaskListener listener) {
         updateLater();
     }
-    
+
     private void updateLater() {
         // schedule update 1 second into the future
         // otherwise calculation is often incorrect
@@ -92,11 +92,11 @@ public class JenkinsIsBusyListener extends RunListener {
             }
         }, 1L, TimeUnit.SECONDS);
     }
-    
+
     private synchronized void updateIMStatus() {
 		int totalExecutors = getTotalExecutors();
         int busyExecutors = getBusyExecutors();
-        
+
         if (totalExecutors != this.lastTotalExecutors || busyExecutors != this.lastBusyExecutors) {
 	        for (IMConnectionProvider provider : connectionProviders) {
 	        	setStatus(provider, busyExecutors, totalExecutors);
@@ -105,14 +105,14 @@ public class JenkinsIsBusyListener extends RunListener {
         this.lastTotalExecutors = totalExecutors;
         this.lastBusyExecutors = busyExecutors;
     }
-    
+
     private void setStatus(IMConnectionProvider provider, int busyExecutors, int totalExecutors) {
     	try {
         	IMConnection conn = provider.currentConnection();
             if (busyExecutors == 0) {
                 conn.setPresence(IMPresence.AVAILABLE, "Yawn, I'm so bored. Don't you have some work for me?");
             } else if (busyExecutors == totalExecutors) {
-                conn.setPresence(IMPresence.DND, 
+                conn.setPresence(IMPresence.DND,
                         "Please give me some rest! All " + totalExecutors + " executors are busy, "
                         + Jenkins.getInstance().getQueue().getItems().length + " job(s) in queue.");
             } else {
@@ -128,22 +128,22 @@ public class JenkinsIsBusyListener extends RunListener {
             // ignore
         }
     }
-    
+
     private int getBusyExecutors() {
         int busyExecutors = 0;
         Computer[] computers = Jenkins.getInstance().getComputers();
         for (Computer compi : computers) {
-            
+
             for (Executor executor : compi.getExecutors()) {
                 if (executor.isBusy()) {
                     busyExecutors++;
                 }
             }
         }
-        
+
         return busyExecutors;
     }
-    
+
     private int getTotalExecutors() {
         int totalExecutors = 0;
         Computer[] computers = Jenkins.getInstance().getComputers();

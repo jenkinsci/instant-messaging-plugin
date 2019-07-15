@@ -21,7 +21,7 @@ import java.io.IOException;
 public abstract class BuildToChatNotifier implements Describable<BuildToChatNotifier> {
     /**
      * Calculates the message to send out to a chat when the specified build is started.
-     * 
+     *
      * @param publisher
      *      The publisher that's driving this. Never null.
      * @param build
@@ -45,10 +45,10 @@ public abstract class BuildToChatNotifier implements Describable<BuildToChatNoti
      */
     public abstract String buildCompletionMessage(IMPublisher publisher, AbstractBuild<?, ?> build, BuildListener listener)
             throws IOException,  InterruptedException;
-    
+
     /**
      * Calculates the message to send out to a committer of a broken build.
-     * 
+     *
      * @param publisher
      *      The publisher that's driving this. Never null.
      * @param build
@@ -67,7 +67,7 @@ public abstract class BuildToChatNotifier implements Describable<BuildToChatNoti
     	    	" is " + ResultTrend.getResultTrend(build).getID() + ": " + MessageHelper.getBuildURL(build);
     	}
     }
-    
+
     /**
      * Calculates the message to send out to a 'culprit' of a broken build.
      * I.e. a committer to a previous build which was broken and all builds since then
@@ -83,10 +83,10 @@ public abstract class BuildToChatNotifier implements Describable<BuildToChatNoti
     public String culpritMessage(IMPublisher publisher, AbstractBuild<?, ?> build, BuildListener listener) {
     	return "You're still being suspected of having broken " + getProjectName(build) + ": " + MessageHelper.getBuildURL(build);
     }
-    
+
     /**
      * Calculates the message to send out to a committer of a fixed build.
-     * 
+     *
      * @param publisher
      *      The publisher that's driving this. Never null.
      * @param build
@@ -97,11 +97,11 @@ public abstract class BuildToChatNotifier implements Describable<BuildToChatNoti
     public String fixerMessage(IMPublisher publisher, AbstractBuild<?, ?> build, BuildListener listener) {
     	return "Yippee! Seems you've fixed " + getProjectName(build) + ": " + MessageHelper.getBuildURL(build);
     }
-    
+
     /**
      * Calculates the message to send out to a committer of an upstream build
      * if this build is broken.
-     * 
+     *
      * @param publisher
      *      The publisher that's driving this. Never null.
      * @param build
@@ -115,7 +115,7 @@ public abstract class BuildToChatNotifier implements Describable<BuildToChatNoti
     		AbstractBuild<?, ?> upstreamBuild) {
     	return "Attention! Your change in " + getProjectName(upstreamBuild)
         	+ ": " + MessageHelper.getBuildURL(upstreamBuild)
-        	+ " *might* have broken the downstream job " + getProjectName(build) + ": " + MessageHelper.getBuildURL(build)	
+        	+ " *might* have broken the downstream job " + getProjectName(build) + ": " + MessageHelper.getBuildURL(build)
         	+ "\nPlease have a look!";
     }
 

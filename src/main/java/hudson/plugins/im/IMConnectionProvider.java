@@ -10,25 +10,25 @@ import org.acegisecurity.Authentication;
 
 /**
  * Abstract implementation of a provider of {@link IMConnection}s.
- * 
+ *
  * @author kutzi
  */
 public abstract class IMConnectionProvider implements IMConnectionListener {
-	
+
 	private static final Logger LOGGER = Logger.getLogger(IMConnectionProvider.class.getName());
-	
+
 	private static final IMConnection NULL_CONNECTION = new DummyConnection();
 
 	protected IMPublisherDescriptor descriptor;
 	private IMConnection imConnection = NULL_CONNECTION;
-	
+
 	private Authentication authentication = null;
-	
+
 	private final ConnectorRunnable connector = new ConnectorRunnable();
-    
+
 	protected IMConnectionProvider() {
 	}
-	
+
 	/**
 	 * Must be called once to initialize the provider.
 	 */
@@ -38,10 +38,10 @@ public abstract class IMConnectionProvider implements IMConnectionListener {
 		connectorThread.start();
 		tryReconnect();
 	}
-	
+
 	/**
 	 * Creates a new connection.
-	 * 
+	 *
 	 * @return the new connection. Never null.
 	 * @throws IMException if the connection couldn't be created for any reason.
 	 * @throws IMException
@@ -54,7 +54,7 @@ public abstract class IMConnectionProvider implements IMConnectionListener {
 			this.imConnection = NULL_CONNECTION;
 			return true;
 		}
-		
+
 		try {
 			this.imConnection = createConnection();
 			this.imConnection.addConnectionListener(this);
@@ -65,12 +65,12 @@ public abstract class IMConnectionProvider implements IMConnectionListener {
 			return false;
 		}
 	}
-	
+
 	/**
 	 * Return the current connection.
 	 * Returns an instance of {@link DummyConnection} if the plugin
 	 * is currently not connection to a IM network.
-	 * 
+	 *
 	 * @return the current connection. Never null.
 	 */
     public synchronized IMConnection currentConnection() {
@@ -94,17 +94,17 @@ public abstract class IMConnectionProvider implements IMConnectionListener {
 
 	public void setDescriptor(IMPublisherDescriptor desc) {
 		this.descriptor = desc;
-		
+
 		if (desc != null && desc.isEnabled()) {
 		    tryReconnect();
 		}
 	}
-	
+
     @Override
 	public void connectionBroken(Exception e) {
 		tryReconnect();
 	}
-    
+
     private void tryReconnect() {
     	this.connector.semaphore.release();
     }
@@ -115,14 +115,14 @@ public abstract class IMConnectionProvider implements IMConnectionListener {
 	    if (descriptor == null || descriptor.getHudsonUserName() == null) {
 	        return null;
 	    }
-	    
+
 	    return new AuthenticationHolder() {
             @Override
             public Authentication getAuthentication() {
                 if (authentication != null) {
                     return authentication;
                 }
-                
+
                 User u = User.get(descriptor.getHudsonUserName());
 
                 return u.impersonate();
@@ -133,14 +133,14 @@ public abstract class IMConnectionProvider implements IMConnectionListener {
     private final class ConnectorRunnable implements Runnable {
 
         private final Semaphore semaphore = new Semaphore(0);
-        
+
         private boolean firstConnect = true;
-        
+
         public void run() {
             try {
                 while (true) {
                     this.semaphore.acquire();
-                    
+
                     if (!firstConnect) {
                     	// wait a little bit in case the XMPP server/network has just a 'hickup'
                     	TimeUnit.SECONDS.sleep(30);
@@ -149,7 +149,7 @@ public abstract class IMConnectionProvider implements IMConnectionListener {
                     	firstConnect = false;
                     	LOGGER.info("Trying to connect");
                     }
-                    
+
                     boolean success = false;
                     int timeout = 1;
                     while (!success) {
@@ -167,12 +167,12 @@ public abstract class IMConnectionProvider implements IMConnectionListener {
 								// ignore
 							}
 						}
-                        
+
                         // make sure to leave the synchronized block before sleeping!
                         if(!success) {
                             LOGGER.info("Reconnect failed. Next connection attempt in " + timeout + " minutes");
                             this.semaphore.drainPermits();
-                            
+
                             // wait up to timeout time OR until semaphore is released again (happens e.g. if global config was changed)
                             this.semaphore.tryAcquire(timeout * 60, TimeUnit.SECONDS);
                             // exponentially increase timeout, but longer than 16 minutes

@@ -21,7 +21,7 @@ import java.util.Collection;
  */
 @Extension
 public class QueueCommand extends BotCommand {
-	
+
 	private static final String HELP = " - show the state of the build queue";
 
     @Override
@@ -46,7 +46,7 @@ public class QueueCommand extends BotCommand {
 		} else {
 			reply = "build queue is empty";
 		}
-		
+
 		chat.sendMessage(reply);
 	}
 

@@ -33,12 +33,12 @@ public class AbortCommand extends AbstractSingleJobCommand {
             throw new CommandException(
                     sender + ": how do you intend to abort a build that isn't building?");
         }
-        
+
         boolean aborted = false;
         if (project.isInQueue()) {
             aborted = Hudson.getInstance().getQueue().cancel(project);
         }
-        
+
         if (!aborted) {
             // must be already building
             AbstractBuild<?, ?> build = project.getLastBuild();
@@ -47,7 +47,7 @@ public class AbortCommand extends AbstractSingleJobCommand {
                 throw new CommandException(
                         sender.getNickname() + ": it appears this job has never been built");
             }
-            
+
             // TODO: do build.doStop() instead of the following lines when moving to core 1.489!
             Executor ex = build.getExecutor();
             if (ex == null) {

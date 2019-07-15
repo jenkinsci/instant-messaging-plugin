@@ -28,7 +28,7 @@ import jenkins.security.NotReallyRoleSensitiveCallable;
 
 /**
  * Instant messaging bot.
- * 
+ *
  * @author Pascal Bleser
  * @author kutzi
  */
@@ -108,7 +108,7 @@ public class Bot implements IMMessageListener {
         String payload = retrieveMessagePayLoad(msg.getBody());
         if (payload != null) {
             final Sender s = getSender(msg);
-        	
+
         	try {
             	if (!this.commandsAccepted) {
             	    this.chat.sendMessage(s.getNickname() + " you may not issue bot commands in this chat!");
@@ -121,13 +121,13 @@ public class Bot implements IMMessageListener {
                 LOGGER.warning(ExceptionHelper.dump(e));
                 return;
             }
-        	
+
             // split words
             final String[] args = MessageHelper.extractCommandLine(payload);
             if (args.length > 0) {
                 // first word is the command name
                 String cmd = args[0];
-                
+
                 try {
                 	final BotCommand command = this.cmdsAndAliases.get(cmd);
                     if (command != null) {
@@ -154,7 +154,7 @@ public class Bot implements IMMessageListener {
             }
         }
 	}
-    
+
     private boolean isAuthenticationNeeded() {
     	return this.authentication != null && Jenkins.getInstance().isUseSecurity();
     }
@@ -162,7 +162,7 @@ public class Bot implements IMMessageListener {
 	private Sender getSender(IMMessage msg) {
 	    String sender = msg.getFrom();
 	    String id = this.chat.getIMId(sender);
-        
+
         final Sender s;
         if (id != null) {
             s = new Sender(this.chat.getNickName(sender), id);
@@ -193,7 +193,7 @@ public class Bot implements IMMessageListener {
 
 		return null;
 	}
-	
+
 	/**
 	 * Returns the command or alias associated with the given name
 	 * or <code>null</code>.
@@ -201,10 +201,10 @@ public class Bot implements IMMessageListener {
 	BotCommand getCommand(String name) {
 		return this.cmdsAndAliases.get(name);
 	}
-	
+
 	/**
 	 * Registers a new alias.
-	 * 
+	 *
 	 * @return the alias previously registered under this name or <code>null</code>
 	 * if no alias was registered by that name previously
 	 * @throws IllegalArgumentException when trying to override a built-in command
@@ -214,12 +214,12 @@ public class Bot implements IMMessageListener {
 		if (old != null && ! (old instanceof AliasCommand)) {
 			throw new IllegalArgumentException("Won't override built-in command: '" + name + "'!");
 		}
-		
+
 		this.cmdsAndAliases.put(name, alias);
 		this.helpCache = null;
 		return old;
 	}
-	
+
 	/**
 	 * Removes an existing alias.
 	 *
@@ -236,7 +236,7 @@ public class Bot implements IMMessageListener {
 		}
 		return null;
 	}
-	
+
 	/**
 	 * Returns a map of all currently defined aliases.
 	 * The map is sorted by the alias name.
@@ -256,7 +256,7 @@ public class Bot implements IMMessageListener {
 	 */
 	public void shutdown() {
 		this.chat.removeMessageListener(this);
-		
+
 		if (this.chat.isMultiUserChat()) {
 			try {
 				chat.sendMessage("Oops, seems like Jenkins is going down now. See ya!");

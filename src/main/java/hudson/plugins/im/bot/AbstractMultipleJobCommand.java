@@ -16,7 +16,7 @@ import java.util.Collection;
  * @author kutzi
  */
 abstract class AbstractMultipleJobCommand extends AbstractTextSendingCommand {
-	
+
 	static final String UNKNOWN_JOB_STR = "unknown job";
 	static final String UNKNOWN_VIEW_STR = "unknown view";
 
@@ -24,7 +24,7 @@ abstract class AbstractMultipleJobCommand extends AbstractTextSendingCommand {
 	 * Returns the message to return for this job.
 	 * Note that {@link AbstractMultipleJobCommand} already inserts one newline after each job's
 	 * message so you don't have to do it yourself.
-	 * 
+	 *
 	 * @param job The job
 	 * @return the result message for this job
 	 */
@@ -33,18 +33,18 @@ abstract class AbstractMultipleJobCommand extends AbstractTextSendingCommand {
     /**
      * Returns a short name of the command needed for the help message
      * and as a leading descriptor in the result message.
-     * 
+     *
      * @return short command name
      */
     protected abstract String getCommandShortName();
-    
+
     enum Mode {
     	SINGLE, VIEW, ALL;
     }
 
     @Override
 	protected String getReply(Bot bot, Sender sender, String[] args) {
-    	
+
 //    	if (!authorizationCheck()) {
 //    		return "Sorry, can't do that!";
 //    	}
@@ -60,7 +60,7 @@ abstract class AbstractMultipleJobCommand extends AbstractTextSendingCommand {
 
         if (!projects.isEmpty()) {
             StringBuilder msg = new StringBuilder();
-                
+
             switch(pair.getHead()) {
             	case SINGLE : break;
             	case ALL:
@@ -88,10 +88,10 @@ abstract class AbstractMultipleJobCommand extends AbstractTextSendingCommand {
             return sender + ": no job found";
         }
 	}
-    
+
     /**
      * Returns a list of projects for the given arguments.
-     * 
+     *
      * @param projects the list to which the projects are added
      * @return a pair of Mode (single job, jobs from view or all) and view name -
      * where view name will be null if mode != VIEW

@@ -30,17 +30,17 @@ import org.apache.commons.lang.ArrayUtils;
 
 /**
  * Build command for the instant messaging bot.
- * 
+ *
  * @author Pascal Bleser
  * @author kutzi
  */
 @Extension
 public class BuildCommand extends AbstractTextSendingCommand {
-	
+
 	private static final Pattern NUMERIC_EXTRACTION_REGEX = Pattern.compile("^(\\d+)");
 	private static final String SYNTAX = " <job> [now|<delay>[s|m|h]] [<parameterkey>=<value>]*";
 	private static final String HELP = SYNTAX + " - schedule a job build, with standard, custom or no quiet period";
-	
+
     @Override
     public Collection<String> getCommandNames() {
         return Arrays.asList("build","schedule");
@@ -50,12 +50,12 @@ public class BuildCommand extends AbstractTextSendingCommand {
      * @return whether the build was actually scheduled
      */
     private boolean scheduleBuild(Bot bot, AbstractProject<?, ?> project, int delaySeconds, Sender sender, List<ParameterValue> parameters) {
-	    
+
 	    String senderId = sender.getId();
 	    if (senderId == null) {
 	        senderId = sender.getNickname();
 	    }
-	    
+
 		Cause cause = new IMCause("Started by " + bot.getImId() + " on request of '" + senderId + "'");
 		if (parameters.isEmpty()) {
 		    return project.scheduleBuild(delaySeconds, cause);
@@ -76,22 +76,22 @@ public class BuildCommand extends AbstractTextSendingCommand {
 			    if (checkPermission != null) {
 			        return checkPermission;
 			    }
-			    
+
 			    StringBuilder reply = new StringBuilder();
     			if (!project.isBuildable()) {
 					return sender.getNickname() + ": job " + jobName + " is disabled";
 				} else {
-				    
+
 				    int delay = project.getQuietPeriod();
-				    
+
 				    List<ParameterValue> parameters = new ArrayList<ParameterValue>();
 				    if (args.length >= 3) {
-				        
+
 				        int parametersStartIndex = 2;
 				        if (!args[2].contains("=")) { // otherwise looks like a parameter
-				            
+
 				            parametersStartIndex = 3;
-				            
+
 				            String delayStr = args[2].trim();
 				            if ("now".equalsIgnoreCase(delayStr)) {
 				                delay = 0;
@@ -107,7 +107,7 @@ public class BuildCommand extends AbstractTextSendingCommand {
                                         return giveSyntax(sender.getNickname(), args[0]);
                                     }
                                 }
-    				            
+
     				            Matcher matcher = NUMERIC_EXTRACTION_REGEX.matcher(delayStr);
                                 if (matcher.find()) {
                                     int value = Integer.parseInt(matcher.group(1));
@@ -117,13 +117,13 @@ public class BuildCommand extends AbstractTextSendingCommand {
                                 }
 				            }
 				        }
-				        
+
 				        if (parametersStartIndex < args.length) {
 				            String[] potentialParameters = (String[]) ArrayUtils.subarray(args, parametersStartIndex,args.length);
 				            parameters = parseBuildParameters(potentialParameters, project, reply);
 				        }
 				    }
-				    			    
+
 				    if (scheduleBuild(bot, project, delay, sender, parameters)) {
 				        if (delay == 0) {
 				            return reply.append(sender.getNickname() + ": job " + jobName + " build scheduled now").toString();
@@ -152,7 +152,7 @@ public class BuildCommand extends AbstractTextSendingCommand {
 
     List<ParameterValue> parseBuildParameters(String[] args,
             AbstractProject<?, ?> project, StringBuilder commandReply) {
-        
+
         if (args.length > 0 && !project.isParameterized()) {
             commandReply.append("Ignoring parameters as project is not parametrized!\n");
             return Collections.emptyList();
@@ -191,7 +191,7 @@ public class BuildCommand extends AbstractTextSendingCommand {
     	}
         return parameters;
     }
-	
+
 	private String checkPermission(Sender sender, AbstractProject<?, ?> project) {
         if (!project.hasPermission(Item.BUILD)) {
             return sender.getNickname() + ": you're not allowed to build job " + project.getDisplayName() + "!";

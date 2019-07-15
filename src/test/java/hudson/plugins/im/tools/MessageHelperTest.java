@@ -38,50 +38,50 @@ public class MessageHelperTest {
 
 		assertEquals(1, MessageHelper.extractCommandLine("\"param1 param2\"").length);
 	}
-	
+
 	@Test
 	@Bug(3215)
 	public void testSingleQuote() {
 	    String cmdLine = "\"";
 	    assertEquals(1, MessageHelper.extractCommandLine(cmdLine).length);
 	    assertEquals("\"", MessageHelper.extractCommandLine(cmdLine)[0]);
-	    
+
 	    cmdLine = "\"a b";
 	    assertEquals(2, MessageHelper.extractCommandLine(cmdLine).length);
 	    assertEquals("\"a", MessageHelper.extractCommandLine(cmdLine)[0]);
-	    
+
 	    cmdLine = "a b\"";
         assertEquals(2, MessageHelper.extractCommandLine(cmdLine).length);
         assertEquals("b\"", MessageHelper.extractCommandLine(cmdLine)[1]);
 	}
-	
+
 	@Test
 	public void testConcat() {
 		String[] a = {"a"};
 		String[] b = {"b"};
 		String[] c = {"c"};
-		
+
 		String[] concat = MessageHelper.concat(a, b, c);
 		Assert.assertArrayEquals(new String[] {"a", "b", "c"}, concat);
-		
+
 		concat = MessageHelper.concat(a);
 		Assert.assertArrayEquals(a, concat);
 	}
-	
+
 	@SuppressWarnings({ "rawtypes", "unchecked" })
     @Test
 	public void testUrlShouldBeUrlEncoded() {
 	    TestResult result = mock(TestResult.class);
 	    AbstractBuild build = mock(AbstractBuild.class);
 	    when(build.getUrl()).thenReturn("/a build");
-	    
+
 	    AbstractTestResultAction action = mock(AbstractTestResultAction.class);
 	    when(action.getUrlName()).thenReturn("/action");
-	    
+
 	    when(result.getOwner()).thenReturn(build);
 	    when(result.getTestResultAction()).thenReturn(action);
 	    when(result.getUrl()).thenReturn("/some id with spaces");
-	    
+
 	    String testUrl = MessageHelper.getTestUrl(result);
 	    assertEquals("null/a%20build/action/some%20id%20with%20spaces", testUrl);
 	}

@@ -8,9 +8,9 @@ import org.springframework.util.Assert;
 
 /**
  * Represents the notification strategy.
- * 
+ *
  * @author Uwe Schaefer
- * 
+ *
  * @deprecated only left here to deserialize old configs
  */
 public enum NotificationStrategy {
@@ -88,7 +88,7 @@ public enum NotificationStrategy {
 	/**
 	 * Signals if the given build qualifies to send a notification according to
 	 * the current strategy.
-	 * 
+	 *
 	 * @param build
 	 *            The build for which it should be decided, if notification is
 	 *            wanted or not.

@@ -5,5 +5,5 @@
     <f:textbox name="${descriptor.paramNames.jenkinsLogin}"
       value="${descriptor.hudsonUserName}" />
   </f:entry>
-  
+
 </j:jelly>

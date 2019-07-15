@@ -5,13 +5,13 @@ import java.util.logging.Logger;
 
 /**
  * Dummy implementation of {@link IMConnection}.
- * 
+ *
  * @author kutzi
  */
 class DummyConnection implements IMConnection {
 
 	private static final Logger LOGGER = Logger.getLogger(DummyConnection.class.getName());
-	
+
 	@Override
 	public void close() {
 	}

@@ -2,7 +2,7 @@ package hudson.plugins.im;
 
 /**
  * Listens to new messages.
- * 
+ *
  * @author kutzi
  */
 public interface IMMessageListener {

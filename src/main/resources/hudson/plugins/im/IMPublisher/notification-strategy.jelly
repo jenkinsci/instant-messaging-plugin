@@ -2,7 +2,7 @@
 <j:jelly xmlns:j="jelly:core" xmlns:st="jelly:stapler" xmlns:d="jelly:define" xmlns:l="/lib/layout" xmlns:t="/lib/hudson" xmlns:f="/lib/form">
 
   <st:documentation>
-    IM configuration regarding notification strategies - i.e. when to notify and whom to notify.    
+    IM configuration regarding notification strategies - i.e. when to notify and whom to notify.
   </st:documentation>
 
   <f:entry title="Notification Strategy" description="When to send notifications (all = always, failure = on any failure, failure and fixed = on failure and fixes, new failure and fixed = on new failure and fixes, change = only on state change)">

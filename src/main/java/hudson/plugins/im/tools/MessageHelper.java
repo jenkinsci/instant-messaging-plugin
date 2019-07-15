@@ -17,14 +17,14 @@ import hudson.tasks.test.AbstractTestResultAction;
 
 /**
  * Utility class to help message creation
- * 
+ *
  * @author vsellier
  * @author kutzi
  */
 public class MessageHelper {
 	private final static Pattern SPACE_PATTERN = Pattern.compile("\\s");
 	private final static String QUOTE = "\"";
-	
+
 	/**
 	 * Returns the full URL to the build details page for a given build.
 	 */
@@ -52,7 +52,7 @@ public class MessageHelper {
 		String buildUrl = getBuildURL(result.getOwner());
 		@SuppressWarnings("rawtypes")
         AbstractTestResultAction action = result.getTestResultAction();
-		
+
 		TestObject parent = result.getParent();
 		TestResult testResultRoot = null;
 		while(parent != null) {
@@ -62,11 +62,11 @@ public class MessageHelper {
 			}
 			parent = parent.getParent();
 		}
-		
+
 		String testUrl = action.getUrlName()
 			+ (testResultRoot != null ? testResultRoot.getUrl() : "")
 			+ result.getUrl();
-		
+
 		String[] pathComponents = testUrl.split("/");
 		StringBuilder buf = new StringBuilder();
 		for (String c : pathComponents) {
@@ -74,7 +74,7 @@ public class MessageHelper {
 		}
 		// remove last /
 		buf.deleteCharAt(buf.length() - 1);
-		
+
         return buildUrl + buf.toString();
 	}
 
@@ -93,12 +93,12 @@ public class MessageHelper {
 
 		// space protection
 		commandLine = commandLine.trim();
-		
-		int firstQuote = commandLine.indexOf(QUOTE);		
-		
+
+		int firstQuote = commandLine.indexOf(QUOTE);
+
 		if (firstQuote != -1) {
 		    int endQuoted = commandLine.indexOf(QUOTE, firstQuote + 1);
-		    
+
 		    if (endQuoted == -1) {
 		        //unmatched quotes, just split on spaces
 		        Collections.addAll(parameters, SPACE_PATTERN.split(commandLine));
@@ -112,7 +112,7 @@ public class MessageHelper {
     						firstQuote)));
     				// adding the parameter between quotes
     				parameters.add(commandLine.substring(firstQuote + 1, endQuoted));
-    
+
     				// adding everything after the quoted parameter into the
     				// parameters list
     				if (endQuoted < commandLine.length() - 1) {
@@ -127,7 +127,7 @@ public class MessageHelper {
 		}
 		return parameters;
 	}
-	
+
 	/**
 	 * Copies the specified range of the specified array into a new array.
      * The initial index of the range (<tt>from</tt>) must lie between zero
@@ -152,7 +152,7 @@ public class MessageHelper {
      *     or <tt>from &gt; original.length()</tt>
      * @throws IllegalArgumentException if <tt>from &gt; to</tt>
      * @throws NullPointerException if <tt>original</tt> is null
-	 * 
+	 *
 	 * Note: Unfortunately in Java 5 there is no Arrays#copyOfRange, yet.
 	 * So we have to implement it ourself.
 	 */
@@ -169,7 +169,7 @@ public class MessageHelper {
                          Math.min(original.length - from, newLength));
         return copy;
     }
-	
+
     /**
      * Copies the specified array, truncating or padding with nulls (if necessary)
      * so the copy has the specified length.  For all indices that are
@@ -185,7 +185,7 @@ public class MessageHelper {
      *     to obtain the specified length
      * @throws NegativeArraySizeException if <tt>newLength</tt> is negative
      * @throws NullPointerException if <tt>original</tt> is null
-     * 
+     *
      * Note: copied from java 6
      */
 	@SuppressWarnings({ "unchecked", "rawtypes" })
@@ -208,7 +208,7 @@ public class MessageHelper {
 			resultLength += array.length;
 		}
 		T[] result = copyOf(array1, resultLength);
-		
+
 		int offset = array1.length;
 		for (T[] array : arrays) {
 			 for (int i=0; i < array.length; i++) {
@@ -228,7 +228,7 @@ public class MessageHelper {
 	    joined = joined.replaceAll("\"", "");
 	    return joined;
 	}
-	
+
 	/**
 	 * Extracts a name from an argument array starting at a start index and removing
 	 * quoting ".

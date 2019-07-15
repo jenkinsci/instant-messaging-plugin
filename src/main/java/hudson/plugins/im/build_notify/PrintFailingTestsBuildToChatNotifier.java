@@ -19,12 +19,12 @@ import hudson.tasks.test.AbstractTestResultAction;
  * Extends {@link DefaultBuildToChatNotifier} and also prints
  * failed tests if any.
  * Up to 5 failing tests are printed. Youngest failing tests are displayed first.
- * 
+ *
  * @author kutzi
  */
 public class PrintFailingTestsBuildToChatNotifier extends
 		DefaultBuildToChatNotifier {
-	
+
 	@DataBoundConstructor
 	public PrintFailingTestsBuildToChatNotifier() {
 	}
@@ -36,9 +36,9 @@ public class PrintFailingTestsBuildToChatNotifier extends
 		String msg = super.buildCompletionMessage(publisher, build, listener);
 		return msg + getFailedTestsReport(build);
 	}
-	
-	
-	
+
+
+
 	@Override
 	public String culpritMessage(IMPublisher publisher,
 			AbstractBuild<?, ?> build, BuildListener listener) {
@@ -64,12 +64,12 @@ public class PrintFailingTestsBuildToChatNotifier extends
 	}
 
 	private CharSequence getFailedTestsReport(AbstractBuild<?, ?> build) {
-		
+
 		AbstractTestResultAction testResultAction = build.getAction(AbstractTestResultAction.class);
 		if (testResultAction == null || testResultAction.getFailCount() == 0) {
 			return "";
 		}
-		
+
 		StringBuilder buf = new StringBuilder();
 		List<CaseResult> failedTests = testResultAction.getFailedTests();
 		Collections.sort(failedTests, new Comparator<CaseResult>() {
@@ -83,7 +83,7 @@ public class PrintFailingTestsBuildToChatNotifier extends
 				return o1.getFullName().compareTo(o2.getFullName());
 			}
 		});
-		
+
 		final int maxNumberOfTestsToPrint = 5;
 		buf.append("\nFailed tests:\n");
 		for (int i=0; i < Math.min(maxNumberOfTestsToPrint, failedTests.size()); i++) {
@@ -93,12 +93,12 @@ public class PrintFailingTestsBuildToChatNotifier extends
 				.append(MessageHelper.getTestUrl(test))
 				.append("\n");
 		}
-		
+
 		int more = failedTests.size() - maxNumberOfTestsToPrint;
 		if (more > 0) {
 			buf.append("(").append(more).append(" more)");
 		}
-		
+
 		return buf;
 	}
 

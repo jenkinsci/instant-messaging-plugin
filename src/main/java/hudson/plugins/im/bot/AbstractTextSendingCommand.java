@@ -10,25 +10,25 @@ import java.util.logging.Logger;
 
 /**
  * Abstract command for sending a reply back to the sender.
- * 
+ *
  * @author kutzi
  */
 public abstract class AbstractTextSendingCommand extends BotCommand {
-	
+
 	private static final Logger LOGGER = Logger.getLogger(AbstractTextSendingCommand.class.getName());
 
 	private JobProvider jobProvider = new DefaultJobProvider();
-	
+
 	protected JobProvider getJobProvider() {
 	    return this.jobProvider;
 	}
-	
-    
+
+
     // for testing
     void setJobProvider(JobProvider jobProvider) {
         this.jobProvider = jobProvider;
     }
-	
+
 	/**
 	 * {@inheritDoc}
 	 */
@@ -46,7 +46,7 @@ public abstract class AbstractTextSendingCommand extends BotCommand {
 
 	/**
 	 * Gets the text reply
-	 * 
+	 *
 	 * @param bot
      *      The bot for which this command is currently operating. Never be null.
      * @param sender the command sender

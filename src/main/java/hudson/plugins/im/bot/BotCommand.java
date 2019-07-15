@@ -34,10 +34,10 @@ public abstract class BotCommand implements ExtensionPoint {
      *      Can be empty but never null.
      */
     public abstract Collection<String> getCommandNames();
-	
+
 	/**
 	 * Execute a command.
-	 * 
+	 *
 	 * @param bot
      *      The bot for which this command runs. Never null.
      * @param chat the {@link IMChat} object, may be used to send reply messages
@@ -48,7 +48,7 @@ public abstract class BotCommand implements ExtensionPoint {
 	 */
 	public abstract void executeCommand(Bot bot, IMChat chat, IMMessage message,
                                         Sender sender, String[] args) throws IMException;
-	
+
 	/**
 	 * Return the command usage text.
 	 * @return the command usage text
@@ -60,5 +60,5 @@ public abstract class BotCommand implements ExtensionPoint {
      */
     public static ExtensionList<BotCommand> all() {
         return Hudson.getInstance().getExtensionList(BotCommand.class);
-    }    
+    }
 }

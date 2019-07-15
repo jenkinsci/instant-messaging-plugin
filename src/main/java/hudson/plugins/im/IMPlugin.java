@@ -9,7 +9,7 @@ public class IMPlugin {
     public IMPlugin(IMConnectionProvider provider) {
     	this.provider = provider;
     }
-    
+
     public void start() throws Exception {
     	this.busyListener = JenkinsIsBusyListener.getInstance();
     	this.busyListener.addConnectionProvider(this.provider);

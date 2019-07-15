@@ -20,9 +20,9 @@ import jenkins.model.Jenkins;
 
 /**
  * CurrentlyBuilding command for instant messaging plugin.
- * 
+ *
  * Generates a list of jobs in progress.
- * 
+ *
  * @author Bjoern Kasteleiner
  */
 @Extension
@@ -44,13 +44,13 @@ public class CurrentlyBuildingCommand extends BotCommand {
 				Executable currentExecutable = executor.getCurrentExecutable();
 				if (currentExecutable != null) {
 					currentlyJobsInProgess = true;
-					
+
 					SubTask task = currentExecutable.getParent();
 					Item item = null;
 					if (task instanceof Item) {
 						item = (Item) task;
 					}
-					
+
 					msg.append("\n- ");
 					msg.append(computer.getDisplayName());
 					msg.append("#");
