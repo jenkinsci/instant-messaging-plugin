@@ -158,14 +158,19 @@ public class CurrentlyBuildingCommand extends BotCommand {
                         String relativeUrl = null;
                         if (currentExecutableBuild != null) {
                             relativeUrl = currentExecutableBuild.getUrl();
-                            if (relativeUrl != null && !relativeUrl.equals("")) {
-                                relativeUrl = relativeUrl.replaceFirst("/*$", "") + "/console";
-                            }
-                        } else
-                        if ( item != null ) {
+                        }
+                        if ((relativeUrl == null || relativeUrl.equals("")) && item != null) {
                             relativeUrl = item.getUrl();
                         }
-                        if (relativeUrl != null  && !relativeUrl.equals("")) {
+                        if (relativeUrl == null || relativeUrl.equals("")) {
+                            relativeUrl = task.getUrl();
+                        }
+                        if (relativeUrl != null && !relativeUrl.equals("")) {
+                            Pattern p = Pattern.compile("/[0-9]+/*$"); // BuildID component in URL
+                            Matcher m = p.matcher(relativeUrl);
+                            if (m.find()) {
+                                relativeUrl = relativeUrl.replaceFirst("/*$", "") + "/console";
+                            }
                             msgLine.append(" @ ");
                             msgLine.append(rootUrl + relativeUrl);
                         }
