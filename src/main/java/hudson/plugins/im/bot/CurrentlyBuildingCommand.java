@@ -9,6 +9,7 @@ import hudson.model.Hudson;
 import hudson.model.Item;
 import hudson.model.Job;
 import hudson.model.Queue.Executable;
+import hudson.model.Queue.Task;
 import hudson.model.queue.SubTask;
 import hudson.model.Run;
 import hudson.plugins.im.IMChat;
@@ -163,7 +164,9 @@ public class CurrentlyBuildingCommand extends BotCommand {
                             relativeUrl = item.getUrl();
                         }
                         if (relativeUrl == null || relativeUrl.equals("")) {
-                            relativeUrl = task.getUrl();
+                            // a SubTask has no getUrl() of its own
+                            Task t = (Task) task.getOwnerTask();
+                            relativeUrl = t.getUrl();
                         }
                         if (relativeUrl != null && !relativeUrl.equals("")) {
                             Pattern p = Pattern.compile("/[0-9]+/*$"); // BuildID component in URL
