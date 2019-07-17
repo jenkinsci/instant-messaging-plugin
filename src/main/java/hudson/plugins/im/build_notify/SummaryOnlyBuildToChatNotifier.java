@@ -39,12 +39,21 @@ public class SummaryOnlyBuildToChatNotifier extends BuildToChatNotifier {
             sb = new StringBuilder();
         }
         ResultTrend result = getResultTrend(run);
-        sb.append(Messages.SummaryOnlyBuildToChatNotifier_Summary(
+        String extraMessage = publisher.getExtraMessage();
+        if (extraMessage != null && !extraMessage.equals("")) {
+            sb.append(Messages.SummaryOnlyBuildToChatNotifier_SummaryExtra(
                 getProjectName(run), run.getDisplayName(),
                 result.getID(),
                 run.getTimestampString(),
                 MessageHelper.getBuildURL(run),
-                publisher.getExtraMessage()));
+                extraMessage));
+        } else {
+            sb.append(Messages.SummaryOnlyBuildToChatNotifier_Summary(
+                getProjectName(run), run.getDisplayName(),
+                result.getID(),
+                run.getTimestampString(),
+                MessageHelper.getBuildURL(run)));
+        }
 
         return sb.toString();
     }
