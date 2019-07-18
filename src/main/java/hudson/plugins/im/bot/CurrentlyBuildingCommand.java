@@ -54,7 +54,7 @@ public class CurrentlyBuildingCommand extends BotCommand {
         // so starting from args[1] when (args.length >= 2)
         argsloop: // label for break to know which statement to abort
         for (int a = 1 ; args.length > a; a++) {
-                        if (cbDebug) { chat.sendMessage("a=" + a + "  arg='" + args[a] + "' len=" + args.length +"\n"); }
+            if (cbDebug) { chat.sendMessage("a=" + a + "  arg='" + args[a] + "' len=" + args.length +"\n"); }
             switch (args[a]) {
                 case "@":
                     msg.append("\n- NOTE: got @ argument for currentlyBuilding: will add URLs to reported strings");
@@ -140,14 +140,17 @@ public class CurrentlyBuildingCommand extends BotCommand {
                         // Display name of a running subtask (one or more per build,
                         // depending on parallelism) includes its build number
                         // e.g. in pipeline originated items.
+                        if (cbDebug) { msgLine.append("task.getDisplayName()= "); }
                         msgLine.append(task.getDisplayName());
                     } else {
                         if (currentExecutableBuild != null) {
                             // A legacy freestyle job build is running.
                             // Its higher-level Executable has the number.
+                            if (cbDebug) { msgLine.append("currentExecutableBuild.getFullDisplayName()= "); }
                             msgLine.append(currentExecutableBuild.getFullDisplayName());
-                        } else
+                        } //else
                         if (task instanceof Run) {
+                            if (cbDebug) { msgLine.append(" Run data= "); }
                             Run r = (Run) task;
                             msgLine.append(item.getFullDisplayName());
                             msgLine.append("#");
@@ -158,13 +161,16 @@ public class CurrentlyBuildingCommand extends BotCommand {
                     if (reportUrls) {
                         String relativeUrl = null;
                         if (currentExecutableBuild != null) {
+                            if (cbDebug) { msgLine.append(" URL:currExec= "); }
                             relativeUrl = currentExecutableBuild.getUrl();
                         }
                         if ((relativeUrl == null || relativeUrl.equals("")) && item != null) {
+                            if (cbDebug) { msgLine.append(" URL:item= "); }
                             relativeUrl = item.getUrl();
                         }
                         if (relativeUrl == null || relativeUrl.equals("")) {
                             // a SubTask has no getUrl() of its own
+                            if (cbDebug) { msgLine.append(" URL:ownerTask= "); }
                             Task t = (Task) task.getOwnerTask();
                             relativeUrl = t.getUrl();
                         }
