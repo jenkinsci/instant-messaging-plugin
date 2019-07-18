@@ -27,7 +27,12 @@ public class SummaryOnlyBuildToChatNotifier extends BuildToChatNotifier {
 
     @Override
     public String buildStartMessage(IMPublisher publisher, AbstractBuild<?, ?> build, BuildListener listener) throws IOException, InterruptedException {
-        return Messages.SummaryOnlyBuildToChatNotifier_StartMessage(build.getDisplayName(),getProjectName(build), publisher.getExtraMessage());
+        String extraMessage = publisher.getExtraMessage();
+        if (extraMessage != null && !extraMessage.equals("")) {
+            return Messages.SummaryOnlyBuildToChatNotifier_StartMessageExtra(build.getDisplayName(),getProjectName(build), extraMessage);
+        } else {
+            return Messages.SummaryOnlyBuildToChatNotifier_StartMessage(build.getDisplayName(),getProjectName(build));
+        }
     }
 
     @Override
