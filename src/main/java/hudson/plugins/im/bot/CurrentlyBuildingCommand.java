@@ -148,9 +148,9 @@ public class CurrentlyBuildingCommand extends BotCommand {
                             // Its higher-level Executable has the number.
                             if (cbDebug) { msgLine.append("currentExecutableBuild.getFullDisplayName()= "); }
                             msgLine.append(currentExecutableBuild.getFullDisplayName());
-                        } //else
+                        } else
                         if (task instanceof Run) {
-                            if (cbDebug) { msgLine.append(" Run data= "); }
+                            if (cbDebug) { msgLine.append(" RunTask_data_of_Item= "); }
                             Run r = (Run) task;
                             msgLine.append(item.getFullDisplayName());
                             msgLine.append("#");
