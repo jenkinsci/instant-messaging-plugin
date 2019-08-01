@@ -22,7 +22,7 @@ import static hudson.plugins.im.tools.BuildHelper.*;
 public abstract class BuildToChatNotifier implements Describable<BuildToChatNotifier> {
     /**
      * Calculates the message to send out to a chat when the specified build is started.
-     * 
+     *
      * @param publisher
      *      The publisher that's driving this. Never null.
      * @param build
@@ -44,7 +44,7 @@ public abstract class BuildToChatNotifier implements Describable<BuildToChatNoti
      */
     public abstract String buildCompletionMessage(IMPublisher publisher, Run<?, ?> run, TaskListener listener)
             throws IOException,  InterruptedException;
-    
+
     /**
      * Calculates the message to send out to a committer of a broken build.
      *  @param publisher
@@ -56,14 +56,14 @@ public abstract class BuildToChatNotifier implements Describable<BuildToChatNoti
      * @param firstFailure
      */
     public String suspectMessage(IMPublisher publisher, Run<?, ?> run, TaskListener listener, boolean firstFailure) {
-    	if (firstFailure) {
-    		return "Oh no! You're suspected of having broken " + getProjectName(run) + ": " + MessageHelper.getBuildURL(run);
-    	} else {
-    		return "Build " + getProjectName(run) +
-    	    	" is " + getResultTrend(run).getID() + ": " + MessageHelper.getBuildURL(run);
-    	}
+        if (firstFailure) {
+            return "Oh no! You're suspected of having broken " + getProjectName(run) + ": " + MessageHelper.getBuildURL(run);
+        } else {
+            return "Build " + getProjectName(run) +
+                " is " + getResultTrend(run).getID() + ": " + MessageHelper.getBuildURL(run);
+        }
     }
-    
+
     /**
      * Calculates the message to send out to a 'culprit' of a broken build.
      * I.e. a committer to a previous build which was broken and all builds since then
@@ -75,12 +75,12 @@ public abstract class BuildToChatNotifier implements Describable<BuildToChatNoti
      * @param listener
      */
     public String culpritMessage(IMPublisher publisher, Run<?, ?> run, TaskListener listener) {
-    	return "You're still being suspected of having broken " + getProjectName(run) + ": " + MessageHelper.getBuildURL(run);
+        return "You're still being suspected of having broken " + getProjectName(run) + ": " + MessageHelper.getBuildURL(run);
     }
-    
+
     /**
      * Calculates the message to send out to a committer of a fixed build.
-     * 
+     *
      * @param publisher
      *      The publisher that's driving this. Never null.
      * @param run
@@ -89,9 +89,9 @@ public abstract class BuildToChatNotifier implements Describable<BuildToChatNoti
      *      Any errors can be reported here.
      */
     public String fixerMessage(IMPublisher publisher, Run<?, ?> run, TaskListener listener) {
-    	return "Yippee! Seems you've fixed " + getProjectName(run) + ": " + MessageHelper.getBuildURL(run);
+        return "Yippee! Seems you've fixed " + getProjectName(run) + ": " + MessageHelper.getBuildURL(run);
     }
-    
+
     /**
      * Calculates the message to send out to a committer of an upstream build
      * if this build is broken.
@@ -105,10 +105,10 @@ public abstract class BuildToChatNotifier implements Describable<BuildToChatNoti
      */
     public String upstreamCommitterMessage(IMPublisher publisher, Run<?, ?> run, TaskListener listener,
             Run<?, ?> upstreamBuild) {
-    	return "Attention! Your change in " + getProjectName(upstreamBuild)
-        	+ ": " + MessageHelper.getBuildURL(upstreamBuild)
-        	+ " *might* have broken the downstream job " + getProjectName(run) + ": " + MessageHelper.getBuildURL(run)
-        	+ "\nPlease have a look!";
+        return "Attention! Your change in " + getProjectName(upstreamBuild)
+            + ": " + MessageHelper.getBuildURL(upstreamBuild)
+            + " *might* have broken the downstream job " + getProjectName(run) + ": " + MessageHelper.getBuildURL(run)
+            + "\nPlease have a look!";
     }
 
 
