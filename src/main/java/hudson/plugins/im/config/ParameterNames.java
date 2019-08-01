@@ -17,6 +17,10 @@ public abstract class ParameterNames {
         return getPrefix() + "notifyStart";
     }
 
+    public String getExtraMessage() {
+        return getPrefix() + "extraMessage";
+    }
+
     public String getNotifySuspects() {
         return getPrefix() + "notifySuspects";
     }

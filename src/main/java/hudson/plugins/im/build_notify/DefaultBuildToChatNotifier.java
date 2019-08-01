@@ -5,12 +5,17 @@ import hudson.model.AbstractBuild;
 import hudson.model.BuildListener;
 import hudson.model.Result;
 import hudson.model.ResultTrend;
+import hudson.model.Run;
+import hudson.model.TaskListener;
 import hudson.plugins.im.IMPublisher;
+import hudson.plugins.im.tools.BuildHelper;
+import hudson.scm.ChangeLogSet;
 import hudson.scm.ChangeLogSet.Entry;
 import org.kohsuke.stapler.DataBoundConstructor;
 
 import java.io.IOException;
-
+import java.util.List;
+import static hudson.plugins.im.tools.BuildHelper.*;
 /**
  * {@link BuildToChatNotifier} that maintains the traditional behaviour of {@link IMPublisher}.
  *
@@ -28,7 +33,7 @@ public class DefaultBuildToChatNotifier extends SummaryOnlyBuildToChatNotifier {
         AbstractBuild<?, ?> previousBuild = build.getPreviousBuild();
         if (previousBuild != null && !previousBuild.isBuilding()) {
             sb.append(" (previous build: ")
-                .append(ResultTrend.getResultTrend(previousBuild).getID());
+                .append(getResultTrend(previousBuild).getID());
 
 
             if (previousBuild.getResult().isWorseThan(Result.SUCCESS)) {
@@ -46,17 +51,21 @@ public class DefaultBuildToChatNotifier extends SummaryOnlyBuildToChatNotifier {
     }
 
     @Override
-    public String buildCompletionMessage(IMPublisher publisher, AbstractBuild<?, ?> build, BuildListener listener) throws IOException, InterruptedException {
-        StringBuilder sb = new StringBuilder(super.buildCompletionMessage(publisher,build,listener));
+    public String buildCompletionMessage(IMPublisher publisher, Run<?, ?> run, TaskListener listener) throws IOException, InterruptedException {
+        StringBuilder sb = new StringBuilder(super.buildCompletionMessage(publisher, run,listener));
 
-        if (!build.getChangeSet().isEmptySet()) {
-            boolean hasManyChangeSets = build.getChangeSet().getItems().length > 1;
-            for (Entry entry : build.getChangeSet()) {
-                sb.append("\n");
-                if (hasManyChangeSets) {
-                    sb.append("* ");
+        List<ChangeLogSet<ChangeLogSet.Entry>> changelogSets = BuildHelper.getChangelogSets(run, listener);
+
+        for (ChangeLogSet<ChangeLogSet.Entry> set : changelogSets) {
+            if (!set.isEmptySet()) {
+                boolean hasManyChangeSets = set.getItems().length > 1;
+                for (Entry entry : set) {
+                    sb.append("\n");
+                    if (hasManyChangeSets) {
+                        sb.append("* ");
+                    }
+                    sb.append(entry.getAuthor()).append(": ").append(entry.getMsg());
                 }
-                sb.append(entry.getAuthor()).append(": ").append(entry.getMsg());
             }
         }
 

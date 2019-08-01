@@ -7,6 +7,7 @@ import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 import hudson.model.FreeStyleBuild;
 import hudson.model.Result;
+import hudson.model.ResultTrend;
 import hudson.plugins.im.tools.BuildHelper.ExtResult;
 
 import org.junit.Test;
@@ -24,40 +25,40 @@ public class BuildHelperTest {
 
             // non non-successful build can ever be a fix:
             when(build.getResult()).thenReturn(Result.ABORTED);
-            assertFalse(BuildHelper.isFix(build));
+            assertFalse(ResultTrend.FIXED == ResultTrend.getResultTrend(build));
 
             when(build.getResult()).thenReturn(Result.NOT_BUILT);
-            assertFalse(BuildHelper.isFix(build));
+            assertFalse(ResultTrend.FIXED == ResultTrend.getResultTrend(build));
 
             when(build.getResult()).thenReturn(Result.UNSTABLE);
-            assertFalse(BuildHelper.isFix(build));
+            assertFalse(ResultTrend.FIXED == ResultTrend.getResultTrend(build));
 
             when(build.getResult()).thenReturn(Result.FAILURE);
-            assertFalse(BuildHelper.isFix(build));
+            assertFalse(ResultTrend.FIXED == ResultTrend.getResultTrend(build));
 
             // only a success can be a fix
             when(build.getResult()).thenReturn(Result.SUCCESS);
-            assertTrue(BuildHelper.isFix(build));
+            assertTrue(ResultTrend.FIXED == ResultTrend.getResultTrend(build));
         }
 
         {
             // a success without a previous failure cannot be a fix:
             FreeStyleBuild build = mock(FreeStyleBuild.class);
             when(build.getResult()).thenReturn(Result.SUCCESS);
-            assertFalse(BuildHelper.isFix(build));
+            assertFalse(ResultTrend.FIXED == ResultTrend.getResultTrend(build));
         }
 
         {
             // ABORTED doesn't count as failure
             FreeStyleBuild build = mock(FreeStyleBuild.class);
             when(build.getResult()).thenReturn(Result.ABORTED);
-            assertFalse(BuildHelper.isFix(build));
+            assertFalse(ResultTrend.FIXED == ResultTrend.getResultTrend(build));
 
             FreeStyleBuild nextBuild = mock(FreeStyleBuild.class);
             when(nextBuild.getResult()).thenReturn(Result.SUCCESS);
             when(nextBuild.getPreviousBuild()).thenReturn(build);
 
-            assertFalse(BuildHelper.isFix(nextBuild));
+            assertFalse(ResultTrend.FIXED == ResultTrend.getResultTrend(nextBuild));
 
             // but if there was a unstable/failing build somewhere before,
             // it is a fix again
@@ -71,7 +72,7 @@ public class BuildHelperTest {
 
             when(anotherAborted.getPreviousBuild()).thenReturn(anUnstableBuild);
 
-            assertTrue(BuildHelper.isFix(nextBuild));
+            assertTrue(ResultTrend.FIXED == ResultTrend.getResultTrend(nextBuild));
         }
     }
 

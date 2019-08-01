@@ -148,7 +148,7 @@ public class IMPublisherTest {
      */
     @Test
     public void testIncludeUpstreamCulprits() throws MessagingException, InterruptedException {
-        Set<User> recipients = this.imPublisher.getNearestUpstreamCommitters(this.build).keySet();
+        Set<User> recipients = this.imPublisher.getNearestUpstreamCommitters(this.build, listener).keySet();
 
         assertEquals(recipients.toString(), 2, recipients.size());
 

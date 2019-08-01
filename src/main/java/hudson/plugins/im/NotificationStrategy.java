@@ -1,10 +1,11 @@
 package hudson.plugins.im;
 
-import hudson.model.AbstractBuild;
 import hudson.model.Result;
 import hudson.model.ResultTrend;
+import hudson.model.Run;
 import hudson.plugins.im.tools.BuildHelper;
 
+import static hudson.plugins.im.tools.BuildHelper.*;
 /**
  * Represents the notification strategy.
  *
@@ -22,7 +23,7 @@ public enum NotificationStrategy {
          * {@inheritDoc}
          */
         @Override
-        public boolean notificationWanted(final AbstractBuild<?, ?> build) {
+        public boolean notificationWanted(final Run<?, ?> run) {
             return true;
         }
     },
@@ -35,8 +36,8 @@ public enum NotificationStrategy {
          * {@inheritDoc}
          */
         @Override
-        public boolean notificationWanted(final AbstractBuild<?, ?> build) {
-            return build.getResult() != Result.SUCCESS;
+        public boolean notificationWanted(final Run<?, ?> run) {
+            return !isSuccessOrInProgress(run);
 
         }
     },
@@ -49,11 +50,11 @@ public enum NotificationStrategy {
          * {@inheritDoc}
          */
         @Override
-        public boolean notificationWanted(final AbstractBuild<?, ?> build) {
-            if (build.getResult() != Result.SUCCESS) {
+        public boolean notificationWanted(final Run<?, ?> run) {
+            if (!isSuccessOrInProgress(run)) {
                 return true;
             }
-            return BuildHelper.isFix(build);
+            return isFix(run);
         }
     },
 
@@ -66,8 +67,8 @@ public enum NotificationStrategy {
          * {@inheritDoc}
          */
         @Override
-        public boolean notificationWanted(final AbstractBuild<?, ?> build) {
-            ResultTrend trend = ResultTrend.getResultTrend(build);
+        public boolean notificationWanted(final Run<?, ?> run) {
+            ResultTrend trend = getResultTrend(run);
             return trend == ResultTrend.FAILURE || trend == ResultTrend.FIXED;
         }
     },
@@ -82,10 +83,10 @@ public enum NotificationStrategy {
          * {@inheritDoc}
          */
         @Override
-        public boolean notificationWanted(final AbstractBuild<?, ?> build) {
-            final AbstractBuild<?, ?> previousBuild = build.getPreviousBuild();
+        public boolean notificationWanted(final Run<?, ?> run) {
+            final Run<?, ?> previousBuild = run.getPreviousBuild();
             return (previousBuild == null)
-                    || (build.getResult() != previousBuild.getResult());
+                    || (run.getResult() != previousBuild.getResult());
         }
     };
 
@@ -109,13 +110,13 @@ public enum NotificationStrategy {
      * Signals if the given build qualifies to send a notification according to
      * the current strategy.
      *
-     * @param build
+     * @param run
      *            The build for which it should be decided, if notification is
      *            wanted or not.
      * @return true if, according to the given strategy, a notification should
      *         be sent.
      */
-    public abstract boolean notificationWanted(AbstractBuild<?, ?> build);
+    public abstract boolean notificationWanted(Run<?, ?> run);
 
     /**
      * Returns the name of the strategy to display in dialogs etc.

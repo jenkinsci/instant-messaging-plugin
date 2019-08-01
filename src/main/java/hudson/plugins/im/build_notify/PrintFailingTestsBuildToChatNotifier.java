@@ -5,11 +5,11 @@ import java.util.Collections;
 import java.util.Comparator;
 import java.util.List;
 
+import hudson.model.Run;
+import hudson.model.TaskListener;
 import org.kohsuke.stapler.DataBoundConstructor;
 
 import hudson.Extension;
-import hudson.model.AbstractBuild;
-import hudson.model.BuildListener;
 import hudson.plugins.im.IMPublisher;
 import hudson.plugins.im.tools.MessageHelper;
 import hudson.tasks.junit.CaseResult;
@@ -31,40 +31,37 @@ public class PrintFailingTestsBuildToChatNotifier extends
 
     @Override
     public String buildCompletionMessage(IMPublisher publisher,
-            AbstractBuild<?, ?> build, BuildListener listener)
+            Run<?, ?> run, TaskListener listener)
             throws IOException, InterruptedException {
-        String msg = super.buildCompletionMessage(publisher, build, listener);
-        return msg + getFailedTestsReport(build);
+        String msg = super.buildCompletionMessage(publisher, run, listener);
+        return msg + getFailedTestsReport(run);
     }
-
-
 
     @Override
     public String culpritMessage(IMPublisher publisher,
-            AbstractBuild<?, ?> build, BuildListener listener) {
-        String msg = super.culpritMessage(publisher, build, listener);
-        return msg + getFailedTestsReport(build);
+            Run<?, ?> run, TaskListener listener) {
+        String msg = super.culpritMessage(publisher, run, listener);
+        return msg + getFailedTestsReport(run);
     }
 
     @Override
     public String suspectMessage(IMPublisher publisher,
-            AbstractBuild<?, ?> build, BuildListener listener,
+            Run<?, ?> run, TaskListener listener,
             boolean firstFailure) {
-        String msg = super.suspectMessage(publisher, build, listener, firstFailure);
-        return msg + getFailedTestsReport(build);
+        String msg = super.suspectMessage(publisher, run, listener, firstFailure);
+        return msg + getFailedTestsReport(run);
     }
 
     @Override
     public String upstreamCommitterMessage(IMPublisher publisher,
-            AbstractBuild<?, ?> build, BuildListener listener,
-            AbstractBuild<?, ?> upstreamBuild) {
+            Run<?, ?> build, TaskListener listener,
+            Run<?, ?> upstreamBuild) {
         String msg = super
                 .upstreamCommitterMessage(publisher, build, listener, upstreamBuild);
         return msg + getFailedTestsReport(build);
     }
 
-    private CharSequence getFailedTestsReport(AbstractBuild<?, ?> build) {
-
+    private CharSequence getFailedTestsReport(Run<?, ?> build) {
         AbstractTestResultAction testResultAction = build.getAction(AbstractTestResultAction.class);
         if (testResultAction == null || testResultAction.getFailCount() == 0) {
             return "";

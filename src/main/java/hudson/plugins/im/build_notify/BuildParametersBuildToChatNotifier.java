@@ -3,11 +3,11 @@ package hudson.plugins.im.build_notify;
 import java.io.IOException;
 import java.util.List;
 
+import hudson.model.Run;
+import hudson.model.TaskListener;
 import org.kohsuke.stapler.DataBoundConstructor;
 
 import hudson.Extension;
-import hudson.model.AbstractBuild;
-import hudson.model.BuildListener;
 import hudson.model.ParameterValue;
 import hudson.model.ParametersAction;
 import hudson.plugins.im.IMPublisher;
@@ -26,36 +26,36 @@ public class BuildParametersBuildToChatNotifier extends SummaryOnlyBuildToChatNo
 
     @Override
     public String buildCompletionMessage(IMPublisher publisher,
-            AbstractBuild<?, ?> build, BuildListener listener)
+            Run<?, ?> run, TaskListener listener)
             throws IOException, InterruptedException {
-        String msg = super.buildCompletionMessage(publisher, build, listener);
-        return msg + getBuildParameters(build);
+        String msg = super.buildCompletionMessage(publisher, run, listener);
+        return msg + getBuildParameters(run);
     }
 
     @Override
     public String culpritMessage(IMPublisher publisher,
-            AbstractBuild<?, ?> build, BuildListener listener) {
-        String msg = super.culpritMessage(publisher, build, listener);
-        return msg + getBuildParameters(build);
+            Run<?, ?> run, TaskListener listener) {
+        String msg = super.culpritMessage(publisher, run, listener);
+        return msg + getBuildParameters(run);
     }
 
     @Override
     public String suspectMessage(IMPublisher publisher,
-            AbstractBuild<?, ?> build, BuildListener listener,
+            Run<?, ?> run, TaskListener listener,
             boolean firstFailure) {
-        String msg = super.suspectMessage(publisher, build, listener, firstFailure);
-        return msg + getBuildParameters(build);
+        String msg = super.suspectMessage(publisher, run, listener, firstFailure);
+        return msg + getBuildParameters(run);
     }
 
     @Override
     public String upstreamCommitterMessage(IMPublisher publisher,
-            AbstractBuild<?, ?> build, BuildListener listener,
-            AbstractBuild<?, ?> upstreamBuild) {
+            Run<?, ?> build, TaskListener listener,
+            Run<?, ?> upstreamBuild) {
         String msg = super.upstreamCommitterMessage(publisher, build, listener, upstreamBuild);
         return msg + getBuildParameters(build);
     }
 
-    private CharSequence getBuildParameters(AbstractBuild<?, ?> build) {
+    private CharSequence getBuildParameters(Run<?, ?> build) {
 
         ParametersAction parametersAction = build.getAction(ParametersAction.class);
 
