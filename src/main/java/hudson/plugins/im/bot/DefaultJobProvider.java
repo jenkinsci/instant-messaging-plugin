@@ -18,7 +18,7 @@ public class DefaultJobProvider implements JobProvider {
     public AbstractProject<?, ?> getJobByName(String name) {
         return Jenkins.getInstance().getItemByFullName(name, AbstractProject.class);
     }
-    
+
 
     @SuppressWarnings("rawtypes")
     @Override
@@ -45,7 +45,7 @@ public class DefaultJobProvider implements JobProvider {
         List items = Jenkins.getInstance().getAllItems(AbstractProject.class);
         return items;
     }
-    
+
     @Override
     @SuppressWarnings("unchecked")
     public List<AbstractProject<?,?>> getTopLevelJobs() {

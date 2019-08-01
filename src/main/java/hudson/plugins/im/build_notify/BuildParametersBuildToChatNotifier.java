@@ -15,7 +15,7 @@ import hudson.plugins.im.IMPublisher;
 /**
  * Extends {@link DefaultBuildToChatNotifier} and also prints
  * build parameters used in the build, if any.
- * 
+ *
  * @author petehayes
  */
 public class BuildParametersBuildToChatNotifier extends SummaryOnlyBuildToChatNotifier {

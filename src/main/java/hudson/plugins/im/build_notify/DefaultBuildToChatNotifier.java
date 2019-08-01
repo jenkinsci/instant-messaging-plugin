@@ -35,7 +35,7 @@ public class DefaultBuildToChatNotifier extends SummaryOnlyBuildToChatNotifier {
             sb.append(" (previous build: ")
                 .append(getResultTrend(previousBuild).getID());
 
-            
+
             if (previousBuild.getResult().isWorseThan(Result.SUCCESS)) {
                 AbstractBuild<?, ?> lastSuccessfulBuild = build.getPreviousSuccessfulBuild();
                 if (lastSuccessfulBuild != null) {
@@ -46,7 +46,7 @@ public class DefaultBuildToChatNotifier extends SummaryOnlyBuildToChatNotifier {
             }
             sb.append(")");
         }
-        
+
         return sb.toString();
     }
 
@@ -76,7 +76,7 @@ public class DefaultBuildToChatNotifier extends SummaryOnlyBuildToChatNotifier {
     @Extension(ordinal=100)
     public static class DescriptorImpl extends BuildToChatNotifierDescriptor {
         @Override
-		public String getDisplayName() {
+        public String getDisplayName() {
             return "Summary + SCM changes";
         }
     }

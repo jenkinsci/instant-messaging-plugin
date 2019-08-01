@@ -21,8 +21,8 @@ import java.util.Collection;
  */
 @Extension
 public class QueueCommand extends BotCommand {
-	
-	private static final String HELP = " - show the state of the build queue";
+
+    private static final String HELP = " - show the state of the build queue";
 
     @Override
     public Collection<String> getCommandNames() {
@@ -31,27 +31,27 @@ public class QueueCommand extends BotCommand {
 
     public void executeCommand(Bot bot, IMChat chat, IMMessage message,
                                Sender sender, String[] args) throws IMException {
-		Queue queue = Hudson.getInstance().getQueue();
-		Item[] items = queue.getItems();
-		String reply;
-		if (items.length > 0) {
-			StringBuffer msg = new StringBuffer();
-			msg.append("Build queue:");
-			for (Item item : queue.getItems()) {
-				msg.append("\n- ")
-				.append(item.task.getFullDisplayName())
-				.append(": ").append(item.getWhy());
-			}
-			reply = msg.toString();
-		} else {
-			reply = "build queue is empty";
-		}
-		
-		chat.sendMessage(reply);
-	}
+        Queue queue = Hudson.getInstance().getQueue();
+        Item[] items = queue.getItems();
+        String reply;
+        if (items.length > 0) {
+            StringBuffer msg = new StringBuffer();
+            msg.append("Build queue:");
+            for (Item item : queue.getItems()) {
+                msg.append("\n- ")
+                .append(item.task.getFullDisplayName())
+                .append(": ").append(item.getWhy());
+            }
+            reply = msg.toString();
+        } else {
+            reply = "build queue is empty";
+        }
 
-	public String getHelp() {
-		return HELP;
-	}
+        chat.sendMessage(reply);
+    }
+
+    public String getHelp() {
+        return HELP;
+    }
 
 }
