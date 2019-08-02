@@ -13,7 +13,7 @@ import org.junit.Test;
 
 /**
  * Test for the botsnack command.
- * 
+ *
  * @author kutzi
  */
 public class SnackCommandTest {
@@ -32,7 +32,7 @@ public class SnackCommandTest {
         assertNotNull(reply);
         assertTrue(reply.contains(sender.getNickname()));
         assertTrue(reply.contains("peanuts"));
-        
+
         args = new String[] { "!botsnack" };
         reply = cmd.getReply(null, sender, args);
         System.out.println(reply);

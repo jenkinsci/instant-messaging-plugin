@@ -4,6 +4,8 @@ import hudson.Extension;
 import hudson.model.AbstractBuild;
 import hudson.model.BuildListener;
 import hudson.model.ResultTrend;
+import hudson.model.Run;
+import hudson.model.TaskListener;
 import hudson.plugins.im.IMPublisher;
 import hudson.plugins.im.tools.BuildHelper;
 import hudson.plugins.im.tools.MessageHelper;
@@ -25,22 +27,38 @@ public class SummaryOnlyBuildToChatNotifier extends BuildToChatNotifier {
 
     @Override
     public String buildStartMessage(IMPublisher publisher, AbstractBuild<?, ?> build, BuildListener listener) throws IOException, InterruptedException {
-        return Messages.SummaryOnlyBuildToChatNotifier_StartMessage(build.getDisplayName(),getProjectName(build));
+        String extraMessage = publisher.getExtraMessage();
+        if (extraMessage != null && !extraMessage.equals("")) {
+            return Messages.SummaryOnlyBuildToChatNotifier_StartMessageExtra(build.getDisplayName(),getProjectName(build), extraMessage);
+        } else {
+            return Messages.SummaryOnlyBuildToChatNotifier_StartMessage(build.getDisplayName(),getProjectName(build));
+        }
     }
 
     @Override
-    public String buildCompletionMessage(IMPublisher publisher, AbstractBuild<?, ?> build, BuildListener listener) throws IOException, InterruptedException {
+    public String buildCompletionMessage(IMPublisher publisher, Run<?, ?> run, TaskListener listener) throws IOException, InterruptedException {
         final StringBuilder sb;
-        if (BuildHelper.isFix(build)) {
+        if (isFix(run)) {
             sb = new StringBuilder(Messages.SummaryOnlyBuildToChatNotifier_BuildIsFixed());
         } else {
             sb = new StringBuilder();
         }
-        sb.append(Messages.SummaryOnlyBuildToChatNotifier_Summary(
-                getProjectName(build), build.getDisplayName(),
-                ResultTrend.getResultTrend(build).getID(),
-                build.getTimestampString(),
-                MessageHelper.getBuildURL(build)));
+        ResultTrend result = getResultTrend(run);
+        String extraMessage = publisher.getExtraMessage();
+        if (extraMessage != null && !extraMessage.equals("")) {
+            sb.append(Messages.SummaryOnlyBuildToChatNotifier_SummaryExtra(
+                getProjectName(run), run.getDisplayName(),
+                result.getID(),
+                run.getTimestampString(),
+                MessageHelper.getBuildURL(run),
+                extraMessage));
+        } else {
+            sb.append(Messages.SummaryOnlyBuildToChatNotifier_Summary(
+                getProjectName(run), run.getDisplayName(),
+                result.getID(),
+                run.getTimestampString(),
+                MessageHelper.getBuildURL(run)));
+        }
 
         return sb.toString();
     }

@@ -37,7 +37,7 @@ public class NotificationStrategyTest {
     testRepeatSuccess(strategy, false);
 
     // ANY_FAILURE notifies on any unsuccessful build, including aborted and not built.
-    // UNSUCCESSFUL would be a better name. 
+    // UNSUCCESSFUL would be a better name.
     testNewAborted(strategy, true);
     testRepeatAborted(strategy, true);
     testNewNotBuilt(strategy, true);
@@ -53,7 +53,7 @@ public class NotificationStrategyTest {
     testRepeatSuccess(strategy, false);
 
     // FAILURE_AND_FIXED notifies on any unsuccessful build, including aborted and not built.
-    // UNSUCCESSFUL_AND_FIXED would be a better name. 
+    // UNSUCCESSFUL_AND_FIXED would be a better name.
     testNewAborted(strategy, true);
     testRepeatAborted(strategy, true);
     testNewNotBuilt(strategy, true);

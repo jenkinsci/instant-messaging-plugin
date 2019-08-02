@@ -20,31 +20,31 @@ public class CommentCommandTest {
         AbstractProject project = mock(AbstractProject.class);
         AbstractBuild<?, ?> build = mock(AbstractBuild.class);
         when(project.getBuildByNumber(4711)).thenReturn(build);
-        
+
         CommentCommand command = new CommentCommand();
         String result = command.getMessageForJob(project, new Sender("kutzi"),
                 new String[] { "4711", "my comment"}).toString();
         assertEquals("Ok", result);
-        
+
         verify(build).setDescription("my comment");
     }
-    
+
     @Test(expected = CommandException.class)
     public void testMalformedBuildNumber() throws CommandException {
         AbstractProject<?, ?> project = mock(AbstractProject.class);
-        
+
         CommentCommand command = new CommentCommand();
         command.getMessageForJob(project, new Sender("kutzi"),
                 new String[] { "abc", "my comment"}).toString();
     }
-    
+
     @Test(expected = CommandException.class)
     public void testUnknownBuildNumber() throws CommandException {
         @SuppressWarnings("rawtypes")
         AbstractProject project = mock(AbstractProject.class);
         AbstractBuild<?, ?> build = mock(AbstractBuild.class);
         when(project.getBuildByNumber(4711)).thenReturn(build);
-        
+
         CommentCommand command = new CommentCommand();
         command.getMessageForJob(project, new Sender("kutzi"),
                 new String[] { "4712", "my comment"}).toString();

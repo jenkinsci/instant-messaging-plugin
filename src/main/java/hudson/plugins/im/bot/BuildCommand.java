@@ -37,7 +37,7 @@ import org.apache.commons.lang.ArrayUtils;
  * @author kutzi
  */
 @Extension
-    public class BuildCommand extends AbstractTextSendingCommand {
+public class BuildCommand extends AbstractTextSendingCommand {
 
     private static final Pattern NUMERIC_EXTRACTION_REGEX = Pattern.compile("^(\\d+)");
     private static final String SYNTAX = " <job> [now|<delay>[s|m|h]] [<parameterkey>=<value>]*";
