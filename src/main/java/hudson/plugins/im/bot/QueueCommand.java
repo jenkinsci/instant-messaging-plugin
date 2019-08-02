@@ -22,38 +22,38 @@ import java.util.Collection;
 @Extension
 public class QueueCommand extends BotCommand {
 
-	private static final String HELP = " - show the state of the build queue";
+    private static final String HELP = " - show the state of the build queue";
 
-	@Override
-	public Collection<String> getCommandNames() {
-		return Arrays.asList("queue","q");
-	}
+    @Override
+    public Collection<String> getCommandNames() {
+        return Arrays.asList("queue","q");
+    }
 
-	public void executeCommand(Bot bot, IMChat chat, IMMessage message,
-	                           Sender sender, String[] args) throws IMException {
-		Queue queue = Hudson.getInstance().getQueue();
-		Item[] items = queue.getItems();
-		String reply;
-		if (items.length > 0) {
-			StringBuffer msg = new StringBuffer();
-			int count = 0;
-			for (Item item : queue.getItems()) {
-				msg.append("\n- ")
-				.append(item.task.getFullDisplayName())
-				.append(": ").append(item.getWhy());
-				count++;
-			}
-			msg.insert(0, "Build queue (" + count + " items):");
-			reply = msg.toString();
-		} else {
-			reply = "build queue is empty";
-		}
+    public void executeCommand(Bot bot, IMChat chat, IMMessage message,
+                               Sender sender, String[] args) throws IMException {
+        Queue queue = Hudson.getInstance().getQueue();
+        Item[] items = queue.getItems();
+        String reply;
+        if (items.length > 0) {
+            StringBuffer msg = new StringBuffer();
+            int count = 0;
+            for (Item item : queue.getItems()) {
+                msg.append("\n- ")
+                .append(item.task.getFullDisplayName())
+                .append(": ").append(item.getWhy());
+                count++;
+            }
+            msg.insert(0, "Build queue (" + count + " items):");
+            reply = msg.toString();
+        } else {
+            reply = "build queue is empty";
+        }
 
-		chat.sendMessage(reply);
-	}
+        chat.sendMessage(reply);
+    }
 
-	public String getHelp() {
-		return HELP;
-	}
+    public String getHelp() {
+        return HELP;
+    }
 
 }
