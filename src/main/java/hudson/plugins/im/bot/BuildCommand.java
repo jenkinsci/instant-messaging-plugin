@@ -70,8 +70,8 @@ public class BuildCommand extends AbstractTextSendingCommand {
             String jobName = args[1];
             jobName = jobName.replaceAll("\"", "");
             AbstractProject<?, ?> project = getJobProvider().getJobByNameOrDisplayName(jobName);
-            if (project != null) {
 
+            if (project != null) {
                 String checkPermission = checkPermission(sender, project);
                 if (checkPermission != null) {
                     return checkPermission;
@@ -81,15 +81,12 @@ public class BuildCommand extends AbstractTextSendingCommand {
                 if (!project.isBuildable()) {
                     return sender.getNickname() + ": job " + jobName + " is disabled";
                 } else {
-
                     int delay = project.getQuietPeriod();
 
                     List<ParameterValue> parameters = new ArrayList<ParameterValue>();
                     if (args.length >= 3) {
-
                         int parametersStartIndex = 2;
                         if (!args[2].contains("=")) { // otherwise looks like a parameter
-
                             parametersStartIndex = 3;
 
                             String delayStr = args[2].trim();
@@ -126,24 +123,29 @@ public class BuildCommand extends AbstractTextSendingCommand {
 
                     if (scheduleBuild(bot, project, delay, sender, parameters)) {
                         if (delay == 0) {
-                            return reply.append(sender.getNickname() + ": job " + jobName + " build scheduled now").toString();
+                            return reply.append(sender.getNickname() + ": job " +
+                                    jobName + " build scheduled now").toString();
                         } else {
-                            return reply.append(sender.getNickname() + ": job " + jobName + " build scheduled with a quiet period of " +
+                            return reply.append(sender.getNickname() + ": job " +
+                                    jobName + " build scheduled with a quiet period of " +
                                     delay + " seconds").toString();
                         }
                     } else {
                         // probably already queued
                         Queue.Item queueItem = project.getQueueItem();
                         if (queueItem != null) {
-                            return sender.getNickname() + ": job " + jobName + " is already in the build queue (" + queueItem.getWhy() + ")";
+                            return sender.getNickname() + ": job " + jobName +
+                                    " is already in the build queue (" + queueItem.getWhy() + ")";
                         } else {
                             // could be race condition (build left build-queue while we were checking) or other reason
-                            return sender.getNickname() + ": job " + jobName + " scheduling failed or already in build queue";
+                            return sender.getNickname() + ": job " + jobName +
+                                    " scheduling failed or already in build queue";
                         }
                     }
                 }
             } else {
-                return giveSyntax(sender.getNickname(), args[0]);
+                return giveSyntax(sender.getNickname(), args[0]) +
+                        " (or, did you type the project name correctly?)";
             }
         } else {
             return sender.getNickname() + ": Error, syntax is: '" + args[0] +  SYNTAX + "'";
@@ -179,8 +181,9 @@ public class BuildCommand extends AbstractTextSendingCommand {
                     SimpleParameterDefinition spd = (SimpleParameterDefinition) pd;
                     parameters.add(spd.createValue(parsedParameters.get(pd.getName())));
                 } else {
-                    commandReply.append("Unsupported parameter type " + pd.getClass().getSimpleName()
-                            + " for parameter " + pd.getName() + "!\n");
+                    commandReply.append("Unsupported parameter type " +
+                            pd.getClass().getSimpleName() +
+                            " for parameter " + pd.getName() + "!\n");
                 }
             } else {
                 ParameterValue pv = pd.getDefaultParameterValue();
@@ -194,7 +197,9 @@ public class BuildCommand extends AbstractTextSendingCommand {
 
     private String checkPermission(Sender sender, AbstractProject<?, ?> project) {
         if (!project.hasPermission(Item.BUILD)) {
-            return sender.getNickname() + ": you're not allowed to build job " + project.getDisplayName() + "!";
+            return sender.getNickname() + " (" + sender.getId() + "): " +
+                    "you're not allowed to build job " +
+                    project.getDisplayName() + "!";
         }
         return null;
     }
@@ -206,6 +211,4 @@ public class BuildCommand extends AbstractTextSendingCommand {
     public String getHelp() {
         return HELP;
     }
-
-
 }
