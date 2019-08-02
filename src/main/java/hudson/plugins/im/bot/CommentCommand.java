@@ -27,14 +27,14 @@ public class CommentCommand extends AbstractSingleJobCommand {
     @Override
     protected CharSequence getMessageForJob(AbstractProject<?, ?> job, Sender sender,
             String[] args) throws CommandException {
-        
+
         try {
             int buildNumber = Integer.parseInt(args[0]);
             Run<?, ?> build = job.getBuildByNumber(buildNumber);
             if (build == null) {
                 throw new CommandException("sender: there is no build with number " + args[0] + "!");
             }
-            
+
             build.setDescription(MessageHelper.join(args, 1));
             return "Ok";
         } catch (NumberFormatException e) {
@@ -43,7 +43,7 @@ public class CommentCommand extends AbstractSingleJobCommand {
             throw new CommandException("Error setting comment: ", e);
         }
     }
-    
+
     @Override
     protected Permission getRequiredPermission() {
         return Item.CONFIGURE;

@@ -33,7 +33,7 @@ public final class Pair<H, T> {
         this.head = head;
         this.tail = tail;
     }
-    
+
     public static <H2, T2> Pair<H2, T2> create(H2 head, T2 tail) {
         return new Pair<H2, T2>(head, tail);
     }
