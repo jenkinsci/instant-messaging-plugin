@@ -174,7 +174,12 @@ public abstract class IMConnectionProvider implements IMConnectionListener {
                             this.semaphore.drainPermits();
 
                             // wait up to timeout time OR until semaphore is released again (happens e.g. if global config was changed)
-                            this.semaphore.tryAcquire(timeout * 60, TimeUnit.SECONDS);
+                            boolean acquired = this.semaphore.tryAcquire(timeout * 60, TimeUnit.SECONDS);
+                            if (acquired) {
+                                this.semaphore.release();
+                            } else {
+                                LOGGER.warning("Could not acquire semaphore for " + (timeout * 60) + "sec");
+                            }
                             // exponentially increase timeout, but longer than 16 minutes
                             if (timeout < 15) {
                                 timeout *= 2;
