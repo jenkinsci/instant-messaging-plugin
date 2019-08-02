@@ -39,12 +39,12 @@ public class TestResultCommand extends AbstractMultipleJobCommand {
             // no test results associated with this job
             return job.getFullDisplayName() + ": latest build contains no test results";
         }
-        StringBuilder listing = new StringBuilder(String.format("%s build #%s had %s of %s tests fail\n", job.getFullDisplayName(), build.getNumber(), tests.getFailCount(), tests.getTotalCount()));
+        StringBuilder listing = new StringBuilder(String.format("%s build #%s had %s of %s tests fail%n", job.getFullDisplayName(), build.getNumber(), tests.getFailCount(), tests.getTotalCount()));
 
         listing.append("\n");
         List<? extends TestResult> failedTests = tests.getFailedTests();
         for (TestResult result : failedTests) {
-            listing.append(String.format("%s failed in %ss\n", result.getFullName(), result.getDuration()));
+            listing.append(String.format("%s failed in %ss%n", result.getFullName(), result.getDuration()));
         }
         return listing;
     }
