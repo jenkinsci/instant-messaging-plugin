@@ -36,12 +36,14 @@ public class QueueCommand extends BotCommand {
         String reply;
         if (items.length > 0) {
             StringBuffer msg = new StringBuffer();
-            msg.append("Build queue:");
+            int count = 0;
             for (Item item : queue.getItems()) {
                 msg.append("\n- ")
                 .append(item.task.getFullDisplayName())
                 .append(": ").append(item.getWhy());
+                count++;
             }
+            msg.insert(0, "Build queue (" + count + " items):");
             reply = msg.toString();
         } else {
             reply = "build queue is empty";

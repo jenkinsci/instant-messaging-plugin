@@ -37,13 +37,12 @@ public class CurrentlyBuildingCommand extends BotCommand {
     public void executeCommand(Bot bot, IMChat chat, IMMessage message,
             Sender sender, String[] args) throws IMException {
         StringBuffer msg = new StringBuffer();
-        msg.append("Currently building:");
-        boolean currentlyJobsInProgess = false;
+        int countJobsInProgess = 0;
         for (Computer computer : Jenkins.getInstance().getComputers()) {
             for (Executor executor : computer.getExecutors()) {
                 Executable currentExecutable = executor.getCurrentExecutable();
                 if (currentExecutable != null) {
-                    currentlyJobsInProgess = true;
+                    countJobsInProgess++;
 
                     SubTask task = currentExecutable.getParent();
                     Item item = null;
@@ -66,9 +65,11 @@ public class CurrentlyBuildingCommand extends BotCommand {
             }
         }
 
-        if (!currentlyJobsInProgess) {
+        if (countJobsInProgess == 0) {
             msg.append("\n- No jobs are running.");
         }
+
+        msg.insert(0, "Currently building (" + countJobsInProgess + " items):");
 
         chat.sendMessage(msg.toString());
     }
