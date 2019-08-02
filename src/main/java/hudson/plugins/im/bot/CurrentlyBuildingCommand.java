@@ -25,6 +25,8 @@ import java.util.regex.Pattern;
 
 import jenkins.model.Jenkins;
 
+import org.jenkinsci.plugins.workflow.support.steps.ExecutorStepExecution.PlaceholderTask;
+
 /**
  * CurrentlyBuilding command for instant messaging plugin.
  *
@@ -130,6 +132,12 @@ public class CurrentlyBuildingCommand extends BotCommand {
                         item = (Item) task;
                     }
 
+                    PlaceholderTask placeholderTask = null;
+                    if (task instanceof PlaceholderTask) {
+                        // e.g. a part of pipeline
+                        placeholderTask = (PlaceholderTask) task;
+                    }
+
                     StringBuffer msgLine = new StringBuffer();
 
                     msgLine.append(computer.getDisplayName());
@@ -163,6 +171,10 @@ public class CurrentlyBuildingCommand extends BotCommand {
                         if (currentExecutableBuild != null) {
                             if (cbDebug) { msgLine.append(" URL:currExec= "); }
                             relativeUrl = currentExecutableBuild.getUrl();
+                        }
+                        if ((relativeUrl == null || relativeUrl.equals("")) && placeholderTask != null) {
+                            if (cbDebug) { msgLine.append(" URL:phTask= "); }
+                            relativeUrl = placeholderTask.getUrl();
                         }
                         if ((relativeUrl == null || relativeUrl.equals("")) && item != null) {
                             if (cbDebug) { msgLine.append(" URL:item= "); }
