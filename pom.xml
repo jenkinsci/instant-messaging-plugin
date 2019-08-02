@@ -3,7 +3,7 @@
     <parent>
         <groupId>org.jvnet.hudson.plugins</groupId>
         <artifactId>instant-messaging-parent</artifactId>
-        <version>1.27</version>
+        <version>1.29</version>
         <relativePath>../instant-messaging-parent-plugin/pom.xml</relativePath>
     </parent>
 
