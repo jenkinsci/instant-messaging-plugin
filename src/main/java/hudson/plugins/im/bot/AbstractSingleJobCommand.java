@@ -13,11 +13,11 @@ import hudson.security.Permission;
 abstract class AbstractSingleJobCommand extends AbstractTextSendingCommand {
 
     private final int numberOfArguments;
-    
+
     protected AbstractSingleJobCommand() {
         this(0);
     }
-    
+
     /**
      * @param numberOfArguments The number of arguments (in addition to the job name)
      * required by this command. Number of actual specified arguments may be equal or greater.
@@ -28,11 +28,11 @@ abstract class AbstractSingleJobCommand extends AbstractTextSendingCommand {
 
     /**
      * Returns the message to return for this job.
-     * 
+     *
      * Implementors should only return a String if the command
      * was executed successfully. Otherwise a {@link CommandException}
      * should be thrown!
-     * 
+     *
      * @param job The job
      * @param sender The sender of the command
      * @return the result message for this job if the command was executed successfully
@@ -40,7 +40,7 @@ abstract class AbstractSingleJobCommand extends AbstractTextSendingCommand {
      */
     protected abstract CharSequence getMessageForJob(AbstractProject<?, ?> job, Sender sender,
             String[] arguments) throws CommandException;
-    
+
     protected abstract Permission getRequiredPermission();
 
     @Override
@@ -60,7 +60,7 @@ abstract class AbstractSingleJobCommand extends AbstractTextSendingCommand {
                 if (!job.hasPermission(getRequiredPermission())) {
                     return "You don't have the permissions to perform this command on this job.";
                 }
-                
+
                 try {
                     return getMessageForJob(job, sender, remainingArgs).toString();
                 } catch (CommandException e) {

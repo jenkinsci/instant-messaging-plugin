@@ -33,14 +33,14 @@ public class TestResultCommand extends AbstractMultipleJobCommand {
         if (build == null) {
             // No builds
             return job.getFullDisplayName() + " has never been built";
-        }   
+        }
         AbstractTestResultAction<?> tests = build.getAction(AbstractTestResultAction.class);
         if (tests == null) {
             // no test results associated with this job
             return job.getFullDisplayName() + ": latest build contains no test results";
         }
         StringBuilder listing = new StringBuilder(String.format("%s build #%s had %s of %s tests fail\n", job.getFullDisplayName(), build.getNumber(), tests.getFailCount(), tests.getTotalCount()));
-        
+
         listing.append("\n");
         List<? extends TestResult> failedTests = tests.getFailedTests();
         for (TestResult result : failedTests) {

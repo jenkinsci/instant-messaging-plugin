@@ -16,38 +16,38 @@ import java.util.Collection;
  * @author kutzi
  */
 abstract class AbstractMultipleJobCommand extends AbstractTextSendingCommand {
-	
-	static final String UNKNOWN_JOB_STR = "unknown job";
-	static final String UNKNOWN_VIEW_STR = "unknown view";
 
-	/**
-	 * Returns the message to return for this job.
-	 * Note that {@link AbstractMultipleJobCommand} already inserts one newline after each job's
-	 * message so you don't have to do it yourself.
-	 * 
-	 * @param job The job
-	 * @return the result message for this job
-	 */
+    static final String UNKNOWN_JOB_STR = "unknown job";
+    static final String UNKNOWN_VIEW_STR = "unknown view";
+
+    /**
+     * Returns the message to return for this job.
+     * Note that {@link AbstractMultipleJobCommand} already inserts one newline after each job's
+     * message so you don't have to do it yourself.
+     *
+     * @param job The job
+     * @return the result message for this job
+     */
     protected abstract CharSequence getMessageForJob(AbstractProject<?, ?> job);
 
     /**
      * Returns a short name of the command needed for the help message
      * and as a leading descriptor in the result message.
-     * 
+     *
      * @return short command name
      */
     protected abstract String getCommandShortName();
-    
+
     enum Mode {
-    	SINGLE, VIEW, ALL;
+        SINGLE, VIEW, ALL;
     }
 
     @Override
-	protected String getReply(Bot bot, Sender sender, String[] args) {
-    	
-//    	if (!authorizationCheck()) {
-//    		return "Sorry, can't do that!";
-//    	}
+    protected String getReply(Bot bot, Sender sender, String[] args) {
+
+//        if (!authorizationCheck()) {
+//            return "Sorry, can't do that!";
+//        }
 
         Collection<AbstractProject<?, ?>> projects = new ArrayList<AbstractProject<?, ?>>();
 
@@ -60,17 +60,17 @@ abstract class AbstractMultipleJobCommand extends AbstractTextSendingCommand {
 
         if (!projects.isEmpty()) {
             StringBuilder msg = new StringBuilder();
-                
+
             switch(pair.getHead()) {
-            	case SINGLE : break;
-            	case ALL:
-            		msg.append(getCommandShortName())
-            			.append(" of all projects:\n");
-            		break;
-            	case VIEW:
-            		msg.append(getCommandShortName())
-        				.append(" of projects in view " + pair.getTail() + ":\n");
-            		break;
+                case SINGLE : break;
+                case ALL:
+                    msg.append(getCommandShortName())
+                        .append(" of all projects:\n");
+                    break;
+                case VIEW:
+                    msg.append(getCommandShortName())
+                        .append(" of projects in view " + pair.getTail() + ":\n");
+                    break;
             }
 
             boolean first = true;
@@ -87,11 +87,11 @@ abstract class AbstractMultipleJobCommand extends AbstractTextSendingCommand {
         } else {
             return sender + ": no job found";
         }
-	}
-    
+    }
+
     /**
      * Returns a list of projects for the given arguments.
-     * 
+     *
      * @param projects the list to which the projects are added
      * @return a pair of Mode (single job, jobs from view or all) and view name -
      * where view name will be null if mode != VIEW
@@ -126,7 +126,7 @@ abstract class AbstractMultipleJobCommand extends AbstractTextSendingCommand {
         return Pair.create(mode, view);
     }
 
-	public String getHelp() {
+    public String getHelp() {
         return " [<job>|-v <view>] - show the "
                 + getCommandShortName()
                 + " of a specific job, jobs in a view or all jobs";
