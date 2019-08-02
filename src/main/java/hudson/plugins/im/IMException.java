@@ -15,7 +15,7 @@ public class IMException extends IOException
         super(e.getMessage());
         initCause(e);
     }
-    
+
     public IMException(String msg) {
     	super(msg);
     }
