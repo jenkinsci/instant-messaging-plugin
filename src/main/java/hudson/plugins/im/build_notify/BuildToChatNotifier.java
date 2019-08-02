@@ -36,6 +36,7 @@ public abstract class BuildToChatNotifier implements Describable<BuildToChatNoti
 
     /**
      * Calculates the message to send out to a chat when the specified build is completed.
+     *
      * @param publisher
      *      The publisher that's driving this. Never null.
      * @param run
@@ -47,6 +48,7 @@ public abstract class BuildToChatNotifier implements Describable<BuildToChatNoti
 
     /**
      * Calculates the message to send out to a committer of a broken build.
+     *
      * @param publisher
      *      The publisher that's driving this. Never null.
      * @param run
@@ -68,7 +70,8 @@ public abstract class BuildToChatNotifier implements Describable<BuildToChatNoti
      * Calculates the message to send out to a 'culprit' of a broken build.
      * I.e. a committer to a previous build which was broken and all builds since then
      * have been broken.
-     *  @param publisher
+     *
+     * @param publisher
      *      The publisher that's driving this. Never null.
      * @param run
      *      The build that just completed. Never null.
@@ -95,6 +98,7 @@ public abstract class BuildToChatNotifier implements Describable<BuildToChatNoti
     /**
      * Calculates the message to send out to a committer of an upstream build
      * if this build is broken.
+     *
      * @param publisher
      *      The publisher that's driving this. Never null.
      * @param run
