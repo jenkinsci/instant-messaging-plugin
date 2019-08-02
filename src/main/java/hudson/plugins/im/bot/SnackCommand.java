@@ -24,22 +24,22 @@ public class SnackCommand extends AbstractTextSendingCommand {
 
     private static final String HELP = " [<snack>] - om nom nom";
 
-	private static final String[] THANKS = new String[] {
-			"thanks a lot! om nom nom.",
-			"you're so kind to me!",
-			"yummy!",
-			"great! yum yum." };
+    private static final String[] THANKS = new String[] {
+            "thanks a lot! om nom nom.",
+            "you're so kind to me!",
+            "yummy!",
+            "great! yum yum." };
 
-	private static final String[] THANKS_WITH_FOOD = new String[] {
-			"I really like that %s",
-			"how did you know that %s is my favorite food?",
-			"I just love %s!",
-			"I could eat %s all day long" };
+    private static final String[] THANKS_WITH_FOOD = new String[] {
+            "I really like that %s",
+            "how did you know that %s is my favorite food?",
+            "I just love %s!",
+            "I could eat %s all day long" };
 
     private final Random ran = new Random();
 
-	@Override
-	protected String getReply(Bot bot, Sender sender, String[] args) {
+    @Override
+    protected String getReply(Bot bot, Sender sender, String[] args) {
         String snack = null;
         if (args.length > 1) {
             snack = StringUtils.join(MessageHelper.copyOfRange(args, 1, args.length), " ");
@@ -54,11 +54,11 @@ public class SnackCommand extends AbstractTextSendingCommand {
             index = ran.nextInt(THANKS_WITH_FOOD.length);
             msg.append(String.format(THANKS_WITH_FOOD[index], snack));
         }
-		return msg.toString();
-	}
+        return msg.toString();
+    }
 
-	public String getHelp() {
-		return HELP;
-	}
+    public String getHelp() {
+        return HELP;
+    }
 
 }

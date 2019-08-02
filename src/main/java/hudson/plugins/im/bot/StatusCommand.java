@@ -43,8 +43,8 @@ public class StatusCommand extends AbstractMultipleJobCommand {
         }
         if (lastBuild != null) {
             msg.append("last build: ").append(lastBuild.getNumber()).append(" (")
-            	.append(lastBuild.getTimestampString()).append(" ago): ").append(lastBuild.getResult()).append(": ")
-            	.append(MessageHelper.getBuildURL(lastBuild));
+                .append(lastBuild.getTimestampString()).append(" ago): ").append(lastBuild.getResult()).append(": ")
+                .append(MessageHelper.getBuildURL(lastBuild));
         } else {
             msg.append("no finished build yet");
         }

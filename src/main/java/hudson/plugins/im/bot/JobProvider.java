@@ -15,7 +15,7 @@ public interface JobProvider {
      */
     @CheckForNull
     AbstractProject<?, ?> getJobByName(String name);
-    
+
     /**
      * Returns the Jenkins job with the given display name or null
      * if no job with that display name exists.
@@ -24,13 +24,13 @@ public interface JobProvider {
      */
     @CheckForNull
     AbstractProject<?, ?> getJobByDisplayName(String displayName);
-    
+
     /**
      * Convenience method to 1st try to get by name and then by display name.
      */
     @CheckForNull
     AbstractProject<?, ?> getJobByNameOrDisplayName(String displayName);
-    
+
     /**
      * Returns all Jenkins jobs.
      *
@@ -38,7 +38,7 @@ public interface JobProvider {
      */
     @Nonnull
     List<AbstractProject<?,?>> getAllJobs();
-    
+
     /**
      * Returns all top-level Jenkins jobs.
      *
@@ -46,9 +46,9 @@ public interface JobProvider {
      */
     @Nonnull
     List<AbstractProject<?,?>> getTopLevelJobs();
-    
+
     boolean isTopLevelJob(AbstractProject<?, ?> job);
-    
+
     /**
      * Return the view by name.
      * @param viewName the view name
