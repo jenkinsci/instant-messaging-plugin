@@ -1,2 +1,3 @@
+<?jelly escape-by-default='true'?>
 <!-- no op by default -->
 <j:jelly xmlns:j="jelly:core" />
