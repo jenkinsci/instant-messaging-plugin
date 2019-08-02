@@ -13,6 +13,7 @@ import hudson.model.ParameterDefinition;
 import hudson.model.ParametersAction;
 import hudson.model.ParametersDefinitionProperty;
 import hudson.model.Queue;
+import hudson.model.User;
 import hudson.plugins.im.IMCause;
 import hudson.plugins.im.Sender;
 
@@ -25,6 +26,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
+import jenkins.model.Jenkins;
 
 import org.apache.commons.lang.ArrayUtils;
 
@@ -196,12 +198,85 @@ public class BuildCommand extends AbstractTextSendingCommand {
     }
 
     private String checkPermission(Sender sender, AbstractProject<?, ?> project) {
-        if (!project.hasPermission(Item.BUILD)) {
-            return sender.getNickname() + " (" + sender.getId() + "): " +
+        if (project == null) {
+            return "ERROR in checkPermission() : project not specified";
+        }
+
+        // This checks the permissions of "current user" in a context of
+        // the call, whatever that might be for an IM session, if anything...
+        if (project.hasPermission(Item.BUILD)) {
+            return null; // OK
+        }
+
+        // Check if we have a Jenkins user account named same as IM sender
+        User senderUser = null;
+        try {
+            senderUser = User.getById(sender.getNickname(), false);
+        } catch (Exception e) {
+            senderUser = null;
+        }
+        if (senderUser == null) {
+            try {
+                senderUser = User.getById(sender.getId(), false);
+            } catch (Exception e) {
+                senderUser = null;
+            }
+        }
+
+        /*
+        // FIXME: Find a way to know the IMPublisher object used for this
+        // instant-messaging interaction, and call its getConfiguredIMId()
+        // against all user accounts to find if anyone has this alias set
+        // up in user config (e.g. "Your IRC Nick").
+
+        if (senderUser == null) {
+            // Check if any Jenkins account has a configured
+            // IM ID that corresponds to strings in the sender
+            for (User user : User.getAll()) {
+                String imId = getConfiguredIMId(user);
+                if (imId.equals(sender.getNickname()) || imId.equals(sender.getNickname())) {
+                    senderUser = user;
+                    break;
+                }
+            }
+        }
+        */
+
+        if ( senderUser != null ) {
+            // This check is hopefully equivalent to legacy one defined above,
+            // project.hasPermission(Item.BUILD), but for an arbitrary username
+            if (Jenkins.getInstance().getAuthorizationStrategy().getACL(project).hasPermission(senderUser.impersonate(), Item.BUILD)) {
+                System.err.println("IM BuildCommand authorized Jenkins user '" +
+                        senderUser.getId() + "' (IM ID '" + sender.getNickname() +
+                        "' / '" + sender.getId() + "') to build '" + project.getName() +
+                        "' (specific project matched, or user may generally build " +
+                        "Items and the project does not constrain further)");
+                return null; // OK
+            }
+
+            /*
+            // FIXME: This block tests if the matched user account has a generic
+            // right to build anything, not necessarily for this project, if it
+            // is specially constrained.
+            if (Jenkins.getInstance().getAuthorizationStrategy().getACL(senderUser).hasPermission(senderUser.impersonate(), Item.BUILD)) {
+                System.err.println("IM BuildCommand authorized Jenkins user '" +
+                        senderUser.getId() + "' (IM ID '" + sender.getNickname() +
+                        "' / '" + sender.getId() + "') to build '" + project.getName() +
+                        "' (user may generally build Items, " +
+                        "and project constraints were not evaluated)");
+                return null; // OK
+            }
+            */
+
+            return sender.getNickname() + " (" + sender.getId() +
+                    " aka " + senderUser.getId() + "): " +
                     "you're not allowed to build job " +
                     project.getDisplayName() + "!";
         }
-        return null;
+
+        return sender.getNickname() + " (" + sender.getId() + "): " +
+                    "you're not allowed to build job " +
+                    project.getDisplayName() + "!";
     }
 
     private String giveSyntax(String sender, String cmd) {
