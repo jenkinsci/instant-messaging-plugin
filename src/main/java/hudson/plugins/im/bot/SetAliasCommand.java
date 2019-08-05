@@ -89,7 +89,7 @@ public class SetAliasCommand extends AbstractTextSendingCommand {
         public AliasCommand(BotCommand cmd, String commandName, String[] arguments) {
             this.command = cmd;
             this.commandName = commandName;
-            this.arguments = arguments;
+            this.arguments = arguments.clone();
         }
 
         @Override
