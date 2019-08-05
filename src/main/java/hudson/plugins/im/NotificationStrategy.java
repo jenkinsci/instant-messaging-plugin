@@ -146,6 +146,7 @@ public enum NotificationStrategy {
      * Returns the display names of all notification strategies.
      */
     public static String[] getDisplayNames() {
-        return DISPLAY_NAMES;
+        // Return a copy of public array, not reference to if directly (findbugs MS - MS_EXPOSE_REP)
+        return (String[])DISPLAY_NAMES.clone();
     }
 }
