@@ -1,8 +1,8 @@
 package hudson.plugins.im.bot;
 
 import hudson.Extension;
-import hudson.model.Item;
 import hudson.model.AbstractProject;
+import hudson.model.Item;
 import hudson.model.Run;
 import hudson.plugins.im.Sender;
 import hudson.plugins.im.tools.MessageHelper;
