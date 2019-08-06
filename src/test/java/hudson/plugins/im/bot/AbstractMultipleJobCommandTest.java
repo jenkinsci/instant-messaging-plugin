@@ -1,14 +1,10 @@
 package hudson.plugins.im.bot;
 
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertNull;
-import static org.junit.Assert.assertSame;
-import static org.mockito.Mockito.mock;
-import static org.mockito.Mockito.when;
 import hudson.model.AbstractProject;
 import hudson.model.FreeStyleProject;
 import hudson.model.TopLevelItem;
 import hudson.model.View;
+
 import hudson.plugins.im.Sender;
 import hudson.plugins.im.bot.AbstractMultipleJobCommand.Mode;
 import hudson.plugins.im.tools.Pair;
@@ -20,6 +16,13 @@ import java.util.List;
 
 import org.apache.commons.lang.StringUtils;
 import org.junit.Test;
+
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertNull;
+import static org.junit.Assert.assertSame;
+
+import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.when;
 
 public class AbstractMultipleJobCommandTest {
 
