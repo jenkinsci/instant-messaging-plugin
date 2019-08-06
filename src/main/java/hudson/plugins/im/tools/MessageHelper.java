@@ -6,14 +6,15 @@ import java.util.Collections;
 import java.util.List;
 import java.util.regex.Pattern;
 
-import hudson.model.Run;
-import org.apache.commons.lang.StringUtils;
 
 import hudson.Util;
 import hudson.model.Hudson;
+import hudson.model.Run;
 import hudson.tasks.test.TestObject;
 import hudson.tasks.junit.TestResult;
 import hudson.tasks.test.AbstractTestResultAction;
+
+import org.apache.commons.lang.StringUtils;
 
 /**
  * Utility class to help message creation
