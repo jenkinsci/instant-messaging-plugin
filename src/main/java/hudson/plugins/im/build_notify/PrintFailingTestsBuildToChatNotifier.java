@@ -1,19 +1,19 @@
 package hudson.plugins.im.build_notify;
 
+import hudson.Extension;
+import hudson.model.Run;
+import hudson.model.TaskListener;
+import hudson.plugins.im.IMPublisher;
+import hudson.plugins.im.tools.MessageHelper;
+import hudson.tasks.junit.CaseResult;
+import hudson.tasks.test.AbstractTestResultAction;
+
 import java.io.IOException;
 import java.util.Collections;
 import java.util.Comparator;
 import java.util.List;
 
-import hudson.model.Run;
-import hudson.model.TaskListener;
 import org.kohsuke.stapler.DataBoundConstructor;
-
-import hudson.Extension;
-import hudson.plugins.im.IMPublisher;
-import hudson.plugins.im.tools.MessageHelper;
-import hudson.tasks.junit.CaseResult;
-import hudson.tasks.test.AbstractTestResultAction;
 
 /**
  * Extends {@link DefaultBuildToChatNotifier} and also prints
