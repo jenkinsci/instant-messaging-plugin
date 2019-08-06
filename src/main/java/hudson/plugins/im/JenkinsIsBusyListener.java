@@ -1,12 +1,5 @@
 package hudson.plugins.im;
 
-import hudson.model.Computer;
-import hudson.model.Executor;
-import hudson.model.Run;
-import hudson.model.TaskListener;
-import hudson.model.listeners.RunListener;
-import hudson.util.DaemonThreadFactory;
-
 import java.util.ArrayList;
 import java.util.List;
 import java.util.concurrent.Executors;
@@ -14,7 +7,14 @@ import java.util.concurrent.ScheduledExecutorService;
 import java.util.concurrent.TimeUnit;
 import java.util.logging.Logger;
 
+import hudson.model.Computer;
+import hudson.model.Executor;
+import hudson.model.Run;
+import hudson.model.TaskListener;
+import hudson.model.listeners.RunListener;
+import hudson.util.DaemonThreadFactory;
 import hudson.util.NamingThreadFactory;
+
 import jenkins.model.Jenkins;
 
 @SuppressWarnings({ "unchecked", "rawtypes" })
