@@ -41,21 +41,21 @@ public class HealthCommand extends AbstractMultipleJobCommand {
             lastBuild = lastBuild.getPreviousBuild();
         }
         if (lastBuild != null) {
-        	msg.append("Health [");
-        	List<HealthReport> reports = project.getBuildHealthReports();
-        	if (reports.isEmpty() ) {
-        		reports = Collections.singletonList(project.getBuildHealth());
-        	}
+            msg.append("Health [");
+            List<HealthReport> reports = project.getBuildHealthReports();
+            if (reports.isEmpty() ) {
+                reports = Collections.singletonList(project.getBuildHealth());
+            }
 
-        	int i = 1;
-        	for (HealthReport health : reports) {
-        		msg.append(health.getDescription())
-        			.append("(").append(health.getScore()).append("%)");
-        		if (i<reports.size()) {
-        			msg.append(", ");
-        		}
-        		i++;
-        	}
+            int i = 1;
+            for (HealthReport health : reports) {
+                msg.append(health.getDescription())
+                    .append("(").append(health.getScore()).append("%)");
+                if (i<reports.size()) {
+                    msg.append(", ");
+                }
+                i++;
+            }
             msg.append(": ").append(MessageHelper.getBuildURL(lastBuild));
         } else {
             msg.append("no finished build yet");
