@@ -3,7 +3,8 @@ package hudson.plugins.im.bot;
 import hudson.Extension;
 import hudson.model.AbstractBuild;
 import hudson.model.AbstractProject;
-import hudson.tasks.junit.CaseResult;
+
+//import hudson.tasks.junit.CaseResult;
 import hudson.tasks.test.AbstractTestResultAction;
 import hudson.tasks.test.TestResult;
 

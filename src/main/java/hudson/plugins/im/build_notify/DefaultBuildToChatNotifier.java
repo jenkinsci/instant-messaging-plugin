@@ -4,17 +4,18 @@ import hudson.Extension;
 import hudson.model.AbstractBuild;
 import hudson.model.BuildListener;
 import hudson.model.Result;
-import hudson.model.ResultTrend;
 import hudson.model.Run;
 import hudson.model.TaskListener;
 import hudson.plugins.im.IMPublisher;
 import hudson.plugins.im.tools.BuildHelper;
 import hudson.scm.ChangeLogSet;
 import hudson.scm.ChangeLogSet.Entry;
-import org.kohsuke.stapler.DataBoundConstructor;
 
 import java.io.IOException;
 import java.util.List;
+
+import org.kohsuke.stapler.DataBoundConstructor;
+
 import static hudson.plugins.im.tools.BuildHelper.*;
 /**
  * {@link BuildToChatNotifier} that maintains the traditional behaviour of {@link IMPublisher}.

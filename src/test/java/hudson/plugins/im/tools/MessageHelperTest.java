@@ -1,8 +1,5 @@
 package hudson.plugins.im.tools;
 
-import static org.junit.Assert.assertEquals;
-import static org.mockito.Mockito.mock;
-import static org.mockito.Mockito.when;
 import hudson.model.AbstractBuild;
 import hudson.plugins.im.tools.MessageHelper;
 import hudson.tasks.test.AbstractTestResultAction;
@@ -11,6 +8,10 @@ import hudson.tasks.test.TestResult;
 import org.junit.Assert;
 import org.junit.Test;
 import org.jvnet.hudson.test.Bug;
+
+import static org.junit.Assert.assertEquals;
+import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.when;
 
 public class MessageHelperTest {
 

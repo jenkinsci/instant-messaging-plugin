@@ -1,10 +1,9 @@
 package hudson.plugins.im.build_notify;
 
-import static hudson.plugins.im.tools.BuildHelper.getProjectName;
 import hudson.DescriptorExtensionList;
+import hudson.model.AbstractBuild;
 import hudson.model.BuildListener;
 import hudson.model.Describable;
-import hudson.model.AbstractBuild;
 import hudson.model.Hudson;
 import hudson.model.Run;
 import hudson.model.TaskListener;
@@ -12,7 +11,9 @@ import hudson.plugins.im.IMPublisher;
 import hudson.plugins.im.tools.MessageHelper;
 
 import java.io.IOException;
+
 import static hudson.plugins.im.tools.BuildHelper.*;
+
 /**
  * Controls the exact messages to be sent to a chat upon start/completion of a build.
  *

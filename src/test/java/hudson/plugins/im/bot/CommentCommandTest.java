@@ -1,16 +1,19 @@
 package hudson.plugins.im.bot;
 
-import static org.junit.Assert.assertEquals;
-import static org.mockito.Mockito.mock;
-import static org.mockito.Mockito.verify;
-import static org.mockito.Mockito.when;
 import hudson.model.AbstractBuild;
 import hudson.model.AbstractProject;
+
 import hudson.plugins.im.Sender;
 
 import java.io.IOException;
 
 import org.junit.Test;
+
+import static org.junit.Assert.assertEquals;
+
+import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.verify;
+import static org.mockito.Mockito.when;
 
 public class CommentCommandTest {
 

@@ -1,9 +1,7 @@
 package hudson.plugins.im;
 
-import hudson.model.Result;
 import hudson.model.ResultTrend;
 import hudson.model.Run;
-import hudson.plugins.im.tools.BuildHelper;
 
 import static hudson.plugins.im.tools.BuildHelper.*;
 /**

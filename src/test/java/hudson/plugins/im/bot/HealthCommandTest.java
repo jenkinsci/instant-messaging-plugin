@@ -1,19 +1,20 @@
 package hudson.plugins.im.bot;
 
-import java.util.regex.Matcher;
-import java.util.regex.Pattern;
-
-import org.junit.Test;
-
 import hudson.maven.AbstractMavenProject;
 import hudson.model.FreeStyleBuild;
 import hudson.model.HealthReport;
 import hudson.model.ItemGroup;
 import hudson.plugins.im.Sender;
 
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
+
+import org.junit.Test;
+
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertTrue;
+
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 

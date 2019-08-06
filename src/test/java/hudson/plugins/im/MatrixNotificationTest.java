@@ -1,23 +1,24 @@
 package hudson.plugins.im;
 
-import static org.mockito.Matchers.any;
-import static org.mockito.Mockito.mock;
-import static org.mockito.Mockito.times;
-import static org.mockito.Mockito.verify;
-import static org.mockito.Mockito.when;
 import hudson.Launcher;
 import hudson.matrix.MatrixAggregator;
-import hudson.matrix.MatrixConfiguration;
 import hudson.matrix.MatrixBuild;
-import hudson.model.BuildListener;
+import hudson.matrix.MatrixConfiguration;
 import hudson.model.AbstractBuild;
 import hudson.model.AbstractProject;
+import hudson.model.BuildListener;
 
 import java.io.IOException;
 
 import org.junit.Before;
 import org.junit.Test;
 import org.mockito.Mockito;
+
+import static org.mockito.Matchers.any;
+import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.times;
+import static org.mockito.Mockito.verify;
+import static org.mockito.Mockito.when;
 
 /**
  * Tests the various notification options (only parent, only configurations, both) for Matrix jobs.

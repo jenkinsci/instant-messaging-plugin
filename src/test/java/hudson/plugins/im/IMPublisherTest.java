@@ -1,15 +1,16 @@
 package hudson.plugins.im;
 
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertFalse;
-import static org.junit.Assert.assertTrue;
-import static org.mockito.Mockito.mock;
-import static org.mockito.Mockito.when;
-import hudson.model.BuildListener;
-import hudson.model.Result;
+import com.google.common.base.Function;
+import com.google.common.collect.Iterables;
+import com.google.common.collect.Iterators;
+import com.google.common.collect.Maps;
+import com.google.common.collect.Sets;
+
 import hudson.model.AbstractBuild;
 import hudson.model.AbstractProject;
+import hudson.model.BuildListener;
 import hudson.model.Fingerprint.RangeSet;
+import hudson.model.Result;
 import hudson.model.User;
 import hudson.plugins.im.build_notify.DefaultBuildToChatNotifier;
 import hudson.scm.ChangeLogSet;
@@ -29,11 +30,12 @@ import javax.mail.MessagingException;
 import org.junit.Before;
 import org.junit.Test;
 
-import com.google.common.base.Function;
-import com.google.common.collect.Iterables;
-import com.google.common.collect.Iterators;
-import com.google.common.collect.Maps;
-import com.google.common.collect.Sets;
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertFalse;
+import static org.junit.Assert.assertTrue;
+
+import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.when;
 
 @SuppressWarnings("rawtypes")
 public class IMPublisherTest {

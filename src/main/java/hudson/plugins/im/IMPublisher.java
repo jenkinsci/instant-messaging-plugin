@@ -1,22 +1,24 @@
 package hudson.plugins.im;
 
+import com.google.common.collect.Lists;
+
 import hudson.FilePath;
 import hudson.Launcher;
 import hudson.Util;
 import hudson.matrix.MatrixAggregatable;
 import hudson.matrix.MatrixAggregator;
-import hudson.matrix.MatrixConfiguration;
 import hudson.matrix.MatrixBuild;
+import hudson.matrix.MatrixConfiguration;
 import hudson.matrix.MatrixProject;
+import hudson.model.AbstractBuild;
+import hudson.model.AbstractProject;
 import hudson.model.BuildListener;
+import hudson.model.Fingerprint.RangeSet;
 import hudson.model.ResultTrend;
 import hudson.model.Run;
 import hudson.model.TaskListener;
-import hudson.model.UserProperty;
-import hudson.model.AbstractBuild;
-import hudson.model.AbstractProject;
-import hudson.model.Fingerprint.RangeSet;
 import hudson.model.User;
+import hudson.model.UserProperty;
 import hudson.plugins.im.build_notify.BuildToChatNotifier;
 import hudson.plugins.im.build_notify.DefaultBuildToChatNotifier;
 import hudson.plugins.im.tools.BuildHelper;
@@ -40,12 +42,10 @@ import java.util.Map;
 import java.util.Set;
 import java.util.logging.Logger;
 
+import javax.annotation.Nonnull;
+
 import org.kohsuke.stapler.DataBoundSetter;
 import org.springframework.util.Assert;
-
-import com.google.common.collect.Lists;
-
-import javax.annotation.Nonnull;
 
 import static hudson.plugins.im.tools.BuildHelper.*;
 

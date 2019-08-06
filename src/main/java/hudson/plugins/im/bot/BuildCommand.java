@@ -4,16 +4,17 @@
 package hudson.plugins.im.bot;
 
 import hudson.Extension;
-import hudson.model.Item;
-import hudson.model.ParameterValue;
-import hudson.model.SimpleParameterDefinition;
 import hudson.model.AbstractProject;
 import hudson.model.Cause;
+import hudson.model.Item;
 import hudson.model.ParameterDefinition;
+import hudson.model.ParameterValue;
 import hudson.model.ParametersAction;
 import hudson.model.ParametersDefinitionProperty;
 import hudson.model.Queue;
+import hudson.model.SimpleParameterDefinition;
 import hudson.model.User;
+
 import hudson.plugins.im.IMCause;
 import hudson.plugins.im.Sender;
 
@@ -26,6 +27,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
+
 import jenkins.model.Jenkins;
 
 import org.apache.commons.lang.ArrayUtils;

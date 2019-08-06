@@ -5,18 +5,15 @@ import hudson.Util;
 import hudson.model.Build;
 import hudson.model.Computer;
 import hudson.model.Executor;
-import hudson.model.Hudson;
 import hudson.model.Item;
-import hudson.model.Job;
 import hudson.model.Queue.Executable;
 import hudson.model.Queue.Task;
-import hudson.model.queue.SubTask;
 import hudson.model.Run;
+import hudson.model.queue.SubTask;
 import hudson.plugins.im.IMChat;
 import hudson.plugins.im.IMException;
 import hudson.plugins.im.IMMessage;
 import hudson.plugins.im.Sender;
-import jenkins.model.JenkinsLocationConfiguration;
 
 import java.util.Arrays;
 import java.util.Collection;
@@ -24,6 +21,7 @@ import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
 import jenkins.model.Jenkins;
+import jenkins.model.JenkinsLocationConfiguration;
 
 import org.jenkinsci.plugins.workflow.support.steps.ExecutorStepExecution.PlaceholderTask;
 
