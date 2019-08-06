@@ -7,9 +7,10 @@ import hudson.model.BuildListener;
 import hudson.model.Run;
 import hudson.model.TaskListener;
 import hudson.plugins.im.IMPublisher;
-import org.kohsuke.stapler.DataBoundConstructor;
 
 import java.io.IOException;
+
+import org.kohsuke.stapler.DataBoundConstructor;
 
 import static hudson.plugins.im.tools.BuildHelper.getProjectName;
 //import static hudson.plugins.im.tools.BuildHelper.getResultTrend;
