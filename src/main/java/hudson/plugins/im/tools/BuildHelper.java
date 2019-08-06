@@ -1,9 +1,9 @@
 package hudson.plugins.im.tools;
 
 import hudson.model.AbstractBuild;
-import hudson.model.Run;
 import hudson.model.Result;
 import hudson.model.ResultTrend;
+import hudson.model.Run;
 import hudson.model.TaskListener;
 import hudson.model.User;
 import hudson.scm.ChangeLogSet;
