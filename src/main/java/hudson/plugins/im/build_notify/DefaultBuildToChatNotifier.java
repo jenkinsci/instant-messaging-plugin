@@ -4,7 +4,6 @@ import hudson.Extension;
 import hudson.model.AbstractBuild;
 import hudson.model.BuildListener;
 import hudson.model.Result;
-import hudson.model.ResultTrend;
 import hudson.model.Run;
 import hudson.model.TaskListener;
 import hudson.plugins.im.IMPublisher;
