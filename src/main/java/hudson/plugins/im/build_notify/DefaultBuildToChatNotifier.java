@@ -10,10 +10,12 @@ import hudson.plugins.im.IMPublisher;
 import hudson.plugins.im.tools.BuildHelper;
 import hudson.scm.ChangeLogSet;
 import hudson.scm.ChangeLogSet.Entry;
-import org.kohsuke.stapler.DataBoundConstructor;
 
 import java.io.IOException;
 import java.util.List;
+
+import org.kohsuke.stapler.DataBoundConstructor;
+
 import static hudson.plugins.im.tools.BuildHelper.*;
 /**
  * {@link BuildToChatNotifier} that maintains the traditional behaviour of {@link IMPublisher}.
