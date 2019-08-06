@@ -1,7 +1,8 @@
 package hudson.plugins.jabber;
 
-import hudson.model.Result;
 import hudson.model.AbstractBuild;
+import hudson.model.Result;
+
 import hudson.plugins.im.tools.BuildHelper;
 
 import org.springframework.util.Assert;
