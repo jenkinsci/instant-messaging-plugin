@@ -5,11 +5,12 @@
 
 package hudson.plugins.im.bot;
 
-import static org.junit.Assert.assertNotNull;
-import static org.junit.Assert.assertTrue;
 import hudson.plugins.im.Sender;
 
 import org.junit.Test;
+
+import static org.junit.Assert.assertNotNull;
+import static org.junit.Assert.assertTrue;
 
 /**
  * Test for the botsnack command.
