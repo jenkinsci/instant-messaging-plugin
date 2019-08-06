@@ -88,11 +88,11 @@ public abstract class IMConnectionProvider implements IMConnectionListener {
         }
     }
 
-    protected IMPublisherDescriptor getDescriptor() {
+    protected synchronized IMPublisherDescriptor getDescriptor() {
         return this.descriptor;
     }
 
-    public void setDescriptor(IMPublisherDescriptor desc) {
+    public synchronized void setDescriptor(IMPublisherDescriptor desc) {
         this.descriptor = desc;
 
         if (desc != null && desc.isEnabled()) {
