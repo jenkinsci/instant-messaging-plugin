@@ -1,16 +1,17 @@
 package hudson.plugins.im.tools;
 
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertFalse;
-import static org.junit.Assert.assertTrue;
-import static org.mockito.Mockito.mock;
-import static org.mockito.Mockito.when;
 import hudson.model.FreeStyleBuild;
 import hudson.model.Result;
 import hudson.model.ResultTrend;
 import hudson.plugins.im.tools.BuildHelper.ExtResult;
 
 import org.junit.Test;
+
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertFalse;
+import static org.junit.Assert.assertTrue;
+import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.when;
 
 public class BuildHelperTest {
 
