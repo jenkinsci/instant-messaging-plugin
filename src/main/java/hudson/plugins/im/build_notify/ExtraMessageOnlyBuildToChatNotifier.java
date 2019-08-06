@@ -3,18 +3,17 @@ package hudson.plugins.im.build_notify;
 import hudson.Extension;
 import hudson.model.AbstractBuild;
 import hudson.model.BuildListener;
-import hudson.model.ResultTrend;
+// import hudson.model.ResultTrend;
 import hudson.model.Run;
 import hudson.model.TaskListener;
 import hudson.plugins.im.IMPublisher;
-import hudson.plugins.im.tools.MessageHelper;
 import org.kohsuke.stapler.DataBoundConstructor;
 
 import java.io.IOException;
 
 import static hudson.plugins.im.tools.BuildHelper.getProjectName;
-import static hudson.plugins.im.tools.BuildHelper.getResultTrend;
-import static hudson.plugins.im.tools.BuildHelper.isFix;
+//import static hudson.plugins.im.tools.BuildHelper.getResultTrend;
+//import static hudson.plugins.im.tools.BuildHelper.isFix;
 
 /**
  * {@link BuildToChatNotifier} that skips status and everything except extraMessage.
