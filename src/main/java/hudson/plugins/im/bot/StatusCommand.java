@@ -26,18 +26,18 @@ public class StatusCommand extends AbstractMultipleJobCommand {
     @Override
     protected CharSequence getMessageForJob(AbstractProject<?, ?> project) {
         StringBuilder msg = new StringBuilder(32);
+        AbstractBuild<?, ?> lastBuild = project.getLastBuild();
         msg.append(project.getFullDisplayName());
         if (project.isDisabled()) {
             msg.append("(disabled) ");
         // a project which is building and additionally in queue should be reported as building
         } else if (project.isBuilding()) {
-            msg.append("(BUILDING: ").append(project.getLastBuild().getDurationString()).append(")");
+            msg.append("(BUILDING: ").append(lastBuild != null ? lastBuild.getDurationString() : "duration N/A").append(")");
         } else if (project.isInQueue()) {
             msg.append("(in queue) ");
         }
         msg.append(": ");
 
-        AbstractBuild<?, ?> lastBuild = project.getLastBuild();
         while ((lastBuild != null) && lastBuild.isBuilding()) {
             lastBuild = lastBuild.getPreviousBuild();
         }
