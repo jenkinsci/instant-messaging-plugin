@@ -17,7 +17,7 @@ public class IMException extends IOException
     }
 
     public IMException(String msg) {
-    	super(msg);
+        super(msg);
     }
 
 }
