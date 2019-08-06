@@ -18,9 +18,9 @@ import hudson.security.ACL;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.Map;
+import java.util.Map.Entry;
 import java.util.SortedMap;
 import java.util.TreeMap;
-import java.util.Map.Entry;
 import java.util.logging.Logger;
 
 import jenkins.model.Jenkins;
