@@ -7,6 +7,8 @@ import java.util.concurrent.ScheduledExecutorService;
 import java.util.concurrent.TimeUnit;
 import java.util.logging.Logger;
 
+import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
+
 import hudson.model.Computer;
 import hudson.model.Executor;
 import hudson.model.Run;
@@ -56,6 +58,8 @@ public class JenkinsIsBusyListener extends RunListener {
         LOGGER.fine("Added connection provider: " + provider);
     }
 
+    @SuppressFBWarnings(value = "ST_WRITE_TO_STATIC_FROM_INSTANCE_METHOD",
+        justification = "We only write to the static field to GC it after unregistering everything")
     public synchronized void removeConnectionProvider(IMConnectionProvider provider) {
         this.connectionProviders.remove(provider);
         LOGGER.fine("Removed connection provider: " + provider);
