@@ -7,7 +7,6 @@ import hudson.model.ResultTrend;
 import hudson.model.Run;
 import hudson.model.TaskListener;
 import hudson.plugins.im.IMPublisher;
-import hudson.plugins.im.tools.BuildHelper;
 import hudson.plugins.im.tools.MessageHelper;
 import org.kohsuke.stapler.DataBoundConstructor;
 
