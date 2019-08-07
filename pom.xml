@@ -67,6 +67,10 @@
         </pluginManagement>
     </build>
 
+    <properties>
+        <java.level>8</java.level>
+    </properties>
+
     <dependencies>
         <dependency>
             <groupId>org.jenkins-ci.plugins</groupId>
