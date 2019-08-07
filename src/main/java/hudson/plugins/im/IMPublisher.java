@@ -355,16 +355,10 @@ public abstract class IMPublisher extends Notifier implements BuildStep, MatrixA
                     notifyOnBuildEnd(run, taskListener);
                 }
             } else {
-                if (run instanceof AbstractBuild
-                        && run.getParent() instanceof WorkflowJob
-                        && getNotifyOnStart()
-                        && taskListener instanceof BuildListener
-                ) {
+                if (run.getParent() instanceof WorkflowJob && getNotifyOnStart()) {
                     // part of a pipeline step, called with the option explicitly
                     // (has no other way to do so at the moment, no options{} support)
-                    AbstractBuild currentBuild = (AbstractBuild) run;
-                    BuildListener currentBuildListener = (BuildListener) taskListener;
-                    notifyChatsOnBuildStart(currentBuild, currentBuildListener);
+                    notifyChatsOnBuildStart(run, taskListener);
                     return;
                 } // else fall through
                 notifyOnBuildEnd(run, taskListener);
