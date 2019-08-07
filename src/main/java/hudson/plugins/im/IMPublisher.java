@@ -398,7 +398,7 @@ public abstract class IMPublisher extends Notifier implements BuildStep, MatrixA
      * @throws IOException
      */
     public void perform(@Nonnull Run<?, ?> run, @Nonnull FilePath workspace, @Nonnull Launcher launcher, @Nonnull TaskListener taskListener) throws InterruptedException, IOException {
-        taskListener.getLogger().println("IMPublisher: sending chat message, strategy " + strategy + ", targets: " + this.getTargets());
+        log(taskListener, "IMPublisher: sending chat message, strategy " + strategy + ", targets: " + this.getTargets());
         internalPerform(run, launcher, taskListener);
     }
 
@@ -464,7 +464,7 @@ public abstract class IMPublisher extends Notifier implements BuildStep, MatrixA
         }
 
         if (this.notifyFixers && resultTrend == ResultTrend.FIXED) {
-            listener.getLogger().append("Notifying fixers\n");
+            log(listener, "Notifying fixers");
             final String message = getBuildToChatNotifier().fixerMessage(this, run, listener);
 
             for (IMMessageTarget target : calculateIMTargets(BuildHelper.getCommitters(run, listener), listener)) {
