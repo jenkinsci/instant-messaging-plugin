@@ -44,7 +44,10 @@ import java.util.logging.Logger;
 
 import javax.annotation.Nonnull;
 
+import org.jenkinsci.plugins.workflow.job.WorkflowJob;
+
 import org.kohsuke.stapler.DataBoundSetter;
+
 import org.springframework.util.Assert;
 
 import static hudson.plugins.im.tools.BuildHelper.*;
@@ -352,6 +355,18 @@ public abstract class IMPublisher extends Notifier implements BuildStep, MatrixA
                     notifyOnBuildEnd(run, taskListener);
                 }
             } else {
+                if (run instanceof AbstractBuild
+                        && run.getParent() instanceof WorkflowJob
+                        && getNotifyOnStart()
+                        && taskListener instanceof BuildListener
+                ) {
+                    // part of a pipeline step, called with the option explicitly
+                    // (has no other way to do so at the moment, no options{} support)
+                    AbstractBuild currentBuild = (AbstractBuild) run;
+                    BuildListener currentBuildListener = (BuildListener) taskListener;
+                    notifyChatsOnBuildStart(currentBuild, currentBuildListener);
+                    return;
+                } // else fall through
                 notifyOnBuildEnd(run, taskListener);
             }
         } else {
