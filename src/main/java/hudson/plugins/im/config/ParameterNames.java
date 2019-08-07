@@ -13,6 +13,7 @@ public abstract class ParameterNames {
         return getPrefix() + "strategy";
     }
 
+    // Note: A pipeline step equivalent would be 'notifyOnStart'
     public String getNotifyStart() {
         return getPrefix() + "notifyStart";
     }

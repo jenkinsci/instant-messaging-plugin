@@ -68,6 +68,15 @@ public abstract class IMPublisher extends Notifier implements BuildStep, MatrixA
     private hudson.plugins.jabber.NotificationStrategy notificationStrategy;
 
     private NotificationStrategy strategy;
+    // Note: the name evolved over time, in notification-strategy.jelly it is
+    // published as 'notifyOnStart' and in Parameters.java (for paramNames)
+    // also as 'notifyStart', while older constructor named it
+    // 'notifyGroupChatsOnBuildStart'.
+    // The getter for this is 'getNotifyOnStart()', while the action taken in
+    // practice is 'notifyChatsOnBuildStart()'.
+    // Indeed, naming is one of the fundamental problems in IT ;)
+    // Following the getter, protocol plugins that expose this as a toggle for
+    // pipeline steps are encouraged to name their argument 'notifyOnStart'.
     private final boolean notifyOnBuildStart;
     private final boolean notifySuspects;
     private final boolean notifyCulprits;
