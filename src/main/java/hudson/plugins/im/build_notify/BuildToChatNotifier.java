@@ -34,6 +34,8 @@ public abstract class BuildToChatNotifier implements Describable<BuildToChatNoti
     public abstract String buildStartMessage(IMPublisher publisher, AbstractBuild<?, ?> build, BuildListener listener)
             throws IOException,  InterruptedException;
 
+    public abstract String buildStartMessage(IMPublisher publisher, Run<?, ?> build, TaskListener listener)
+            throws IOException,  InterruptedException;
 
     /**
      * Calculates the message to send out to a chat when the specified build is completed.
