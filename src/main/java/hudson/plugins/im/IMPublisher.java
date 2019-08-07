@@ -75,7 +75,17 @@ public abstract class IMPublisher extends Notifier implements BuildStep, MatrixA
     private final boolean notifyUpstreamCommitters;
     private BuildToChatNotifier buildToChatNotifier;
     private MatrixJobMultiplier matrixMultiplier = MatrixJobMultiplier.ONLY_CONFIGURATIONS;
+
+    // An optional extraMessage is appended to the build start and completion
+    // notifications on the IM stream.
     private String extraMessage = "";
+
+    // An optional customMessage is THE message to be posted in this step,
+    // regardless of build notifications settings. In other words, it can be
+    // used to send an arbitrary message the to specified or default (via
+    // global config) targets with the pipeline step (and ignoring the notify*
+    // strategy and filtering rules options above).
+    private String customMessage = "";
 
     /**
      * @deprecated Only for deserializing old instances
@@ -294,6 +304,19 @@ public abstract class IMPublisher extends Notifier implements BuildStep, MatrixA
         this.extraMessage = extraMessage;
     }
 
+    public String getCustomMessage() {
+        return customMessage;
+    }
+
+    @DataBoundSetter
+    public void setCustomMessage(String customMessage) {
+        if (customMessage == null) {
+            //mostly for deserializing old instances
+            customMessage = "";
+        }
+        this.customMessage = customMessage;
+    }
+
     /**
      * Logs message to the build listener's logger.
      */
@@ -309,16 +332,33 @@ public abstract class IMPublisher extends Notifier implements BuildStep, MatrixA
     }
 
     private void internalPerform(@Nonnull Run<?, ?> run, @Nonnull Launcher launcher, @Nonnull TaskListener taskListener) throws InterruptedException, IOException {
-        Assert.notNull(run, "Parameter 'build' must not be null.");
-        Assert.notNull(taskListener, "Parameter 'buildListener' must not be null.");
+        if (customMessage == null || customMessage.isEmpty()) {
+            // Do the normal notification routine
+            Assert.notNull(run, "Parameter 'build' must not be null.");
+            Assert.notNull(taskListener, "Parameter 'buildListener' must not be null.");
 
-        if (run.getParent() instanceof MatrixConfiguration) {
-            if (getMatrixNotifier() == MatrixJobMultiplier.ONLY_CONFIGURATIONS
-                || getMatrixNotifier() == MatrixJobMultiplier.ALL) {
+            if (run.getParent() instanceof MatrixConfiguration) {
+                if (getMatrixNotifier() == MatrixJobMultiplier.ONLY_CONFIGURATIONS
+                    || getMatrixNotifier() == MatrixJobMultiplier.ALL) {
+                    notifyOnBuildEnd(run, taskListener);
+                }
+            } else {
                 notifyOnBuildEnd(run, taskListener);
             }
         } else {
-            notifyOnBuildEnd(run, taskListener);
+            // Just send the specified custom message to IM target(s) at this time
+            try {
+                for (final IMMessageTarget target : this.targets) {
+                    try {
+                        log(taskListener, "Sending custom message to target: " + target.toString());
+                        sendNotification(customMessage, target, taskListener);
+                    } catch (RuntimeException re) {
+                        log(taskListener, "There was an error sending custom message to target: " + target.toString());
+                    }
+                }
+            } catch (Exception e) {
+                log(taskListener, "There was an error iterating targets for sending a custom message");
+            }
         }
     }
 

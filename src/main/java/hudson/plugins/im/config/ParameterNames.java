@@ -21,6 +21,12 @@ public abstract class ParameterNames {
         return getPrefix() + "extraMessage";
     }
 
+    // Note: This is not currently exposed in freestyle jobs,
+    // but was added here for consistency
+    public String getCustomMessage() {
+        return getPrefix() + "customMessage";
+    }
+
     public String getNotifySuspects() {
         return getPrefix() + "notifySuspects";
     }

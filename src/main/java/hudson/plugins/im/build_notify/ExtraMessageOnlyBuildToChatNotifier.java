@@ -17,7 +17,9 @@ import static hudson.plugins.im.tools.BuildHelper.getProjectName;
 //import static hudson.plugins.im.tools.BuildHelper.isFix;
 
 /**
- * {@link BuildToChatNotifier} that skips status and everything except extraMessage.
+ * {@link BuildToChatNotifier} that skips status and everything except
+ * the extraMessage (and project/build identification data) while handling
+ * the Start and Completion event notifications of a build.
  * This is probably most useful as a pipeline step.
  *
  */
@@ -29,7 +31,7 @@ public class ExtraMessageOnlyBuildToChatNotifier extends BuildToChatNotifier {
     @Override
     public String buildStartMessage(IMPublisher publisher, AbstractBuild<?, ?> build, BuildListener listener) throws IOException, InterruptedException {
         return Messages.ExtraMessageOnlyBuildToChatNotifier_StartMessage(
-                build.getDisplayName(),getProjectName(build), publisher.getExtraMessage());
+                build.getDisplayName(), getProjectName(build), publisher.getExtraMessage());
     }
 
     @Override
