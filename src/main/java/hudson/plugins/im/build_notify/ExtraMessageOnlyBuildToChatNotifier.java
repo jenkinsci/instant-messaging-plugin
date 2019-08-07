@@ -30,6 +30,11 @@ public class ExtraMessageOnlyBuildToChatNotifier extends BuildToChatNotifier {
 
     @Override
     public String buildStartMessage(IMPublisher publisher, AbstractBuild<?, ?> build, BuildListener listener) throws IOException, InterruptedException {
+        return this.buildStartMessage(publisher, (Run<?, ?>) build, (TaskListener) listener);
+    }
+
+    @Override
+    public String buildStartMessage(IMPublisher publisher, Run<?, ?> build, TaskListener listener) throws IOException, InterruptedException {
         return Messages.ExtraMessageOnlyBuildToChatNotifier_StartMessage(
                 build.getDisplayName(), getProjectName(build), publisher.getExtraMessage());
     }

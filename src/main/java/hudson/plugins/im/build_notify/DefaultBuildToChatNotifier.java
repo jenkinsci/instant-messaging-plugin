@@ -29,16 +29,21 @@ public class DefaultBuildToChatNotifier extends SummaryOnlyBuildToChatNotifier {
 
     @Override
     public String buildStartMessage(IMPublisher publisher, AbstractBuild<?, ?> build, BuildListener listener) throws IOException, InterruptedException {
+        return this.buildStartMessage(publisher, (Run<?, ?>) build, (TaskListener) listener);
+    }
+
+    @Override
+    public String buildStartMessage(IMPublisher publisher, Run<?, ?> build, TaskListener listener) throws IOException, InterruptedException {
         StringBuilder sb = new StringBuilder(super.buildStartMessage(publisher, build, listener));
 
-        AbstractBuild<?, ?> previousBuild = build.getPreviousBuild();
+        Run<?, ?> previousBuild = build.getPreviousBuild();
         if (previousBuild != null && !previousBuild.isBuilding()) {
             sb.append(" (previous build: ")
                 .append(getResultTrend(previousBuild).getID());
 
             Result r = previousBuild.getResult();
             if (r == null || r.isWorseThan(Result.SUCCESS)) {
-                AbstractBuild<?, ?> lastSuccessfulBuild = build.getPreviousSuccessfulBuild();
+                Run<?, ?> lastSuccessfulBuild = build.getPreviousSuccessfulBuild();
                 if (lastSuccessfulBuild != null) {
                     sb.append(" -- last ").append(Result.SUCCESS).append(" ")
                         .append(lastSuccessfulBuild.getDisplayName())

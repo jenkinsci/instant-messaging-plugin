@@ -44,7 +44,10 @@ import java.util.logging.Logger;
 
 import javax.annotation.Nonnull;
 
+import org.jenkinsci.plugins.workflow.job.WorkflowJob;
+
 import org.kohsuke.stapler.DataBoundSetter;
+
 import org.springframework.util.Assert;
 
 import static hudson.plugins.im.tools.BuildHelper.*;
@@ -68,6 +71,15 @@ public abstract class IMPublisher extends Notifier implements BuildStep, MatrixA
     private hudson.plugins.jabber.NotificationStrategy notificationStrategy;
 
     private NotificationStrategy strategy;
+    // Note: the name evolved over time, in notification-strategy.jelly it is
+    // published as 'notifyOnStart' and in Parameters.java (for paramNames)
+    // also as 'notifyStart', while older constructor named it
+    // 'notifyGroupChatsOnBuildStart'.
+    // The getter for this is 'getNotifyOnStart()', while the action taken in
+    // practice is 'notifyChatsOnBuildStart()'.
+    // Indeed, naming is one of the fundamental problems in IT ;)
+    // Following the getter, protocol plugins that expose this as a toggle for
+    // pipeline steps are encouraged to name their argument 'notifyOnStart'.
     private final boolean notifyOnBuildStart;
     private final boolean notifySuspects;
     private final boolean notifyCulprits;
@@ -343,6 +355,12 @@ public abstract class IMPublisher extends Notifier implements BuildStep, MatrixA
                     notifyOnBuildEnd(run, taskListener);
                 }
             } else {
+                if (run.getParent() instanceof WorkflowJob && getNotifyOnStart()) {
+                    // part of a pipeline step, called with the option explicitly
+                    // (has no other way to do so at the moment, no options{} support)
+                    notifyChatsOnBuildStart(run, taskListener);
+                    return;
+                } // else fall through
                 notifyOnBuildEnd(run, taskListener);
             }
         } else {
@@ -664,7 +682,11 @@ public abstract class IMPublisher extends Notifier implements BuildStep, MatrixA
      * @throws IOException
      */
     /* package for testing */ void notifyChatsOnBuildStart(AbstractBuild<?, ?> build, BuildListener buildListener) throws IOException, InterruptedException {
-        final String msg = buildToChatNotifier.buildStartMessage(this,build,buildListener);
+        this.notifyChatsOnBuildStart( (Run<?, ?>)build, (TaskListener) buildListener );
+    }
+
+    /* package for testing */ void notifyChatsOnBuildStart(@Nonnull Run<?, ?> build, @Nonnull TaskListener buildListener) throws IOException, InterruptedException {
+        final String msg = getBuildToChatNotifier().buildStartMessage(this, build, buildListener);
         if (Util.fixEmpty(msg) == null) {
             return;
         }
