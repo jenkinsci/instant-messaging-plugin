@@ -16,7 +16,9 @@ would output, and count and report hits compared to the full job lists.
 
 The key argument for this is `~` and the rest of the argument string is
 assumed to be the regular expression (note however that whitespace between
-tokens of the argument string is converted during argument processing).
+tokens of the argument string is converted during argument processing;
+for clarity it would be preferable to pass a single-token argument with
+`\s+` in positions where whitespace matches are expected).
 
 Beside ordinarily matching what is *present* in a line, this can be used
 with "negative lookups" for matching lines that *do not contain* certain
