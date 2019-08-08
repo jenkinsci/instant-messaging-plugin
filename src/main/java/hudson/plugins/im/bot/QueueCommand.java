@@ -37,9 +37,8 @@ public class QueueCommand extends BotCommand {
                                Sender sender, String[] args) throws IMException {
         Queue queue = Hudson.getInstance().getQueue();
         Item[] items = queue.getItems();
-        String reply;
+        StringBuffer msg = new StringBuffer();
         if (items.length > 0) {
-            StringBuffer msg = new StringBuffer();
             int count = 0;
             for (Item item : queue.getItems()) {
                 msg.append("\n- ")
@@ -48,12 +47,11 @@ public class QueueCommand extends BotCommand {
                 count++;
             }
             msg.insert(0, "Build queue (" + count + " items):");
-            reply = msg.toString();
         } else {
-            reply = "build queue is empty";
+            msg.append("build queue is empty");
         }
 
-        chat.sendMessage(reply);
+        chat.sendMessage(msg.toString());
     }
 
     @Override
