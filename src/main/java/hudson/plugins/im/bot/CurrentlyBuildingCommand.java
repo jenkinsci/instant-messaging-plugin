@@ -238,18 +238,27 @@ public class CurrentlyBuildingCommand extends BotCommand {
         }
 
         if (countJobsInProgess == 0) {
-            msg.append("\n- No jobs are running.");
-        } else if (countJobsInPattern == 0 && filterPattern != null) {
-            msg.append("\n- None of the running jobs matched the filter.");
-        }
-
-        if (filterPattern != null) {
-            msg.insert(0, "Currently building (" + countJobsInProgess +
-                " items total, of which " + countJobsInPattern +
-                " items matched the filter):");
+            if (cbDebug) {
+                msg.append("\n- ");
+            } else {
+                // Do not spam in the channel
+                msg = null; // Drop and GC the now-useless argument-processing data
+                msg = new StringBuffer();
+            }
+            msg.append("No jobs are running");
         } else {
-            msg.insert(0, "Currently building (" + countJobsInProgess +
-                " items):");
+            if (countJobsInPattern == 0 && filterPattern != null) {
+                msg.append("\n- None of the running jobs matched the filter.");
+            }
+
+            if (filterPattern != null) {
+                msg.insert(0, "Currently building (" + countJobsInProgess +
+                    " items total, of which " + countJobsInPattern +
+                    " items matched the filter):");
+            } else {
+                msg.insert(0, "Currently building (" + countJobsInProgess +
+                    " items):");
+            }
         }
 
         chat.sendMessage(msg.toString());
