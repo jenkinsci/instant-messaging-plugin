@@ -47,6 +47,13 @@ public class QueueCommand extends BotCommand {
                 count++;
             }
             msg.insert(0, "Build queue (" + count + " items):");
+            if (items.length != count) {
+                msg.append("\n- WARNING: Internal queue array length was ")
+                    .append(items.length)
+                    .append(" while we counted ")
+                    .append(count)
+                    .append(" items during listing! (maybe a bug in instant-messaging-plugin)");
+            }
         } else {
             msg.append("build queue is empty");
         }
