@@ -16,7 +16,10 @@ import java.util.Arrays;
 import java.util.Collection;
 
 /**
- * Queue command for the jabber bot.
+ * Queue command for the instant messaging plugin bot.
+ *
+ * Generates a list of jobs waiting in the queue.
+ *
  * @author Pascal Bleser
  */
 @Extension
