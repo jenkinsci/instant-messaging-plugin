@@ -51,7 +51,7 @@ public class QueueCommand extends BotCommand {
                 msg.append("\n- WARNING: Internal queue array length was ")
                     .append(items.length)
                     .append(" while we counted ")
-                    .append(count)
+                    .append(countJobsInQueue)
                     .append(" items during listing! (maybe a bug in instant-messaging-plugin)");
             }
         } else {
