@@ -40,7 +40,7 @@ public class QueueCommand extends BotCommand {
         StringBuffer msg = new StringBuffer();
         if (items.length > 0) {
             int count = 0;
-            for (Item item : queue.getItems()) {
+            for (Item item : items) {
                 msg.append("\n- ")
                 .append(item.task.getFullDisplayName())
                 .append(": ").append(item.getWhy());
