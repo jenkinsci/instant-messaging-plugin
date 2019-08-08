@@ -32,6 +32,7 @@ public class QueueCommand extends BotCommand {
         return Arrays.asList("queue","q");
     }
 
+    @Override
     public void executeCommand(Bot bot, IMChat chat, IMMessage message,
                                Sender sender, String[] args) throws IMException {
         Queue queue = Hudson.getInstance().getQueue();
@@ -55,6 +56,7 @@ public class QueueCommand extends BotCommand {
         chat.sendMessage(reply);
     }
 
+    @Override
     public String getHelp() {
         return HELP;
     }
