@@ -2,9 +2,12 @@ Jenkins Instant-Messaging plugin [![Build Status](https://ci.jenkins.io/job/Plug
 ================================
 
 This plugin provides abstract support for instant-messaging notifications
-to Jenkins, including a common bot-driven command and query interface.
+to Jenkins, including a common bot-driven command and query interface
+and the core for pipeline steps integration code.
+
 Practical support for particular IM protocols is implemented by various
-concrete plugins like the Jabber or the IRC plugin.
+concrete plugins like the Jabber or the IRC plugin, allowing users to have
+the same interactions with their Jenkins server whatever messenger they use.
 
 Note that there are some other IM protocol plugins that chose to implement
 everything from scratch, so they do not use `instant-messaging-plugin` as
