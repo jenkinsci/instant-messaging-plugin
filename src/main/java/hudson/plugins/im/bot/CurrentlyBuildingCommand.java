@@ -79,6 +79,9 @@ public class CurrentlyBuildingCommand extends BotCommand {
                             // whitespaces trimmed by line-parser.
                             // So if they meant modifiers (brackets,
                             // counts), they should spell them out.
+                            // For clarity it would be preferable to
+                            // pass a single token with \s+ where
+                            // whitespaces are expected.
                             filterRegex += " " + args[i];
                         }
                     }
