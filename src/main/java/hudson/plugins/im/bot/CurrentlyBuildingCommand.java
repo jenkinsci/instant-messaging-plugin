@@ -34,8 +34,8 @@ import org.jenkinsci.plugins.workflow.support.steps.ExecutorStepExecution.Placeh
  */
 @Extension
 public class CurrentlyBuildingCommand extends BotCommand {
-    private static final String SYNTAX = " [@] [?] [~ regex pattern]";
-    private static final String HELP = SYNTAX + " - list jobs which are currently in progress, with optional '@' display of URLs to the build (console log if possible) and/or '~ regex' filter on reported lines; '?' enables debugging of the command itself";
+    private static final String SYNTAX = " [@|#] [?] [~ regex pattern]";
+    private static final String HELP = SYNTAX + " - list jobs which are currently in progress, with optional '@' display of URLs to the build (console log if possible) and/or '~ regex' filter on reported lines; '#' returns just the match count; '?' enables debugging of the command itself";
 
     @Override
     public Collection<String> getCommandNames() {
@@ -49,6 +49,7 @@ public class CurrentlyBuildingCommand extends BotCommand {
         String filterRegex = null;
         Pattern filterPattern = null;
         boolean reportUrls = false;
+        boolean reportCountOnly = false;
         boolean cbDebug = false;
         // We are interested in args to the command, if any,
         // so starting from args[1] when (args.length >= 2)
@@ -56,6 +57,10 @@ public class CurrentlyBuildingCommand extends BotCommand {
         for (int a = 1 ; args.length > a; a++) {
             if (cbDebug) { chat.sendMessage("a=" + a + "  arg='" + args[a] + "' len=" + args.length +"\n"); }
             switch (args[a]) {
+                case "#":
+                    msg.append("\n- NOTE: got # argument for currentlyBuilding: will only report the matched-item counts");
+                    reportCountOnly = true;
+                    break;
                 case "@":
                     msg.append("\n- NOTE: got @ argument for currentlyBuilding: will add URLs to reported strings");
                     reportUrls = true;
@@ -99,7 +104,7 @@ public class CurrentlyBuildingCommand extends BotCommand {
         }
 
         String rootUrl = null;
-        if (reportUrls) {
+        if (reportUrls && !reportCountOnly) {
             JenkinsLocationConfiguration cfg = JenkinsLocationConfiguration.get();
             if (cfg != null) {
                 rootUrl = cfg.getUrl();
@@ -167,7 +172,7 @@ public class CurrentlyBuildingCommand extends BotCommand {
                         }
                     }
 
-                    if (reportUrls) {
+                    if (reportUrls && !reportCountOnly) {
                         String relativeUrl = null;
                         if (currentExecutableBuild != null) {
                             if (cbDebug) { msgLine.append(" URL:currExec= "); }
@@ -207,34 +212,36 @@ public class CurrentlyBuildingCommand extends BotCommand {
                         countJobsInPattern++;
                     }
 
-                    msg.append("\n- ");
-                    msg.append(msgLine);
-                    msg.append(" (Elapsed time: ");
-                    msg.append(Util.getTimeSpanString(executor.getElapsedTime()));
-                    msg.append(", Estimated remaining time: ");
-                    msg.append(executor.getEstimatedRemainingTime());
-                    msg.append(")");
+                    if (!reportCountOnly) {
+                        msg.append("\n- ");
+                        msg.append(msgLine);
+                        msg.append(" (Elapsed time: ");
+                        msg.append(Util.getTimeSpanString(executor.getElapsedTime()));
+                        msg.append(", Estimated remaining time: ");
+                        msg.append(executor.getEstimatedRemainingTime());
+                        msg.append(")");
 
-                    if (cbDebug) {
-                        msg.append("\n=== currExec class: ");
-                        msg.append(Arrays.asList(currentExecutable.getClass().getName()));
+                        if (cbDebug) {
+                            msg.append("\n=== currExec class: ");
+                            msg.append(Arrays.asList(currentExecutable.getClass().getName()));
 
-                        msg.append("\n=== currExec interfaces: ");
-                        msg.append(Arrays.asList(currentExecutable.getClass().getInterfaces()));
+                            msg.append("\n=== currExec interfaces: ");
+                            msg.append(Arrays.asList(currentExecutable.getClass().getInterfaces()));
 
-                        msg.append("\n=== currExec classes: ");
-                        msg.append(Arrays.asList(currentExecutable.getClass().getClasses()));
+                            msg.append("\n=== currExec classes: ");
+                            msg.append(Arrays.asList(currentExecutable.getClass().getClasses()));
 
-                        msg.append("\n=== currTask class: ");
-                        msg.append(Arrays.asList(task.getClass().getName()));
+                            msg.append("\n=== currTask class: ");
+                            msg.append(Arrays.asList(task.getClass().getName()));
 
-                        msg.append("\n=== currTask interfaces: ");
-                        msg.append(Arrays.asList(task.getClass().getInterfaces()));
+                            msg.append("\n=== currTask interfaces: ");
+                            msg.append(Arrays.asList(task.getClass().getInterfaces()));
 
-                        msg.append("\n=== currTask classes: ");
-                        msg.append(Arrays.asList(task.getClass().getClasses()));
+                            msg.append("\n=== currTask classes: ");
+                            msg.append(Arrays.asList(task.getClass().getClasses()));
 
-                        msg.append("\n");
+                            msg.append("\n");
+                        }
                     }
                 }
             }

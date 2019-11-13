@@ -26,8 +26,8 @@ import java.util.regex.Pattern;
  */
 @Extension
 public class QueueCommand extends BotCommand {
-    private static final String SYNTAX = " [~ regex pattern]";
-    private static final String HELP = SYNTAX + " - show the state of the build queue, with optional '~ regex' filter on reported lines";
+    private static final String SYNTAX = " [#] [~ regex pattern]";
+    private static final String HELP = SYNTAX + " - show the state of the build queue, with optional '~ regex' filter on reported lines; '#' returns just the match count";
 
     @Override
     public Collection<String> getCommandNames() {
@@ -42,12 +42,17 @@ public class QueueCommand extends BotCommand {
         StringBuffer msg = new StringBuffer();
         String filterRegex = null;
         Pattern filterPattern = null;
+        boolean reportCountOnly = false;
 
         // We are interested in args to the command, if any,
         // so starting from args[1] when (args.length >= 2)
         argsloop: // label for break to know which statement to abort
         for (int a = 1 ; args.length > a; a++) {
             switch (args[a]) {
+                case "#":
+                    msg.append("\n- NOTE: got # argument for currentlyBuilding: will only report the matched-item counts");
+                    reportCountOnly = true;
+                    break;
                 case "~": // the rest of line is the regex expression
                     if ( (args.length - a) < 1) {
                         msg.append("\n- WARNING: got ~ filtering argument for currentlyBuilding, but no filter value - so none was applied\n");
@@ -100,7 +105,9 @@ public class QueueCommand extends BotCommand {
                     countJobsInPattern++;
                 }
 
-                msg.append("\n- ").append(msgLine);
+                if (!reportCountOnly) {
+                    msg.append("\n- ").append(msgLine);
+                }
             }
             if (items.length != countJobsInQueue) {
                 msg.append("\n- WARNING: Internal queue array length was ")
