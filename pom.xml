@@ -26,6 +26,7 @@
         <revision>1.39</revision>
         <changelist>-SNAPSHOT</changelist>
         <gitHubRepo>jenkinsci/instant-messaging-plugin</gitHubRepo>
+        <version.findbugs-maven-plugin>3.0.4</version.findbugs-maven-plugin>
         <java.level>8</java.level>
     </properties>
 
@@ -169,6 +170,24 @@
                     <configuration>
                         <skip>true</skip>
                     </configuration>
+                </plugin>
+                <plugin>
+                    <groupId>org.codehaus.mojo</groupId>
+                    <artifactId>findbugs-maven-plugin</artifactId>
+                    <version>${version.findbugs-maven-plugin}</version>
+                    <configuration>
+                        <effort>Max</effort>
+                        <threshold>Low</threshold>
+                        <xmlOutput>true</xmlOutput>
+                        <failOnError>false</failOnError>
+                    </configuration>
+                    <executions>
+                        <execution>
+                            <goals>
+                                <goal>check</goal>
+                            </goals>
+                        </execution>
+                    </executions>
                 </plugin>
             </plugins>
         </pluginManagement>
