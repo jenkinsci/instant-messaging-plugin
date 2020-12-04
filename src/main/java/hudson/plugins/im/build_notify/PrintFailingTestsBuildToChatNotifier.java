@@ -1,5 +1,7 @@
 package hudson.plugins.im.build_notify;
 
+import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
+
 import hudson.Extension;
 import hudson.model.Run;
 import hudson.model.TaskListener;
@@ -69,7 +71,10 @@ public class PrintFailingTestsBuildToChatNotifier extends
 
         StringBuilder buf = new StringBuilder();
         List<CaseResult> failedTests = testResultAction.getFailedTests();
+
         Collections.sort(failedTests, new Comparator<CaseResult>() {
+            @SuppressFBWarnings(value = "SIC_INNER_SHOULD_BE_STATIC_ANON",
+                justification = "Maybe fix this inefficiency later, does not seem fatal")
             @Override
             public int compare(CaseResult o1, CaseResult o2) {
                 if (o1.getAge() < o2.getAge()) {
