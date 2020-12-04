@@ -146,7 +146,7 @@ public enum NotificationStrategy {
     }
 
     /**
-     * Returns the display names of all notification strategies.
+     * Returns the display names of all notification strategies as a List.
      */
     public static List<String> getDisplayNamesList() {
         // Return an immutable list copy of public array, not reference to it directly (findbugs MS - MS_EXPOSE_REP)
@@ -154,6 +154,11 @@ public enum NotificationStrategy {
         return Collections.unmodifiableList(resultList);
     }
 
+    /**
+     * Returns the display names of all notification strategies as an array.
+     * Deprecated because String[] array is not immutable and upsets findbugs.
+     */
+    @Deprecated
     public static String[] getDisplayNames() {
         // Return a copy of public array, not reference to if directly (findbugs MS - MS_EXPOSE_REP)
         return (String[])DISPLAY_NAMES.clone();
