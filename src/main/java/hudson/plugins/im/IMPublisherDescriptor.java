@@ -7,7 +7,7 @@ import java.util.List;
 public interface IMPublisherDescriptor {
 
     public static final String PARAMETERVALUE_STRATEGY_DEFAULT = NotificationStrategy.STATECHANGE_ONLY.getDisplayName();;
-    public static final String[] PARAMETERVALUE_STRATEGY_VALUES = NotificationStrategy.getDisplayNames();
+    public static final List<String> PARAMETERVALUE_STRATEGY_VALUES = NotificationStrategy.getDisplayNamesList();
 
     /**
      * Internally used to construct the parameter names on the config page.

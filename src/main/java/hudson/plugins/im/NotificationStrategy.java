@@ -3,6 +3,11 @@ package hudson.plugins.im;
 import hudson.model.ResultTrend;
 import hudson.model.Run;
 
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.Collections;
+import java.util.List;
+
 import static hudson.plugins.im.tools.BuildHelper.*;
 /**
  * Represents the notification strategy.
@@ -141,8 +146,19 @@ public enum NotificationStrategy {
     }
 
     /**
-     * Returns the display names of all notification strategies.
+     * Returns the display names of all notification strategies as a List.
      */
+    public static List<String> getDisplayNamesList() {
+        // Return an immutable list copy of public array, not reference to it directly (findbugs MS - MS_EXPOSE_REP)
+        List<String> resultList = Arrays.asList(DISPLAY_NAMES.clone());
+        return Collections.unmodifiableList(resultList);
+    }
+
+    /**
+     * Returns the display names of all notification strategies as an array.
+     * Deprecated because String[] array is not immutable and upsets findbugs.
+     */
+    @Deprecated
     public static String[] getDisplayNames() {
         // Return a copy of public array, not reference to if directly (findbugs MS - MS_EXPOSE_REP)
         return (String[])DISPLAY_NAMES.clone();
