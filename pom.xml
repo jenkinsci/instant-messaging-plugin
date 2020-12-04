@@ -1,3 +1,5 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!-- $Id: pom.xml 39481 2011-05-12 20:14:54Z kutzi $ -->
 <project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
     <modelVersion>4.0.0</modelVersion>
     <parent>
@@ -12,19 +14,6 @@
     <version>1.39-SNAPSHOT</version>
     <packaging>hpi</packaging>
     <url>http://wiki.jenkins-ci.org/display/JENKINS/Instant+Messaging+Plugin</url>
-    <developers>
-        <developer>
-            <id>kutzi</id>
-            <name>Christoph Kutzinski</name>
-            <email>kutzi@gmx.de</email>
-            <timezone>1</timezone>
-        </developer>
-        <developer>
-          <id>kohsuke</id>
-          <name>Kohsuke Kawaguchi</name>
-          <email>kk@kohsuke.org</email>
-        </developer>
-    </developers>
 
     <licenses>
         <license>
@@ -32,40 +21,6 @@
             <comments>All source code is under the MIT license.</comments>
         </license>
     </licenses>
-
-    <build>
-        <pluginManagement>
-            <plugins>
-                <plugin>
-                   <artifactId>maven-checkstyle-plugin</artifactId>
-                   <version>3.0.0</version>
-                   <configuration>
-                     <configLocation>${basedir}/checkstyle.xml</configLocation>
-                     <includeTestSourceDirectory>true</includeTestSourceDirectory>
-                     <sourceDirectories>
-                       <sourceDirectory>${project.build.sourceDirectory}</sourceDirectory>
-                     </sourceDirectories>
-                     <testSourceDirectories>
-                       <sourceDirectory>${project.build.testSourceDirectory}</sourceDirectory>
-                     </testSourceDirectories>
-                   </configuration>
-                   <executions>
-                     <execution>
-                       <goals>
-                         <goal>check</goal>
-                       </goals>
-                     </execution>
-                   </executions>
-                </plugin>
-                <plugin>
-                    <artifactId>maven-javadoc-plugin</artifactId>
-                    <configuration>
-                        <skip>true</skip>
-                    </configuration>
-              </plugin>
-            </plugins>
-        </pluginManagement>
-    </build>
 
     <properties>
         <java.level>8</java.level>
@@ -148,6 +103,26 @@
         </repository>
     </repositories>
 
+    <developers>
+        <developer>
+            <id>jimklimov</id>
+            <name>Jim Klimov</name>
+            <email>jimklimov+jenkinsci@gmail.com</email>
+            <timezone>1</timezone>
+        </developer>
+        <developer>
+            <id>kutzi</id>
+            <name>Christoph Kutzinski</name>
+            <email>kutzi@gmx.de</email>
+            <timezone>1</timezone>
+        </developer>
+        <developer>
+          <id>kohsuke</id>
+          <name>Kohsuke Kawaguchi</name>
+          <email>kk@kohsuke.org</email>
+        </developer>
+    </developers>
+
     <scm>
         <connection>scm:git:git@github.com:jenkinsci/instant-messaging-plugin.git</connection>
         <developerConnection>scm:git:git@github.com:jenkinsci/instant-messaging-plugin.git</developerConnection>
@@ -161,4 +136,39 @@
             <url>https://repo.jenkins-ci.org/public/</url>
         </pluginRepository>
     </pluginRepositories>
+
+    <build>
+        <pluginManagement>
+            <plugins>
+                <plugin>
+                    <artifactId>maven-checkstyle-plugin</artifactId>
+                    <version>3.0.0</version>
+                    <configuration>
+                        <configLocation>${basedir}/checkstyle.xml</configLocation>
+                        <includeTestSourceDirectory>true</includeTestSourceDirectory>
+                        <sourceDirectories>
+                            <sourceDirectory>${project.build.sourceDirectory}</sourceDirectory>
+                        </sourceDirectories>
+                        <testSourceDirectories>
+                            <sourceDirectory>${project.build.testSourceDirectory}</sourceDirectory>
+                        </testSourceDirectories>
+                    </configuration>
+                    <executions>
+                        <execution>
+                            <goals>
+                                <goal>check</goal>
+                            </goals>
+                        </execution>
+                    </executions>
+                </plugin>
+                <plugin>
+                    <artifactId>maven-javadoc-plugin</artifactId>
+                    <configuration>
+                        <skip>true</skip>
+                    </configuration>
+                </plugin>
+            </plugins>
+        </pluginManagement>
+    </build>
+
 </project>
