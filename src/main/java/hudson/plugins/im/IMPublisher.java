@@ -58,7 +58,7 @@ import static hudson.plugins.im.tools.BuildHelper.*;
  * @author Uwe Schaefer
  * @author Christoph Kutzinski
  */
-public abstract class IMPublisher extends Notifier implements BuildStep, MatrixAggregatable
+public abstract class IMPublisher extends Notifier implements /* BuildStep, */ MatrixAggregatable
 {
     private static final Logger LOGGER = Logger.getLogger(IMPublisher.class.getName());
 
