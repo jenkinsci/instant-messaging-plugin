@@ -11,7 +11,7 @@
 
     <artifactId>instant-messaging</artifactId>
     <name>Jenkins instant-messaging plugin</name>
-    <version>1.39-SNAPSHOT</version>
+    <version>${revision}${changelist}</version>
     <packaging>hpi</packaging>
     <url>https://plugins.jenkins.io/instant-messaging/</url>
 
@@ -23,6 +23,9 @@
     </licenses>
 
     <properties>
+        <revision>1.39</revision>
+        <changelist>-SNAPSHOT</changelist>
+        <gitHubRepo>jenkinsci/instant-messaging-plugin</gitHubRepo>
         <java.level>8</java.level>
     </properties>
 
