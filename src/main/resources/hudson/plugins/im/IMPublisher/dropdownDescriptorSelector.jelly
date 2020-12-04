@@ -47,7 +47,7 @@ THE SOFTWARE.
       <f:dropdownListBlock value="${loop.index}" title="${descriptor.displayName}"
         selected="${current.descriptor==descriptor || (current==null and descriptor==attrs.default)}">
         <j:set var="instance" value="${current.descriptor==descriptor ? current : null}" />
-        <tr><td><input type="hidden" name="stapler-class" value="${descriptor.clazz.name}"/></td></tr>
+        <f:invisibleEntry><input type="hidden" name="stapler-class" value="${descriptor.clazz.name}"/></f:invisibleEntry>
         <st:include from="${descriptor}" page="${descriptor.configPage}" />
       </f:dropdownListBlock>
     </j:forEach>
