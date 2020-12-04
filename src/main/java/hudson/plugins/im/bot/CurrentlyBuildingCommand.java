@@ -99,6 +99,7 @@ public class CurrentlyBuildingCommand extends BotCommand {
                     break argsloop;
                 default:
                     msg.append("\n- WARNING: got unsupported argument '" + args[a] + "' for currentlyBuilding, ignored; no filter was applied\n");
+                    if (cbDebug) { msg.append(giveSyntax(sender.getNickname(), args[0])); }
                     break;
             }
         }

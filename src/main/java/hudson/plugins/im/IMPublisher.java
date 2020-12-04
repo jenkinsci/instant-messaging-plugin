@@ -58,7 +58,7 @@ import static hudson.plugins.im.tools.BuildHelper.*;
  * @author Uwe Schaefer
  * @author Christoph Kutzinski
  */
-public abstract class IMPublisher extends Notifier implements BuildStep, MatrixAggregatable
+public abstract class IMPublisher extends Notifier implements /* BuildStep, */ MatrixAggregatable
 {
     private static final Logger LOGGER = Logger.getLogger(IMPublisher.class.getName());
 
@@ -374,7 +374,7 @@ public abstract class IMPublisher extends Notifier implements BuildStep, MatrixA
                         log(taskListener, "There was an error sending custom message to target: " + target.toString());
                     }
                 }
-            } catch (Exception e) {
+            } catch (RuntimeException e) {
                 log(taskListener, "There was an error iterating targets for sending a custom message");
             }
         }

@@ -8,6 +8,7 @@ public class IMPlugin {
 
     public IMPlugin(IMConnectionProvider provider) {
         this.provider = provider;
+        this.busyListener = null;
     }
 
     public void start() throws Exception {
@@ -16,7 +17,9 @@ public class IMPlugin {
     }
 
     public void stop() throws Exception {
-        this.busyListener.removeConnectionProvider(this.provider);
+        if (this.busyListener != null) {
+            this.busyListener.removeConnectionProvider(this.provider);
+        }
         this.provider.releaseConnection();
     }
 }
