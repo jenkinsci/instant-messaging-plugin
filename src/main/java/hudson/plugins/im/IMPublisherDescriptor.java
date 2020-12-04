@@ -3,11 +3,12 @@ package hudson.plugins.im;
 import hudson.plugins.im.config.ParameterNames;
 
 import java.util.List;
+import java.util.Collections;
 
 public interface IMPublisherDescriptor {
 
     public static final String PARAMETERVALUE_STRATEGY_DEFAULT = NotificationStrategy.STATECHANGE_ONLY.getDisplayName();;
-    public static final String[] PARAMETERVALUE_STRATEGY_VALUES = NotificationStrategy.getDisplayNames();
+    public static final List<String> PARAMETERVALUE_STRATEGY_VALUES = Collections.unmodifiableList(NotificationStrategy.getDisplayNames().asList());
 
     /**
      * Internally used to construct the parameter names on the config page.
