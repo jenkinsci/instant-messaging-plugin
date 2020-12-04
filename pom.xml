@@ -11,7 +11,7 @@
 
     <artifactId>instant-messaging</artifactId>
     <name>Jenkins instant-messaging plugin</name>
-    <version>${revision}${changelist}</version>
+    <version>1.39</version>
     <packaging>hpi</packaging>
     <url>https://plugins.jenkins.io/instant-messaging/</url>
 
@@ -139,7 +139,7 @@
         <connection>scm:git:github.com:${gitHubRepo}.git</connection>
         <developerConnection>scm:git:git@github.com:${gitHubRepo}.git</developerConnection>
         <url>https://github.com/${gitHubRepo}</url>
-        <tag>${scmTag}</tag>
+        <tag>instant-messaging-1.39</tag>
     </scm>
 
     <pluginRepositories>
