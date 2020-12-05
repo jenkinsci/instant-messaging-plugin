@@ -1,5 +1,6 @@
 package hudson.plugins.im;
 
+import hudson.Extension;
 import hudson.model.Describable;
 import hudson.model.Descriptor;
 import java.io.Serializable;
@@ -18,5 +19,13 @@ public interface IMMessageTarget extends Serializable, Describable<IMMessageTarg
     @SuppressWarnings("unchecked")
     default Descriptor<IMMessageTarget> getDescriptor() {
         return (Descriptor<IMMessageTarget>) Jenkins.get().getDescriptorOrDie(getClass());
+    }
+
+    @Extension
+    class DescriptorImpl extends Descriptor<IMMessageTarget> {
+        @Override
+        public String getDisplayName() {
+            return "IM Message Target";
+        }
     }
 }
