@@ -15,6 +15,7 @@ import java.util.Collections;
 import java.util.List;
 import java.util.regex.Pattern;
 
+import jenkins.model.Jenkins;
 import org.apache.commons.lang.StringUtils;
 
 /**
@@ -30,8 +31,6 @@ public class MessageHelper {
     /**
      * Returns the full URL to the build details page for a given build.
      */
-    @SuppressFBWarnings(value="RCN_REDUNDANT_NULLCHECK_OF_NONNULL_VALUE",
-        justification="In different Jenkins core versions, getInstance() might not always be NotNull")
     public static String getBuildURL(Run<?, ?> run) {
         if (run == null) {
             return "?";
@@ -39,9 +38,9 @@ public class MessageHelper {
 
         // The hudson's base url
         final StringBuilder builder;
-        if (Hudson.getInstance() != null) {
+        if (Jenkins.getInstanceOrNull() != null) {
             builder = new StringBuilder(
-                String.valueOf(Hudson.getInstance().getRootUrl()));
+                String.valueOf(Jenkins.get().getRootUrl()));
         } else {
             builder = new StringBuilder("null");
         }
