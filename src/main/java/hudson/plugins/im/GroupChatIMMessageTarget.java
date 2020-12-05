@@ -4,6 +4,9 @@ import hudson.Extension;
 import hudson.Util;
 
 import hudson.model.Descriptor;
+import hudson.util.Secret;
+import java.util.Objects;
+import org.kohsuke.stapler.DataBoundConstructor;
 import org.springframework.util.Assert;
 
 /**
@@ -20,20 +23,30 @@ public class GroupChatIMMessageTarget implements IMMessageTarget {
 
     private String name;
     private String password;
-    private boolean notificationOnly;
+    private Secret secretPassword;
+    private final boolean notificationOnly;
 
     /**
      * @deprecated use {@link GroupChatIMMessageTarget#GroupChatIMMessageTarget(String, String, boolean)}!
      */
     @Deprecated
     public GroupChatIMMessageTarget(final String name) {
-        this(name, null, false);
+        this(name, (Secret) null, false);
     }
 
+    @Deprecated
     public GroupChatIMMessageTarget(String name, String password, boolean notificationOnly) {
         Assert.notNull(name, "Parameter 'name' must not be null.");
         this.name = name;
-        this.password = password;
+        this.secretPassword = Secret.fromString(password);
+        this.notificationOnly = notificationOnly;
+    }
+
+    @DataBoundConstructor
+    public GroupChatIMMessageTarget(String name, Secret secretPassword, boolean notificationOnly) {
+        Assert.notNull(name, "Parameter 'name' must not be null.");
+        this.name = name;
+        this.secretPassword = secretPassword;
         this.notificationOnly = notificationOnly;
     }
 
@@ -41,12 +54,17 @@ public class GroupChatIMMessageTarget implements IMMessageTarget {
         return name;
     }
 
+    @Deprecated
     public String getPassword() {
         return password;
     }
 
+    public Secret getSecretPassword() {
+        return secretPassword;
+    }
+
     public boolean hasPassword() {
-        return Util.fixEmpty(this.password) != null;
+        return this.secretPassword != null;
     }
 
     public boolean isNotificationOnly() {
@@ -54,38 +72,19 @@ public class GroupChatIMMessageTarget implements IMMessageTarget {
     }
 
     @Override
-    public int hashCode() {
-        final int prime = 31;
-        int result = 1;
-        result = prime * result + ((name == null) ? 0 : name.hashCode());
-        result = prime * result + (notificationOnly ? 1231 : 1237);
-        result = prime * result
-                + ((password == null) ? 0 : password.hashCode());
-        return result;
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (o == null || getClass() != o.getClass()) return false;
+        GroupChatIMMessageTarget that = (GroupChatIMMessageTarget) o;
+        return notificationOnly == that.notificationOnly && 
+            Objects.equals(value, that.value) && 
+            Objects.equals(name, that.name) && 
+            Objects.equals(secretPassword, that.secretPassword);
     }
 
     @Override
-    public boolean equals(Object obj) {
-        if (this == obj)
-            return true;
-        if (obj == null)
-            return false;
-        if (getClass() != obj.getClass())
-            return false;
-        GroupChatIMMessageTarget other = (GroupChatIMMessageTarget) obj;
-        if (name == null) {
-            if (other.name != null)
-                return false;
-        } else if (!name.equals(other.name))
-            return false;
-        if (notificationOnly != other.notificationOnly)
-            return false;
-        if (password == null) {
-            if (other.password != null)
-                return false;
-        } else if (!password.equals(other.password))
-            return false;
-        return true;
+    public int hashCode() {
+        return Objects.hash(value, name, secretPassword, notificationOnly);
     }
 
     @Override
@@ -96,10 +95,16 @@ public class GroupChatIMMessageTarget implements IMMessageTarget {
     /**
      * Deserialize old instances.
      */
-    private Object readResolve() {
+    protected Object readResolve() {
         if (this.value != null && this.name == null) {
             this.name = this.value;
         }
+        
+        if (this.password != null) {
+            this.secretPassword = Secret.fromString(this.password);
+            this.password = null;
+        }
+        
         this.value = null;
         return this;
     }
