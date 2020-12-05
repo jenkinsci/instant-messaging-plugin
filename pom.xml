@@ -10,7 +10,7 @@
     <groupId>org.jvnet.hudson.plugins</groupId>
     <artifactId>instant-messaging</artifactId>
     <name>Jenkins instant-messaging plugin</name>
-    <version>1.40-SNAPSHOT</version>
+    <version>${revision}${changelist}</version>
     <packaging>hpi</packaging>
     <url>https://github.com/jenkinsci/instant-messaging-plugin</url>
 
@@ -22,10 +22,9 @@
     </licenses>
 
     <properties>
-        <revision>1.39</revision>
+        <revision>1.40</revision>
         <changelist>-SNAPSHOT</changelist>
         <gitHubRepo>jenkinsci/instant-messaging-plugin</gitHubRepo>
-        <version.findbugs-maven-plugin>3.0.4</version.findbugs-maven-plugin>
         <jenkins.version>2.269</jenkins.version>
         <java.level>8</java.level>
     </properties>
