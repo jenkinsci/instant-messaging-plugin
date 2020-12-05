@@ -1,6 +1,9 @@
 package hudson.plugins.im;
 
+import hudson.model.Describable;
+import hudson.model.Descriptor;
 import java.io.Serializable;
+import jenkins.model.Jenkins;
 
 /**
  * A MessageTarget represents a user to send notifications to (like "peter@jabber.org").
@@ -10,7 +13,10 @@ import java.io.Serializable;
  *
  * @author Uwe Schaefer
  */
-public interface IMMessageTarget extends Serializable
-{
+public interface IMMessageTarget extends Serializable, Describable<IMMessageTarget> {
 
+    @SuppressWarnings("unchecked")
+    default Descriptor<IMMessageTarget> getDescriptor() {
+        return (Descriptor<IMMessageTarget>) Jenkins.get().getDescriptorOrDie(getClass());
+    }
 }

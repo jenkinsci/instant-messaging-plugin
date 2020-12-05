@@ -1,7 +1,9 @@
 package hudson.plugins.im;
 
+import hudson.Extension;
 import hudson.Util;
 
+import hudson.model.Descriptor;
 import org.springframework.util.Assert;
 
 /**
@@ -100,5 +102,13 @@ public class GroupChatIMMessageTarget implements IMMessageTarget {
         }
         this.value = null;
         return this;
+    }
+
+    @Extension
+    public static class DescriptorImpl extends Descriptor<IMMessageTarget> {
+        @Override
+        public String getDisplayName() {
+            return "groupChatIMMessageTarget";
+        }
     }
 }
