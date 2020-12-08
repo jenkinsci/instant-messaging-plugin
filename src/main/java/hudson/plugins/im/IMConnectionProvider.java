@@ -4,6 +4,7 @@ import hudson.model.User;
 import hudson.plugins.im.tools.ExceptionHelper;
 import java.util.concurrent.Semaphore;
 import java.util.concurrent.TimeUnit;
+import java.util.logging.Level;
 import java.util.logging.Logger;
 
 import org.acegisecurity.Authentication;
@@ -60,6 +61,7 @@ public abstract class IMConnectionProvider implements IMConnectionListener {
             this.imConnection.addConnectionListener(this);
             return true;
         } catch (IMException e) {
+            LOGGER.log(Level.WARNING, "Could not create IM connection", e);
             this.imConnection = NULL_CONNECTION;
             tryReconnect();
             return false;
