@@ -6,6 +6,7 @@ import hudson.Util;
 import hudson.model.Descriptor;
 import hudson.util.Secret;
 import java.util.Objects;
+import org.apache.commons.lang.StringUtils;
 import org.kohsuke.stapler.DataBoundConstructor;
 import org.springframework.util.Assert;
 
@@ -64,7 +65,7 @@ public class GroupChatIMMessageTarget implements IMMessageTarget {
     }
 
     public boolean hasPassword() {
-        return this.secretPassword != null;
+        return this.secretPassword != null && StringUtils.isNotBlank(this.secretPassword.getPlainText());
     }
 
     public boolean isNotificationOnly() {
