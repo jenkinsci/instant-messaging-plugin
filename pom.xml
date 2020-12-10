@@ -101,9 +101,9 @@
 
         <!-- These used to be in instant-messaging-parent-plugin -->
         <dependency>
-            <groupId>org.jvnet.hudson.plugins</groupId>
+            <groupId>org.jenkins-ci.plugins</groupId>
             <artifactId>ci-game</artifactId>
-            <version>1.16</version>
+            <version>1.26</version>
             <scope>compile</scope>
             <optional>true</optional>
             <exclusions>
