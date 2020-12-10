@@ -98,6 +98,22 @@
             <artifactId>mockito-core</artifactId>
             <scope>test</scope>
         </dependency>
+
+        <!-- These used to be in instant-messaging-parent-plugin -->
+        <dependency>
+            <groupId>org.jvnet.hudson.plugins</groupId>
+            <artifactId>ci-game</artifactId>
+            <version>1.16</version>
+            <scope>compile</scope>
+            <optional>true</optional>
+            <exclusions>
+                <exclusion>
+                    <groupId>org.jvnet.hudson.main</groupId>
+                    <artifactId>maven-plugin</artifactId>
+                </exclusion>
+            </exclusions>
+        </dependency>
+
     </dependencies>
 
     <repositories>
