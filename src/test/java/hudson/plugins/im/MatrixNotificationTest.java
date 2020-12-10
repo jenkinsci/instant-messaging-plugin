@@ -37,8 +37,8 @@ public class MatrixNotificationTest {
     public void before() throws InterruptedException, IOException {
         this.publisher = mock(IMPublisher.class);
         when(publisher.prebuild(any(AbstractBuild.class), any(BuildListener.class))).thenCallRealMethod();
-        when(publisher.perform(any(AbstractBuild.class), any(Launcher.class), any(BuildListener.class))).thenCallRealMethod();
-        when(publisher.createAggregator(any(MatrixBuild.class), any(Launcher.class), any(BuildListener.class))).thenCallRealMethod();
+        when(publisher.perform(any(AbstractBuild.class), any(), any(BuildListener.class))).thenCallRealMethod();
+        when(publisher.createAggregator(any(MatrixBuild.class), any(), any(BuildListener.class))).thenCallRealMethod();
         when(publisher.getNotifyOnStart()).thenReturn(Boolean.TRUE);
 
         Mockito.doNothing().when(publisher).notifyChatsOnBuildStart(any(AbstractBuild.class), any(BuildListener.class));
