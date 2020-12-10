@@ -3,6 +3,7 @@ package hudson.plugins.im.bot;
 import hudson.Extension;
 import hudson.model.Hudson;
 import hudson.model.User;
+import hudson.plugins.cigame.UserScoreProperty;
 import hudson.plugins.im.Sender;
 import hudson.tasks.Mailer;
 
@@ -49,7 +50,17 @@ public class UserStatCommand extends AbstractTextSendingCommand {
             if (mailProperty != null) {
                 buf.append("\n").append("E-mail: ").append(mailProperty.getAddress());
             }
-            
+//            if (Hudson.getInstance().getPlugin("jabber") != null) {
+//
+//            }
+
+            if (Hudson.getInstance().getPlugin("ci-game") != null) {
+                UserScoreProperty property = user.getProperty(UserScoreProperty.class);
+                if (property != null) {
+                    int score = (int) property.getScore();
+                    buf.append("\n").append("Current score in continuous integration game: ").append(score);
+                }
+            }
             return buf.toString();
         } else {
             return sender.getNickname() + ": don't know a user named " + userName;
