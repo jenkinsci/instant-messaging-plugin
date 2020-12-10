@@ -1,5 +1,7 @@
 package hudson.plugins.im;
 
+import hudson.Extension;
+import hudson.model.Descriptor;
 import org.springframework.util.Assert;
 
 /**
@@ -50,5 +52,13 @@ public class DefaultIMMessageTarget implements IMMessageTarget
     public String toString()
     {
         return this.value;
+    }
+
+    @Extension
+    public static class DescriptorImpl extends Descriptor<IMMessageTarget> {
+        @Override
+        public String getDisplayName() {
+            return "defaultIMMessageTarget";
+        }
     }
 }

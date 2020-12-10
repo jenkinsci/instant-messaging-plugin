@@ -2,6 +2,7 @@ package hudson.plugins.im;
 
 import hudson.plugins.im.config.ParameterNames;
 
+import hudson.util.Secret;
 import java.util.List;
 
 public interface IMPublisherDescriptor {
@@ -57,8 +58,17 @@ public interface IMPublisherDescriptor {
 
     /**
      * Returns the password needed to login into the IM network.
+     * @deprecated use {@link #getSecretPassword()}
      */
-    String getPassword();
+    @Deprecated
+    default String getPassword() {
+        throw new UnsupportedOperationException("use getSecretPassword()");
+    }
+
+    /**
+     * Returns the password needed to login into the IM network.
+     */
+    Secret getSecretPassword();
 
     String getCommandPrefix();
 
