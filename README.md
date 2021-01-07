@@ -6,15 +6,25 @@ to Jenkins, including a common bot-driven command and query interface
 and the core for pipeline steps integration code.
 
 Practical support for particular IM protocols is implemented by various
-concrete plugins like the Jabber or the IRC plugin, allowing users to have
-the same interactions with their Jenkins server whatever messenger they use.
+concrete plugins like the
+[Jabber/XMPP](https://github.com/jenkinsci/jabber-plugin) or the
+[IRC](https://github.com/jenkinsci/ircbot-plugin) plugin, allowing users
+to have the same interactions with their Jenkins server whatever messenger
+they use.
 
 Note that there are some other IM protocol plugins that chose to implement
 everything from scratch, so they do not use `instant-messaging-plugin` as
 a dependency and do not enjoy its common features.
 
-For more information, visit the wiki page:
-<https://wiki.jenkins-ci.org/display/JENKINS/Instant+Messaging+Plugin>
+There are also plugins which add commands available via instant messaging
+such as [Log Command](https://github.com/jenkinsci/log-command-plugin).
+
+For more information, visit the plugin information page:
+<https://plugins.jenkins.io/instant-messaging/>
+
+The practical suggestions for freestyle or pipeline job setup may be seen in
+<https://plugins.jenkins.io/ircbot/> and <https://plugins.jenkins.io/jabber/>
+pages.
 
 Regex support in bot commands
 -----------------------------
