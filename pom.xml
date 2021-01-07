@@ -10,7 +10,7 @@
     <groupId>org.jvnet.hudson.plugins</groupId>
     <artifactId>instant-messaging</artifactId>
     <name>Jenkins instant-messaging plugin</name>
-    <version>${revision}${changelist}</version>
+    <version>1.41</version>
     <packaging>hpi</packaging>
     <url>https://github.com/jenkinsci/instant-messaging-plugin</url>
 
@@ -147,7 +147,7 @@
         <connection>scm:git:github.com:${gitHubRepo}.git</connection>
         <developerConnection>scm:git:git@github.com:${gitHubRepo}.git</developerConnection>
         <url>https://github.com/${gitHubRepo}</url>
-        <tag>${scmTag}</tag>
+        <tag>instant-messaging-1.41</tag>
     </scm>
 
     <pluginRepositories>
