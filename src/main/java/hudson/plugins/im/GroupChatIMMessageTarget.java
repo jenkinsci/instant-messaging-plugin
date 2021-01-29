@@ -1,14 +1,15 @@
 package hudson.plugins.im;
 
 import hudson.Extension;
-import hudson.Util;
 
 import hudson.model.Descriptor;
 import hudson.util.Secret;
 import java.util.Objects;
 import org.apache.commons.lang.StringUtils;
 import org.kohsuke.stapler.DataBoundConstructor;
-import org.springframework.util.Assert;
+import org.kohsuke.stapler.DataBoundSetter;
+
+import static java.util.Objects.requireNonNull;
 
 /**
  * {@link GroupChatIMMessageTarget} represents a 'chat room' or something like that.
@@ -23,8 +24,9 @@ public class GroupChatIMMessageTarget implements IMMessageTarget {
     private transient String value;
 
     private String name;
-    private String password;
-    private Secret secretPassword;
+    private Secret password;
+    @Deprecated
+    private transient Secret secretPassword;
     private final boolean notificationOnly;
 
     /**
@@ -37,17 +39,23 @@ public class GroupChatIMMessageTarget implements IMMessageTarget {
 
     @Deprecated
     public GroupChatIMMessageTarget(String name, String password, boolean notificationOnly) {
-        Assert.notNull(name, "Parameter 'name' must not be null.");
+        requireNonNull(name, "Parameter 'name' must not be null.");
         this.name = name;
-        this.secretPassword = Secret.fromString(password);
+        this.password = Secret.fromString(password);
+        this.notificationOnly = notificationOnly;
+    }
+
+    public GroupChatIMMessageTarget(String name, Secret secretPassword, boolean notificationOnly) {
+        requireNonNull(name, "Parameter 'name' must not be null.");
+        this.name = name;
+        this.password = secretPassword;
         this.notificationOnly = notificationOnly;
     }
 
     @DataBoundConstructor
-    public GroupChatIMMessageTarget(String name, Secret secretPassword, boolean notificationOnly) {
-        Assert.notNull(name, "Parameter 'name' must not be null.");
+    public GroupChatIMMessageTarget(String name, boolean notificationOnly) {
+        requireNonNull(name, "Parameter 'name' must not be null.");
         this.name = name;
-        this.secretPassword = secretPassword;
         this.notificationOnly = notificationOnly;
     }
 
@@ -57,15 +65,24 @@ public class GroupChatIMMessageTarget implements IMMessageTarget {
 
     @Deprecated
     public String getPassword() {
-        return password;
+        return Secret.toString(password);
     }
 
     public Secret getSecretPassword() {
-        return secretPassword;
+        return password;
+    }
+
+    @DataBoundSetter
+    public void setSecretPassword(Secret secretPassword) {
+        if (Secret.toString(secretPassword).equals("")) {
+            this.password = null;
+        } else {
+            this.password = secretPassword;
+        }
     }
 
     public boolean hasPassword() {
-        return this.secretPassword != null && StringUtils.isNotBlank(this.secretPassword.getPlainText());
+        return this.password != null && StringUtils.isNotBlank(this.password.getPlainText());
     }
 
     public boolean isNotificationOnly() {
@@ -80,12 +97,12 @@ public class GroupChatIMMessageTarget implements IMMessageTarget {
         return notificationOnly == that.notificationOnly && 
             Objects.equals(value, that.value) && 
             Objects.equals(name, that.name) && 
-            Objects.equals(secretPassword, that.secretPassword);
+            Objects.equals(password, that.password);
     }
 
     @Override
     public int hashCode() {
-        return Objects.hash(value, name, secretPassword, notificationOnly);
+        return Objects.hash(value, name, password, notificationOnly);
     }
 
     @Override
@@ -101,9 +118,9 @@ public class GroupChatIMMessageTarget implements IMMessageTarget {
             this.name = this.value;
         }
         
-        if (this.password != null) {
-            this.secretPassword = Secret.fromString(this.password);
-            this.password = null;
+        if (this.secretPassword != null) {
+            this.password = this.secretPassword;
+            this.secretPassword = null;
         }
         
         this.value = null;
