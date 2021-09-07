@@ -17,6 +17,7 @@
     <name>Jenkins instant-messaging plugin</name>
     <description>A plugin that allows interaction with Jenkins from instant messaging chat systems (using protocol adapters from other plugins, such as ircbot and others)</description>
     <url>https://github.com/jenkinsci/instant-messaging-plugin</url>
+    <inceptionYear>2009</inceptionYear>
 
     <licenses>
         <license>
