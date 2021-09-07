@@ -5,12 +5,15 @@
     <parent>
         <groupId>org.jenkins-ci.plugins</groupId>
         <artifactId>plugin</artifactId>
-        <version>4.13</version>
+        <version>4.19</version>
+    <relativePath />
     </parent>
+
     <groupId>org.jvnet.hudson.plugins</groupId>
     <artifactId>instant-messaging</artifactId>
     <packaging>hpi</packaging>
     <version>${revision}${changelist}</version>
+
     <name>Jenkins instant-messaging plugin</name>
     <description>A plugin that allows interaction with Jenkins from instant messaging chat systems (using protocol adapters from other plugins, such as ircbot and others)</description>
     <url>https://github.com/jenkinsci/instant-messaging-plugin</url>
