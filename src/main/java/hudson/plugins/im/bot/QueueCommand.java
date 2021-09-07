@@ -50,12 +50,12 @@ public class QueueCommand extends BotCommand {
         for (int a = 1 ; args.length > a; a++) {
             switch (args[a]) {
                 case "#":
-                    msg.append("\n- NOTE: got # argument for currentlyBuilding: will only report the matched-item counts");
+                    msg.append("\n- NOTE: got # argument for queue: will only report the matched-item counts");
                     reportCountOnly = true;
                     break;
                 case "~": // the rest of line is the regex expression
                     if ( (args.length - a) < 1) {
-                        msg.append("\n- WARNING: got ~ filtering argument for currentlyBuilding, but no filter value - so none was applied\n");
+                        msg.append("\n- WARNING: got ~ filtering argument for queue, but no filter value - so none was applied\n");
                         break argsloop;
                     }
                     for (int i = (a + 1); i < args.length; i++) {
