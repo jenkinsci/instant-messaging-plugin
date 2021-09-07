@@ -16,7 +16,7 @@
 
     <name>Jenkins instant-messaging plugin</name>
     <description>A plugin that allows interaction with Jenkins from instant messaging chat systems (using protocol adapters from other plugins, such as ircbot and others)</description>
-    <url>https://github.com/jenkinsci/instant-messaging-plugin</url>
+    <url>https://github.com/jenkinsci/${project.artifactId}-plugin</url>
     <inceptionYear>2009</inceptionYear>
 
     <licenses>
@@ -30,7 +30,7 @@
     <properties>
         <revision>1.43</revision>
         <changelist>-SNAPSHOT</changelist>
-        <gitHubRepo>jenkinsci/instant-messaging-plugin</gitHubRepo>
+        <gitHubRepo>jenkinsci/${project.artifactId}-plugin</gitHubRepo>
         <java.level>8</java.level>
         <jenkins.version>2.269</jenkins.version>
     </properties>
