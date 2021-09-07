@@ -46,7 +46,7 @@ patterns. Certain know-how applies to such expressions:
 * To negative-match the whole string from start, use a caret, e.g.:
 
 ````
-cb ~ ^(?!master)
+developer> cb ~ ^(?!master)
 ````
 to skip jobs running on nodes whose name starts with (or equals) `master`.
 Without the caret it did not work.
@@ -55,7 +55,30 @@ Without the caret it did not work.
 lookahead pattern:
 
 ````
-cb ~ ^(?!.*rescan)
+developer> cb ~ ^(?!.*rescan)
 ````
 
 would list only jobs whose IM report line does NOT include `rescan`.
+
+* Similarly, these commands can be used to quickly gauge how many builds
+are queued or running (without spelling out each one), with a regex filter
+or overall:
+
+````
+developer> jenkins: q # ~ mycomponent
+jenkins> (notice) Build queue (19 items total, of which 2 items matched the filter)
+
+developer> jenkins: cb #
+jenkins> (notice) Currently building (11 items)
+````
+
+* The `currentlyBuilding` command can also be asked to provide URLs to the
+console of the reported running builds, so you can quickly tap into them,
+e.g.:
+
+````
+developer> jenkins: cb @ ~ UI
+jenkins> (notice) - ui-builder-1#0: UIbuild #25190
+  @ https://jenkins.some.org/job/UIbuild/25190/console
+  (Elapsed time: 2 min 31 sec, Estimated remaining time: 4 min 35 sec)
+````
