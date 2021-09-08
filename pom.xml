@@ -32,7 +32,7 @@
         <changelist>-SNAPSHOT</changelist>
         <gitHubRepo>jenkinsci/${project.artifactId}-plugin</gitHubRepo>
         <java.level>8</java.level>
-        <jenkins.version>2.269</jenkins.version>
+        <jenkins.version>2.270</jenkins.version>
     </properties>
 
     <dependencyManagement>
@@ -66,7 +66,7 @@
             <groupId>org.jenkins-ci.main</groupId>
             <artifactId>maven-plugin</artifactId>
             <!-- needs hudson.model.User with getById() -->
-            <version>3.8</version>
+            <version>3.12</version>
             <exclusions>
                 <!-- TODO bump in maven plugin, conflict with junit plugin dependencies -->
                 <exclusion>
@@ -202,6 +202,18 @@
                 </plugin>
             </plugins>
         </pluginManagement>
+        <plugins>
+            <plugin>
+                <groupId>org.jenkins-ci.tools</groupId>
+                <artifactId>maven-hpi-plugin</artifactId>
+                <configuration>
+                    <loggers>
+                        <hudson.plugins.im>FINE</hudson.plugins.im>
+                    </loggers>
+                    <compatibleSinceVersion>2.0</compatibleSinceVersion>
+                </configuration>
+            </plugin>
+        </plugins>
     </build>
 
 </project>
