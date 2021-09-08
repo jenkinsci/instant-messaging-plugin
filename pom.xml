@@ -12,7 +12,7 @@
     <groupId>org.jvnet.hudson.plugins</groupId>
     <artifactId>instant-messaging</artifactId>
     <packaging>hpi</packaging>
-    <version>${revision}${changelist}</version>
+    <version>1.43</version>
 
     <name>Jenkins instant-messaging plugin</name>
     <description>A plugin that allows interaction with Jenkins from instant messaging chat systems (using protocol adapters from other plugins, such as ircbot and others)</description>
@@ -160,7 +160,7 @@
         <connection>scm:git:git://github.com/${gitHubRepo}.git</connection>
         <developerConnection>scm:git:git@github.com:${gitHubRepo}.git</developerConnection>
         <url>https://github.com/${gitHubRepo}</url>
-        <tag>${scmTag}</tag>
+        <tag>instant-messaging-1.43</tag>
     </scm>
 
     <pluginRepositories>
