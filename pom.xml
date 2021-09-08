@@ -62,6 +62,7 @@
             <groupId>org.jenkins-ci.plugins</groupId>
             <artifactId>junit</artifactId>
         </dependency>
+
         <dependency>
             <groupId>org.jenkins-ci.main</groupId>
             <artifactId>maven-plugin</artifactId>
@@ -120,12 +121,14 @@
             <version>1.26</version>
             <scope>compile</scope>
             <optional>true</optional>
+<!--
             <exclusions>
                 <exclusion>
                     <groupId>org.jvnet.hudson.main</groupId>
                     <artifactId>maven-plugin</artifactId>
                 </exclusion>
             </exclusions>
+-->
         </dependency>
 
     </dependencies>
