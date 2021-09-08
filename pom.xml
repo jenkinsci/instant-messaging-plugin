@@ -5,7 +5,7 @@
     <parent>
         <groupId>org.jenkins-ci.plugins</groupId>
         <artifactId>plugin</artifactId>
-        <version>4.19</version>
+        <version>4.24</version>
         <relativePath />
     </parent>
 
@@ -62,6 +62,7 @@
             <groupId>org.jenkins-ci.plugins</groupId>
             <artifactId>junit</artifactId>
         </dependency>
+
         <dependency>
             <groupId>org.jenkins-ci.main</groupId>
             <artifactId>maven-plugin</artifactId>
@@ -72,6 +73,14 @@
                 <exclusion>
                     <groupId>org.apache.commons</groupId>
                     <artifactId>commons-lang3</artifactId>
+                </exclusion>
+                <!-- TODO conflict with jenkins-test-harness that wants a newer
+                     version currently, see comments in
+                     https://github.com/jenkinsci/instant-messaging-plugin/pull/50
+                -->
+                <exclusion>
+                    <groupId>commons-net</groupId>
+                    <artifactId>commons-net</artifactId>
                 </exclusion>
             </exclusions>
         </dependency>
@@ -112,12 +121,14 @@
             <version>1.26</version>
             <scope>compile</scope>
             <optional>true</optional>
+<!--
             <exclusions>
                 <exclusion>
                     <groupId>org.jvnet.hudson.main</groupId>
                     <artifactId>maven-plugin</artifactId>
                 </exclusion>
             </exclusions>
+-->
         </dependency>
 
     </dependencies>
