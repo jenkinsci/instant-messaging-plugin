@@ -73,6 +73,14 @@
                     <groupId>org.apache.commons</groupId>
                     <artifactId>commons-lang3</artifactId>
                 </exclusion>
+                <!-- TODO conflict with jenkins-test-harness that wants a newer
+                     version currently, see comments in
+                     https://github.com/jenkinsci/instant-messaging-plugin/pull/50
+                -->
+                <exclusion>
+                    <groupId>commons-net</groupId>
+                    <artifactId>commons-net</artifactId>
+                </exclusion>
             </exclusions>
         </dependency>
 
