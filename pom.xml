@@ -67,7 +67,7 @@
             <groupId>org.jenkins-ci.main</groupId>
             <artifactId>maven-plugin</artifactId>
             <!-- needs hudson.model.User with getById() -->
-            <version>3.16</version>
+            <version>3.17</version>
             <exclusions>
                 <!-- TODO bump in maven plugin, conflict with junit plugin dependencies -->
                 <exclusion>
