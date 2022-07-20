@@ -32,15 +32,15 @@
         <changelist>-SNAPSHOT</changelist>
         <gitHubRepo>jenkinsci/${project.artifactId}-plugin</gitHubRepo>
         <java.level>8</java.level>
-        <jenkins.version>2.289.1</jenkins.version>
+        <jenkins.version>2.332.1</jenkins.version>
     </properties>
 
     <dependencyManagement>
         <dependencies>
             <dependency>
                 <groupId>io.jenkins.tools.bom</groupId>
-                <artifactId>bom-2.263.x</artifactId>
-                <version>961.vf0c9f6f59827</version>
+                <artifactId>bom-2.332.x</artifactId>
+                <version>1500.ve4d05cd32975</version>
                 <scope>import</scope>
                 <type>pom</type>
             </dependency>
@@ -52,6 +52,28 @@
             <groupId>org.jenkins-ci.plugins</groupId>
             <artifactId>mailer</artifactId>
             <!-- TODO: should be transformed into a optional dependency -->
+        </dependency>
+        <dependency>
+            <groupId>javax.mail</groupId>
+            <artifactId>javax.mail-api</artifactId>
+            <version>1.5.6</version>
+        </dependency>
+        <dependency>
+            <groupId>org.kohsuke</groupId>
+            <artifactId>access-modifier-annotation</artifactId>
+            <scope>provided</scope>
+            <!-- Use version preferred by jenkins-core -->
+        </dependency>
+        <dependency>
+            <groupId>com.github.spotbugs</groupId>
+            <artifactId>spotbugs-annotations</artifactId>
+            <scope>provided</scope>
+            <!-- Use version preferred by jenkins-core -->
+        </dependency>
+        <dependency>
+            <groupId>javax.annotation</groupId>
+            <artifactId>javax.annotation-api</artifactId>
+            <version>1.3.2</version>
         </dependency>
         <dependency>
             <groupId>org.jenkins-ci.plugins</groupId>
@@ -67,7 +89,7 @@
             <groupId>org.jenkins-ci.main</groupId>
             <artifactId>maven-plugin</artifactId>
             <!-- needs hudson.model.User with getById() -->
-            <version>3.16</version>
+            <version>3.19</version>
             <exclusions>
                 <!-- TODO bump in maven plugin, conflict with junit plugin dependencies -->
                 <exclusion>
@@ -81,6 +103,11 @@
                 <exclusion>
                     <groupId>commons-net</groupId>
                     <artifactId>commons-net</artifactId>
+                </exclusion>
+                <!-- Provided by Jenkins core -->
+                <exclusion>
+                    <groupId>org.jenkins-ci</groupId>
+                    <artifactId>symbol-annotation</artifactId>
                 </exclusion>
             </exclusions>
         </dependency>
