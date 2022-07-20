@@ -5,7 +5,7 @@
     <parent>
         <groupId>org.jenkins-ci.plugins</groupId>
         <artifactId>plugin</artifactId>
-        <version>4.29</version>
+        <version>4.43.1</version>
         <relativePath />
     </parent>
 
@@ -139,6 +139,11 @@
         <dependency>
             <groupId>org.mockito</groupId>
             <artifactId>mockito-core</artifactId>
+            <version>3.12.4</version>
+            <!-- Note: mockito 4.x removed the Matchers class,
+                 which was Deprecated in 3.x and is currently
+                 used in MatrixNotificationTest sources
+            -->
             <scope>test</scope>
         </dependency>
 
