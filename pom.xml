@@ -33,6 +33,7 @@
         <gitHubRepo>jenkinsci/${project.artifactId}-plugin</gitHubRepo>
         <java.level>8</java.level>
         <jenkins.version>2.332.1</jenkins.version>
+        <!-- Note: keep in sync with io.jenkins.tools.bom version below -->
     </properties>
 
     <dependencyManagement>
@@ -88,7 +89,7 @@
         <dependency>
             <groupId>org.jenkins-ci.main</groupId>
             <artifactId>maven-plugin</artifactId>
-            <!-- needs hudson.model.User with getById() -->
+            <!-- needs version of hudson.model.User with getById() -->
             <version>3.19</version>
             <exclusions>
                 <!-- TODO bump in maven plugin, conflict with junit plugin dependencies -->
