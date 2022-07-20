@@ -122,11 +122,6 @@
         <dependency>
             <groupId>org.mockito</groupId>
             <artifactId>mockito-core</artifactId>
-            <version>3.12.4</version>
-            <!-- Note: mockito 4.x removed the Matchers class,
-                 which was Deprecated in 3.x and is currently
-                 used in MatrixNotificationTest sources
-            -->
             <scope>test</scope>
         </dependency>
 
