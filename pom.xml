@@ -31,7 +31,6 @@
         <revision>1.50</revision>
         <changelist>-SNAPSHOT</changelist>
         <gitHubRepo>jenkinsci/${project.artifactId}-plugin</gitHubRepo>
-        <java.level>8</java.level>
         <jenkins.version>2.332.1</jenkins.version>
         <!-- Note: keep in sync with io.jenkins.tools.bom version below -->
     </properties>
