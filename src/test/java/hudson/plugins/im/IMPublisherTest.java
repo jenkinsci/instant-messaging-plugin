@@ -25,8 +25,6 @@ import java.util.Iterator;
 import java.util.Map;
 import java.util.Set;
 
-import javax.mail.MessagingException;
-
 import org.junit.Before;
 import org.junit.Test;
 
@@ -149,7 +147,8 @@ public class IMPublisherTest {
      * list.
      */
     @Test
-    public void testIncludeUpstreamCulprits() throws MessagingException, InterruptedException {
+    public void testIncludeUpstreamCulprits() throws Exception {
+        /* Anticipating javax.mail.MessagingException and InterruptedException */
         Set<User> recipients = this.imPublisher.getNearestUpstreamCommitters(this.build, listener).keySet();
 
         assertEquals(recipients.toString(), 2, recipients.size());
