@@ -58,7 +58,7 @@ public class JenkinsIsBusyListener extends RunListener {
         LOGGER.fine("Added connection provider: " + provider);
     }
 
-    @SuppressFBWarnings(value = "ST_WRITE_TO_STATIC_FROM_INSTANCE_METHOD",
+    @SuppressFBWarnings(value = {"ST_WRITE_TO_STATIC_FROM_INSTANCE_METHOD", "SSD_DO_NOT_USE_INSTANCE_LOCK_ON_SHARED_STATIC_DATA"},
         justification = "We only write to the static field to GC it after unregistering everything")
     public synchronized void removeConnectionProvider(IMConnectionProvider provider) {
         this.connectionProviders.remove(provider);
