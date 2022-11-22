@@ -1,7 +1,5 @@
 package hudson.plugins.im.bot;
 
-import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
-
 import hudson.Extension;
 import hudson.plugins.im.Sender;
 import hudson.plugins.im.tools.MessageHelper;
@@ -42,7 +40,6 @@ public class SnackCommand extends AbstractTextSendingCommand {
     // a single Random object than to keep allocating new ones
     private static final Random ran = new Random();
 
-    @SuppressFBWarnings("DMI_RANDOM_USED_ONLY_ONCE") // See also https://github.com/spotbugs/spotbugs/issues/1539
     @Override
     protected String getReply(Bot bot, Sender sender, String[] args) {
         String snack = null;
