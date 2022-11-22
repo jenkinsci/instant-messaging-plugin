@@ -12,7 +12,7 @@
     <groupId>org.jvnet.hudson.plugins</groupId>
     <artifactId>instant-messaging</artifactId>
     <packaging>hpi</packaging>
-    <version>${revision}${changelist}</version>
+    <version>${revision}.${changelist}</version>
 
     <name>Jenkins instant-messaging plugin</name>
     <description>A plugin that allows interaction with Jenkins from instant messaging chat systems (using protocol adapters from other plugins, such as ircbot and others)</description>
@@ -28,8 +28,8 @@
     </licenses>
 
     <properties>
-        <revision>1.54</revision>
-        <changelist>-SNAPSHOT</changelist>
+        <revision>2</revision>
+        <changelist>999999-SNAPSHOT</changelist>
         <gitHubRepo>jenkinsci/${project.artifactId}-plugin</gitHubRepo>
         <jenkins.version>2.332.4</jenkins.version>
         <!-- Note: keep in sync with io.jenkins.tools.bom version below -->
