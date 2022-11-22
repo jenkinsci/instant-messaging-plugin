@@ -1,7 +1,5 @@
 package hudson.plugins.im.tools;
 
-import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
-
 import hudson.Util;
 import hudson.model.Hudson;
 import hudson.model.Run;
