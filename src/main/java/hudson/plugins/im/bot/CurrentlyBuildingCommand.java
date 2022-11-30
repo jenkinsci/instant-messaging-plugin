@@ -107,9 +107,7 @@ public class CurrentlyBuildingCommand extends BotCommand {
         String rootUrl = null;
         if (reportUrls && !reportCountOnly) {
             JenkinsLocationConfiguration cfg = JenkinsLocationConfiguration.get();
-            if (cfg != null) {
-                rootUrl = cfg.getUrl();
-            }
+            rootUrl = cfg.getUrl();
             if (rootUrl == null) {
                 msg.append("\n- WARNING: Could not determine Jenkins URL for reporting.\n");
             } else {

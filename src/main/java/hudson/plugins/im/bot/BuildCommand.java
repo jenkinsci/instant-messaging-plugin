@@ -180,7 +180,7 @@ public class BuildCommand extends AbstractTextSendingCommand {
         List<ParameterValue> parameters = new ArrayList<ParameterValue>();
         ParametersDefinitionProperty propDefs = project.getProperty(ParametersDefinitionProperty.class);
         for (ParameterDefinition pd : propDefs.getParameterDefinitions()) {
-            if (pd.getName() != null && parsedParameters.containsKey(pd.getName())) {
+            if (parsedParameters.containsKey(pd.getName())) {
                 if (pd instanceof SimpleParameterDefinition) {
                     SimpleParameterDefinition spd = (SimpleParameterDefinition) pd;
                     parameters.add(spd.createValue(parsedParameters.get(pd.getName())));
