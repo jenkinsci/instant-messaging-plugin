@@ -1,5 +1,6 @@
 package hudson.plugins.im.build_notify;
 
+import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 import hudson.Extension;
 import hudson.model.Run;
 import hudson.model.TaskListener;
@@ -61,6 +62,8 @@ public class PrintFailingTestsBuildToChatNotifier extends
         return msg + getFailedTestsReport(build);
     }
 
+    @SuppressFBWarnings(value = "SIC_INNER_SHOULD_BE_STATIC_ANON",
+        justification = "Commented below, no idea how to solve")
     private CharSequence getFailedTestsReport(Run<?, ?> build) {
         AbstractTestResultAction testResultAction = build.getAction(AbstractTestResultAction.class);
         if (testResultAction == null || testResultAction.getFailCount() == 0) {
@@ -68,6 +71,12 @@ public class PrintFailingTestsBuildToChatNotifier extends
         }
 
         StringBuilder buf = new StringBuilder();
+        // SIC_INNER_SHOULD_BE_STATIC_ANON.... whatever that means:
+        // The class hudson.plugins.im.build_notify.PrintFailingTestsBuildToChatNotifier$1
+        // could be refactored into a named _static_ inner class.
+        // IDEA says: Unchecked assignment: 'java.util.List' to 'java.util.List<hudson.tasks.junit.CaseResult>'.
+        //   Reason: 'testResultAction' has raw type, so result of getFailedTests is erased.
+        // and suggests to change to "raw" List, then complains it is raw :\
         List<CaseResult> failedTests = testResultAction.getFailedTests();
 
         Collections.sort(failedTests, new Comparator<CaseResult>() {
