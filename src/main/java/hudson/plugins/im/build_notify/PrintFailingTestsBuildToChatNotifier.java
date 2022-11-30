@@ -71,14 +71,14 @@ public class PrintFailingTestsBuildToChatNotifier extends
         }
 
         StringBuilder buf = new StringBuilder();
-        // SIC_INNER_SHOULD_BE_STATIC_ANON.... whatever that means:
-        // The class hudson.plugins.im.build_notify.PrintFailingTestsBuildToChatNotifier$1
-        // could be refactored into a named _static_ inner class.
         // IDEA says: Unchecked assignment: 'java.util.List' to 'java.util.List<hudson.tasks.junit.CaseResult>'.
         //   Reason: 'testResultAction' has raw type, so result of getFailedTests is erased.
         // and suggests to change to "raw" List, then complains it is raw :\
         List<CaseResult> failedTests = testResultAction.getFailedTests();
 
+        // SIC_INNER_SHOULD_BE_STATIC_ANON.... whatever that means:
+        // The class hudson.plugins.im.build_notify.PrintFailingTestsBuildToChatNotifier$1
+        // could be refactored into a named _static_ inner class.
         Collections.sort(failedTests, new Comparator<CaseResult>() {
             @Override
             public int compare(CaseResult o1, CaseResult o2) {
