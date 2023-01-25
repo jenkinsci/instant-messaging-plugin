@@ -31,7 +31,7 @@
         <revision>2</revision>
         <changelist>999999-SNAPSHOT</changelist>
         <gitHubRepo>jenkinsci/${project.artifactId}-plugin</gitHubRepo>
-        <jenkins.version>2.361.4</jenkins.version>
+        <jenkins.version>2.375.1</jenkins.version>
         <!-- Note: keep in sync with io.jenkins.tools.bom version below -->
         <spotbugs.effort>Max</spotbugs.effort>
         <spotbugs.threshold>Low</spotbugs.threshold>
@@ -41,8 +41,8 @@
         <dependencies>
             <dependency>
                 <groupId>io.jenkins.tools.bom</groupId>
-                <artifactId>bom-2.361.x</artifactId>
-                <version>1792.v0295db_e7c548</version>
+                <artifactId>bom-2.375.x</artifactId>
+                <version>1798.vc671fe94856f</version>
                 <scope>import</scope>
                 <type>pom</type>
             </dependency>
