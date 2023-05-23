@@ -14,6 +14,7 @@ import org.springframework.util.Assert;
  *
  * @deprecated only left here to deserialize old configs
  */
+@Deprecated
 public enum NotificationStrategy {
 
     // Note that the order of the constants also specifies the display order!

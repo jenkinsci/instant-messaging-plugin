@@ -161,6 +161,7 @@ public class BuildHelper {
      *
      * @deprecated use {@link Run#getPreviousSuccessfulBuild()}
     */
+    @Deprecated
     public static AbstractBuild<?, ?> getPreviousSuccessfulBuild(AbstractBuild<?, ?> build) {
         AbstractBuild<?, ?> previousBuild = build.getPreviousBuild();
         while (previousBuild != null) {
