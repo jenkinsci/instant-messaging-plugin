@@ -1,5 +1,15 @@
-Jenkins Instant-Messaging plugin [![Build Status](https://ci.jenkins.io/job/Plugins/job/instant-messaging-plugin/job/master/badge/icon)](https://ci.jenkins.io/job/Plugins/job/instant-messaging-plugin/job/master/)
+Jenkins Instant-Messaging plugin
 ================================
+
+[![Jenkins Plugin](https://img.shields.io/jenkins/plugin/v/instant-messaging.svg)](https://plugins.jenkins.io/instant-messaging)
+[![GitHub release](https://img.shields.io/github/release/jenkinsci/instant-messaging-plugin.svg?label=release)](https://github.com/jenkinsci/instant-messaging-plugin/releases/latest)
+[![Jenkins Plugin Installs](https://img.shields.io/jenkins/plugin/i/instant-messaging.svg?color=blue)](https://plugins.jenkins.io/instant-messaging)
+[![Build Status](https://ci.jenkins.io/job/Plugins/job/instant-messaging-plugin/job/main/badge/icon)](https://ci.jenkins.io/job/Plugins/job/instant-messaging-plugin/job/master/)
+[![GitHub license](https://img.shields.io/github/license/jenkinsci/instant-messaging-plugin.svg)](https://github.com/jenkinsci/instant-messaging-plugin/blob/master/LICENSE.txt)
+[![Maintenance](https://img.shields.io/maintenance/yes/2023.svg)](https://github.com/jenkinsci/instant-messaging-plugin)
+
+Introduction
+------------
 
 This plugin provides abstract support for instant-messaging notifications
 to Jenkins, including a common bot-driven command and query interface
