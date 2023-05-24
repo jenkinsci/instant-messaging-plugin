@@ -629,7 +629,8 @@ public abstract class IMPublisher extends Notifier implements /* BuildStep, */ M
     //@Bug(6712)
     private boolean downstreamIsFirstInRangeTriggeredByUpstream(
             AbstractBuild<?, ?> upstreamBuild, AbstractBuild<?, ?> downstreamBuild) {
-        RangeSet rangeSet = upstreamBuild.getDownstreamRelationship(downstreamBuild.getProject());
+        AbstractProject<?, ?> downstreamProject = downstreamBuild.getProject();
+        RangeSet rangeSet = upstreamBuild.getDownstreamRelationship(downstreamProject);
 
         if (rangeSet == null || rangeSet.isEmpty()) {
             // should not happen
