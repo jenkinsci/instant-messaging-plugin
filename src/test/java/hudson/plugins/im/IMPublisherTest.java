@@ -103,12 +103,12 @@ public class IMPublisherTest {
 
         this.build = mock(AbstractBuild.class);
         when(this.build.getResult()).thenReturn(Result.FAILURE);
-        when(build.getUpstreamRelationshipBuild(upstreamProject)).thenReturn(this.upstreamBuild);
+        when(this.build.getUpstreamRelationshipBuild(this.upstreamProject)).thenReturn(this.upstreamBuild);
         Map<AbstractProject, Integer> upstreamBuilds = Maps.newHashMap();
         upstreamBuilds.put(this.upstreamProject, -1); // number is unimportant, just needed to get the upstream projects
-        when(build.getUpstreamBuilds()).thenReturn(upstreamBuilds);
-        when(build.getParent()).thenReturn(this.project);
-        when(build.getNumber()).thenReturn(buildNumber);
+        when(this.build.getUpstreamBuilds()).thenReturn(upstreamBuilds);
+        when(this.build.getParent()).thenReturn(this.project);
+        when(this.build.getNumber()).thenReturn(this.buildNumber);
 
         createPreviousNextRelationShip(this.previousBuild, this.build);
 
