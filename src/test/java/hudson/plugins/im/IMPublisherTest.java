@@ -51,6 +51,7 @@ public class IMPublisherTest {
     private AbstractProject project;
     private AbstractProject upstreamProject;
     private BuildListener listener;
+    private RangeSet rangeset;
 
     @SuppressWarnings("unchecked")
     @Before
@@ -63,16 +64,16 @@ public class IMPublisherTest {
         this.project = mock(AbstractProject.class);
         when(project.getScm()).thenReturn(new NullSCM());
 
-        RangeSet rangeset = RangeSet.fromString(buildNumber + "-" + (buildNumber + 2), false);
+        this.rangeset = RangeSet.fromString(buildNumber + "-" + (buildNumber + 2), false);
 
         this.previousBuildUpstreamBuild = mock(AbstractBuild.class);
         when(this.previousBuildUpstreamBuild.getParent()).thenReturn(project);
 
         this.upstreamBuildBetweenPreviousAndCurrent = mock(AbstractBuild.class);
-        when(this.upstreamBuildBetweenPreviousAndCurrent.getDownstreamRelationship(this.project)).thenReturn(rangeset);
+        when(this.upstreamBuildBetweenPreviousAndCurrent.getDownstreamRelationship(this.project)).thenReturn(this.rangeset);
 
         this.upstreamBuild = mock(AbstractBuild.class);
-        when(this.upstreamBuild.getDownstreamRelationship(this.project)).thenReturn(rangeset);
+        when(this.upstreamBuild.getDownstreamRelationship(this.project)).thenReturn(this.rangeset);
 
         createPreviousNextRelationShip(this.previousBuildUpstreamBuild, this.upstreamBuildBetweenPreviousAndCurrent,
                 this.upstreamBuild);
