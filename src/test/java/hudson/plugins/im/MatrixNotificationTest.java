@@ -48,7 +48,8 @@ public class MatrixNotificationTest {
 
         this.configurationBuild = mock(AbstractBuild.class);
         AbstractProject project = mock(MatrixConfiguration.class);
-        when(configurationBuild.getParent()).thenReturn(project);
+        when(configurationBuild.getProject()).thenReturn(project); // Seems required since https://github.com/jenkinsci/instant-messaging-plugin/pull/171 bump
+        when(configurationBuild.getParent()).thenReturn(project);  // => should pop out in AbstractBuild.getProject()
 
         this.parentBuild = mock(MatrixBuild.class);
     }
