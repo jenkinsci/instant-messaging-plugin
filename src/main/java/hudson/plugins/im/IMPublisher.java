@@ -631,8 +631,10 @@ public abstract class IMPublisher extends Notifier implements /* BuildStep, */ M
             AbstractBuild<?, ?> upstreamBuild, AbstractBuild<?, ?> downstreamBuild) {
         RangeSet rangeSet = upstreamBuild.getDownstreamRelationship(downstreamBuild.getProject());
 
-        if (rangeSet.isEmpty()) {
+        if (rangeSet == null || rangeSet.isEmpty()) {
             // should not happen
+            // In fact, getDownstreamRelationship() should never return "null"
+            // at all - but sometimes does at least in mock-enhanced test classes.
             LOGGER.warning("Range set is empty. Upstream " + upstreamBuild + ", downstream " + downstreamBuild);
             return false;
         }
