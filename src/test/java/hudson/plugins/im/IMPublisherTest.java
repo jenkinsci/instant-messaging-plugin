@@ -62,6 +62,7 @@ public class IMPublisherTest {
 
         this.upstreamProject = mock(AbstractProject.class);
         when(this.upstreamProject.toString()).thenReturn("mock.upstreamProject");
+
         this.project = mock(AbstractProject.class);
         when(this.project.toString()).thenReturn("mock.project");
         when(project.getScm()).thenReturn(new NullSCM());
@@ -70,7 +71,8 @@ public class IMPublisherTest {
 
         this.previousBuildUpstreamBuild = mock(AbstractBuild.class);
         when(this.previousBuildUpstreamBuild.toString()).thenReturn("mock.previousBuildUpstreamBuild");
-        when(this.previousBuildUpstreamBuild.getParent()).thenReturn(project);
+        when(this.previousBuildUpstreamBuild.getProject()).thenReturn(this.project); // Seems required since https://github.com/jenkinsci/instant-messaging-plugin/pull/171 bump
+        when(this.previousBuildUpstreamBuild.getParent()).thenReturn(this.project);  // => should pop out in AbstractBuild.getProject()
 
         this.upstreamBuildBetweenPreviousAndCurrent = mock(AbstractBuild.class);
         when(this.upstreamBuildBetweenPreviousAndCurrent.toString()).thenReturn("mock.upstreamBuildBetweenPreviousAndCurrent");
@@ -115,7 +117,8 @@ public class IMPublisherTest {
         Map<AbstractProject, Integer> upstreamBuilds = Maps.newHashMap();
         upstreamBuilds.put(this.upstreamProject, -1); // number is unimportant, just needed to get the upstream projects
         when(this.build.getUpstreamBuilds()).thenReturn(upstreamBuilds);
-        when(this.build.getParent()).thenReturn(this.project);
+        when(this.build.getProject()).thenReturn(this.project); // Seems required since https://github.com/jenkinsci/instant-messaging-plugin/pull/171 bump
+        when(this.build.getParent()).thenReturn(this.project);  // => should pop out in AbstractBuild.getProject()
         when(this.build.getNumber()).thenReturn(this.buildNumber);
 
         createPreviousNextRelationShip(this.previousBuild, this.build);
