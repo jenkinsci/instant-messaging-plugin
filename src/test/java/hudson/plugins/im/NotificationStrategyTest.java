@@ -31,7 +31,7 @@ public class NotificationStrategyTest {
   @Test
   public void testAnyFailure() {
     NotificationStrategy strategy = NotificationStrategy.ANY_FAILURE;
-    testNewFailure(strategy, true);
+    testNewFailure2(strategy, true);
     testRepeatFailure(strategy, true);
     testFixed(strategy, false);
     testRepeatSuccess(strategy, false);
@@ -47,7 +47,7 @@ public class NotificationStrategyTest {
   @Test
   public void testFailureAndFixed() {
     NotificationStrategy strategy = NotificationStrategy.FAILURE_AND_FIXED;
-    testNewFailure(strategy, true);
+    testNewFailure2(strategy, true);
     testRepeatFailure(strategy, true);
     testFixed(strategy, true);
     testRepeatSuccess(strategy, false);
@@ -76,7 +76,7 @@ public class NotificationStrategyTest {
   @Test
   public void testStateChangeOnly() {
     NotificationStrategy strategy = NotificationStrategy.STATECHANGE_ONLY;
-    testNewFailure(strategy, true);
+    testNewFailure3(strategy, true);
     testRepeatFailureStrict(strategy, false);
     testFixed(strategy, true);
     testRepeatSuccessStrict(strategy, false);
@@ -191,4 +191,45 @@ public class NotificationStrategyTest {
     }
     return toRet;
   }
+
+    private AbstractBuild historyOf2(Result... results) {
+        AbstractBuild toRet = null;
+        for (int i = 0; i < results.length; i++) {
+            AbstractBuild build = mock(AbstractBuild.class);
+            when(build.getResult()).thenReturn(results[i]);
+            toRet = build;
+        }
+        return toRet;
+    }
+
+    private void testNewFailure2(NotificationStrategy strategy, boolean expected) {
+        // Basic success -> new failure
+        assertThat(strategy.notificationWanted(historyOf(SUCCESS, FAILURE)), equalTo(expected));
+        // Failure on first build.
+        assertThat(strategy.notificationWanted(historyOf2(FAILURE)), equalTo(expected));
+        // Intermediate ABORTED and NOT_BUILT states do not affect result
+        assertThat(strategy.notificationWanted(historyOf(SUCCESS, ABORTED, FAILURE)), equalTo(expected));
+        assertThat(strategy.notificationWanted(historyOf(SUCCESS, NOT_BUILT, FAILURE)), equalTo(expected));
+    }
+
+    private AbstractBuild historyOf3(Result... results) {
+        AbstractBuild toRet = null;
+        for (int i = 0; i < results.length; i++) {
+            AbstractBuild build = mock(AbstractBuild.class);
+            when(build.getPreviousBuild()).thenReturn(toRet);
+            toRet = build;
+        }
+        return toRet;
+    }
+
+    private void testNewFailure3(NotificationStrategy strategy, boolean expected) {
+        // Basic success -> new failure
+        assertThat(strategy.notificationWanted(historyOf(SUCCESS, FAILURE)), equalTo(expected));
+        // Failure on first build.
+        assertThat(strategy.notificationWanted(historyOf3(FAILURE)), equalTo(expected));
+        // Intermediate ABORTED and NOT_BUILT states do not affect result
+        assertThat(strategy.notificationWanted(historyOf(SUCCESS, ABORTED, FAILURE)), equalTo(expected));
+        assertThat(strategy.notificationWanted(historyOf(SUCCESS, NOT_BUILT, FAILURE)), equalTo(expected));
+    }
+
 }
