@@ -61,25 +61,14 @@ public class IMPublisherTest {
         this.imPublisher = new IMTestPublisher();
 
         this.upstreamProject = mock(AbstractProject.class);
-        when(this.upstreamProject.toString()).thenReturn("mock.upstreamProject");
-
         this.project = mock(AbstractProject.class);
-        when(this.project.toString()).thenReturn("mock.project");
-        when(project.getScm()).thenReturn(new NullSCM());
-
         this.rangeset = RangeSet.fromString(buildNumber + "-" + (buildNumber + 2), false);
 
         this.previousBuildUpstreamBuild = mock(AbstractBuild.class);
-        when(this.previousBuildUpstreamBuild.toString()).thenReturn("mock.previousBuildUpstreamBuild");
-        when(this.previousBuildUpstreamBuild.getProject()).thenReturn(this.project); // Seems required since https://github.com/jenkinsci/instant-messaging-plugin/pull/171 bump
-        when(this.previousBuildUpstreamBuild.getParent()).thenReturn(this.project);  // => should pop out in AbstractBuild.getProject()
-
         this.upstreamBuildBetweenPreviousAndCurrent = mock(AbstractBuild.class);
-        when(this.upstreamBuildBetweenPreviousAndCurrent.toString()).thenReturn("mock.upstreamBuildBetweenPreviousAndCurrent");
         when(this.upstreamBuildBetweenPreviousAndCurrent.getDownstreamRelationship(this.project)).thenReturn(this.rangeset);
 
         this.upstreamBuild = mock(AbstractBuild.class);
-        when(this.upstreamBuild.toString()).thenReturn("mock.upstreamBuild");
         when(this.upstreamBuild.getDownstreamRelationship(this.project)).thenReturn(this.rangeset);
 
         createPreviousNextRelationShip(this.previousBuildUpstreamBuild, this.upstreamBuildBetweenPreviousAndCurrent,
@@ -87,11 +76,8 @@ public class IMPublisherTest {
 
 
         User user1 = mock(User.class);
-        when(user1.toString()).thenReturn("User1");
         ChangeLogSet<TestEntry> changeLogSet1 = new TestChangeLogSet(this.previousBuildUpstreamBuild,
                 new TestEntry(user1));
-        when(this.previousBuildUpstreamBuild.getChangeSet()).thenReturn(changeLogSet1);
-
         User user2 = mock(User.class);
         when(user2.toString()).thenReturn("User2");
         ChangeLogSet<TestEntry> changeLogSet2 = new TestChangeLogSet(this.upstreamBuildBetweenPreviousAndCurrent,
@@ -106,12 +92,10 @@ public class IMPublisherTest {
 
 
         this.previousBuild = mock(AbstractBuild.class);
-        when(this.previousBuild.toString()).thenReturn("mock.previousBuild");
         when(this.previousBuild.getResult()).thenReturn(Result.SUCCESS);
         when(this.previousBuild.getUpstreamRelationshipBuild(this.upstreamProject)).thenReturn(this.previousBuildUpstreamBuild);
 
         this.build = mock(AbstractBuild.class);
-        when(this.build.toString()).thenReturn("mock.build");
         when(this.build.getResult()).thenReturn(Result.FAILURE);
         when(this.build.getUpstreamRelationshipBuild(this.upstreamProject)).thenReturn(this.upstreamBuild);
         Map<AbstractProject, Integer> upstreamBuilds = Maps.newHashMap();
@@ -121,10 +105,9 @@ public class IMPublisherTest {
         when(this.build.getParent()).thenReturn(this.project);  // => should pop out in AbstractBuild.getProject()
         when(this.build.getNumber()).thenReturn(this.buildNumber);
 
-        createPreviousNextRelationShip(this.previousBuild, this.build);
+        createPreviousNextRelationShip2(this.previousBuild, this.build);
 
         this.listener = mock(BuildListener.class);
-        when(this.listener.getLogger()).thenReturn(System.out);
     }
 
     /**
@@ -147,7 +130,6 @@ public class IMPublisherTest {
 
         for (int i = builds.length - 1; i >= 0; i--) {
             if (i >= 1) {
-                when(builds[i].getPreviousBuild()).thenReturn(builds[i-1]);
             }
         }
     }
@@ -246,6 +228,22 @@ public class IMPublisherTest {
         @Override
         public boolean isEmptySet() {
             return false;
+        }
+    }
+    private static void createPreviousNextRelationShip2(AbstractBuild... builds) {
+        int max = builds.length - 1;
+        AbstractBuild previousSuccessful = null;
+        for (int i = 0; i < builds.length; i++) {
+            if (builds[i].getResult() == Result.SUCCESS) {
+                previousSuccessful = builds[i];
+            }
+            if (i < max) {
+                when(builds[i + 1].getPreviousSuccessfulBuild()).thenReturn(previousSuccessful);
+            }
+        }
+        for (int i = builds.length - 1; i >= 0; i--) {
+            if (i >= 1) {
+            }
         }
     }
 }
