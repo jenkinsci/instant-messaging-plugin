@@ -98,7 +98,7 @@ public class BuildCommandTest {
         JobProvider jobProvider = mock(JobProvider.class);
         cmd.setJobProvider(jobProvider);
 
-        AbstractProject<?, ?> project = mockProject(jobProvider);
+        AbstractProject<?, ?> project = mockProject2(jobProvider);
         project = mockProject(jobProvider);
         when(project.isParameterized()).thenReturn(Boolean.TRUE);
         when(project.getProperty(ParametersDefinitionProperty.class)).thenReturn(
@@ -194,18 +194,30 @@ public class BuildCommandTest {
     @Test
     public void disabledProjectShouldNotBeScheduled() {
         Bot bot = mock(Bot.class);
-        when(bot.getImId()).thenReturn("hudsonbot");
-
         BuildCommand cmd = new BuildCommand();
         JobProvider jobProvider = mock(JobProvider.class);
         cmd.setJobProvider(jobProvider);
 
-        AbstractProject<?, ?> project = mockProject(jobProvider);
+        AbstractProject<?, ?> project = mockProject3(jobProvider);
         when(project.isBuildable()).thenReturn(false);
 
         Sender sender = new Sender("sender");
         cmd.getReply(bot, sender, new String[]{"build", "project"});
 
         verify(project, times(0)).scheduleBuild(anyInt(), any(Cause.class));
+    }
+
+    private AbstractProject<?, ?> mockProject2(JobProvider jobProvider) {
+        @SuppressWarnings("rawtypes")
+        AbstractProject project = mock(FreeStyleProject.class);
+        return project;
+    }
+
+    private AbstractProject<?, ?> mockProject3(JobProvider jobProvider) {
+        @SuppressWarnings("rawtypes")
+        AbstractProject project = mock(FreeStyleProject.class);
+        when(jobProvider.getJobByNameOrDisplayName(Mockito.anyString())).thenReturn(project);
+        when(project.hasPermission(Item.BUILD)).thenReturn(Boolean.TRUE);
+        return project;
     }
 }
