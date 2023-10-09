@@ -230,6 +230,7 @@ public class IMPublisherTest {
             return false;
         }
     }
+
     private static void createPreviousNextRelationShip2(AbstractBuild... builds) {
         int max = builds.length - 1;
         AbstractBuild previousSuccessful = null;
