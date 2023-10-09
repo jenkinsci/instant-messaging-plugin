@@ -46,8 +46,6 @@ public class CommentCommandTest {
         @SuppressWarnings("rawtypes")
         AbstractProject project = mock(AbstractProject.class);
         AbstractBuild<?, ?> build = mock(AbstractBuild.class);
-        when(project.getBuildByNumber(4711)).thenReturn(build);
-
         CommentCommand command = new CommentCommand();
         command.getMessageForJob(project, new Sender("kutzi"),
                 new String[] { "4712", "my comment"}).toString();
