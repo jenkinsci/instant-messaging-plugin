@@ -66,12 +66,8 @@ public class BuildHelperTest {
             FreeStyleBuild anotherAborted = mock(FreeStyleBuild.class);
             when(build.getResult()).thenReturn(Result.ABORTED);
 
-            when(build.getPreviousBuild()).thenReturn(anotherAborted);
-
             FreeStyleBuild anUnstableBuild = mock(FreeStyleBuild.class);
             when(build.getResult()).thenReturn(Result.UNSTABLE);
-
-            when(anotherAborted.getPreviousBuild()).thenReturn(anUnstableBuild);
 
             assertTrue(ResultTrend.FIXED == ResultTrend.getResultTrend(nextBuild));
         }
