@@ -51,7 +51,8 @@ public class Bot implements IMMessageListener {
                 for (final Entry<String, BotCommand> item : bot.cmdsAndAliases.entrySet()) {
                     // skip myself
                     if ((item.getValue() != this)
-                            && (item.getValue().getHelp() != null)) {
+                        && (item.getValue().getHelp() != null)
+                    ) {
                         msg.append("\n");
                         msg.append(item.getKey());
                         msg.append(item.getValue().getHelp());
@@ -73,6 +74,7 @@ public class Bot implements IMMessageListener {
     private final String nick;
     private final String imServer;
     private final String commandPrefix;
+    private final boolean commandPrefixRequired;
     private boolean commandsAccepted;
     private String helpCache = null;
 
@@ -81,18 +83,20 @@ public class Bot implements IMMessageListener {
     @SuppressFBWarnings(value = "MC_OVERRIDABLE_METHOD_CALL_IN_CONSTRUCTOR",
         justification = "Need ecosystem change to separate Bot construction from IMChat connection")
     public Bot(IMChat chat, String nick, String imServer,
-            String commandPrefix, AuthenticationHolder authentication
-            ) {
+               String commandPrefix, AuthenticationHolder authentication,
+               boolean commandPrefixRequired
+    ) {
         this.chat = chat;
         this.nick = nick;
         this.imServer = imServer;
         this.commandPrefix = commandPrefix;
+        this.commandPrefixRequired = commandPrefixRequired;
         this.authentication = authentication;
         this.commandsAccepted = chat.isCommandsAccepted();
 
         for (BotCommand cmd : BotCommand.all()) {
             for (String name : cmd.getCommandNames())
-                this.cmdsAndAliases.put(name,cmd);
+                this.cmdsAndAliases.put(name, cmd);
         }
 
         // MC_OVERRIDABLE_METHOD_CALL_IN_CONSTRUCTOR
@@ -100,6 +104,25 @@ public class Bot implements IMMessageListener {
         // Overridable method addMessageListener is called from constructor
         // It may also leak the "this" reference of the partially constructed object.
         chat.addMessageListener(this);
+    }
+
+    /**
+     * Long-time default constructor (and class) behavior, which requires
+     * the {@code commandPrefix} to be present. A different constructor is
+     * available to customize that toggle.
+     *
+     * @param chat
+     * @param nick
+     * @param imServer
+     * @param commandPrefix
+     * @param authentication
+     */
+    @SuppressFBWarnings(value = "MC_OVERRIDABLE_METHOD_CALL_IN_CONSTRUCTOR",
+        justification = "Need ecosystem change to separate Bot construction from IMChat connection")
+    public Bot(IMChat chat, String nick, String imServer,
+               String commandPrefix, AuthenticationHolder authentication
+    ) {
+        this(chat, nick, imServer, commandPrefix, authentication, true);
     }
 
     /**
@@ -198,6 +221,18 @@ public class Bot implements IMMessageListener {
             return body.substring(this.nick.length() + 1).trim();
         }
 
+        // By default, bots require the commandPrefix or nick prefix at least,
+        // but this can be an overkill in private chat sessions (admin to bot).
+        // If the caller like ircbot-plugin used commandPrefixRequired=false,
+        // they knew what they were doing - allow any message pattern to be
+        // treated as a potential bot command.
+        // Note they might not have an acceptable solution to just use an
+        // empty commandPrefix (e.g. legacy automation config vs. interactive
+        // chats, or a single setting for all chats in some consumer plugins).
+        if (!this.commandPrefixRequired)
+            return body.trim();
+
+        // By default, this message was not destined to be seen by the bot.
         return null;
     }
 
