@@ -1,5 +1,6 @@
 package hudson.plugins.im;
 
+import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 import hudson.model.User;
 import hudson.plugins.im.tools.ExceptionHelper;
 import java.util.concurrent.Semaphore;
@@ -113,6 +114,9 @@ public abstract class IMConnectionProvider implements IMConnectionListener {
 
     // we need an additional level of indirection to the Authentication entity
     // to fix HUDSON-5978 and HUDSON-5233
+    @SuppressFBWarnings(
+        value = "UWF_FIELD_NOT_INITIALIZED_IN_CONSTRUCTOR",
+        justification = "IMConnectionProvider.descriptor is checked in wrapping getAuthenticationHolder()")
     public synchronized AuthenticationHolder getAuthenticationHolder() {
         if (descriptor == null || descriptor.getHudsonUserName() == null) {
             return null;
