@@ -8,7 +8,10 @@ import java.util.concurrent.TimeUnit;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
+import jenkins.model.Jenkins;
 import org.acegisecurity.Authentication;
+import org.acegisecurity.userdetails.UsernameNotFoundException;
+//import org.springframework.security.core.userdetails.UsernameNotFoundException;
 
 /**
  * Abstract implementation of a provider of {@link IMConnection}s.
@@ -115,9 +118,15 @@ public abstract class IMConnectionProvider implements IMConnectionListener {
     // we need an additional level of indirection to the Authentication entity
     // to fix HUDSON-5978 and HUDSON-5233
     public synchronized AuthenticationHolder getAuthenticationHolder() {
-        if (descriptor == null || descriptor.getHudsonUserName() == null
-            || descriptor.getHudsonUserName().isBlank()
-        ) {
+        if (descriptor == null || descriptor.getHudsonUserName() == null) {
+            return null;
+        }
+
+        if (descriptor.getHudsonUserName().isBlank()) {
+            if (Jenkins.getInstance().isUseSecurity()) {
+                throw new UsernameNotFoundException(
+                    "No local Jenkins user name is configured for instant messaging to act as");
+            }
             return null;
         }
 
@@ -130,9 +139,15 @@ public abstract class IMConnectionProvider implements IMConnectionListener {
 
                 // New spotbugs UWF_FIELD_NOT_INITIALIZED_IN_CONSTRUCTOR
                 // just can't be quiesced, so duplicating the sanity-check here
-                if (descriptor == null || descriptor.getHudsonUserName() == null
-                    || descriptor.getHudsonUserName().isBlank()
-                ) {
+                if (descriptor == null || descriptor.getHudsonUserName() == null) {
+                    return null;
+                }
+
+                if (descriptor.getHudsonUserName().isBlank()) {
+                    if (Jenkins.getInstance().isUseSecurity()) {
+                        throw new UsernameNotFoundException(
+                            "No local Jenkins user name is configured for instant messaging to act as");
+                    }
                     return null;
                 }
 
