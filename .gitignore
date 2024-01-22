@@ -3,6 +3,7 @@
 /.classpath
 /.settings
 /fb-instmsg.xml
+/.idea
 
 ### https://github.com/github/gitignore/blob/master/Maven.gitignore
 /pom.xml.tag
