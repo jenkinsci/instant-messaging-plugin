@@ -1,5 +1,6 @@
 package hudson.plugins.im;
 
+import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 import hudson.model.User;
 import hudson.plugins.im.tools.ExceptionHelper;
 import java.util.concurrent.Semaphore;
@@ -123,6 +124,12 @@ public abstract class IMConnectionProvider implements IMConnectionListener {
             public Authentication getAuthentication() {
                 if (authentication != null) {
                     return authentication;
+                }
+
+                // New spotbugs UWF_FIELD_NOT_INITIALIZED_IN_CONSTRUCTOR
+                // just can't be quiesced, so duplicating the sanity-check here
+                if (descriptor == null || descriptor.getHudsonUserName() == null) {
+                    return null;
                 }
 
                 User u = User.get(descriptor.getHudsonUserName());
