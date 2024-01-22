@@ -115,7 +115,9 @@ public abstract class IMConnectionProvider implements IMConnectionListener {
     // we need an additional level of indirection to the Authentication entity
     // to fix HUDSON-5978 and HUDSON-5233
     public synchronized AuthenticationHolder getAuthenticationHolder() {
-        if (descriptor == null || descriptor.getHudsonUserName() == null) {
+        if (descriptor == null || descriptor.getHudsonUserName() == null
+            || descriptor.getHudsonUserName().isBlank()
+        ) {
             return null;
         }
 
@@ -128,7 +130,9 @@ public abstract class IMConnectionProvider implements IMConnectionListener {
 
                 // New spotbugs UWF_FIELD_NOT_INITIALIZED_IN_CONSTRUCTOR
                 // just can't be quiesced, so duplicating the sanity-check here
-                if (descriptor == null || descriptor.getHudsonUserName() == null) {
+                if (descriptor == null || descriptor.getHudsonUserName() == null
+                    || descriptor.getHudsonUserName().isBlank()
+                ) {
                     return null;
                 }
 
