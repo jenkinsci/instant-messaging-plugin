@@ -122,14 +122,6 @@ public abstract class IMConnectionProvider implements IMConnectionListener {
             return null;
         }
 
-        if (descriptor.getHudsonUserName().isBlank()) {
-            if (Jenkins.getInstance().isUseSecurity()) {
-                throw new UsernameNotFoundException(
-                    "No local Jenkins user name is configured for instant messaging to act as");
-            }
-            return null;
-        }
-
         return new AuthenticationHolder() {
             @Override
             public Authentication getAuthentication() {
@@ -143,17 +135,20 @@ public abstract class IMConnectionProvider implements IMConnectionListener {
                     return null;
                 }
 
-                if (descriptor.getHudsonUserName().isBlank()) {
-                    if (Jenkins.getInstance().isUseSecurity()) {
-                        throw new UsernameNotFoundException(
-                            "No local Jenkins user name is configured for instant messaging to act as");
-                    }
+                if (descriptor.getHudsonUserName().isBlank() && !(Jenkins.getInstance().isUseSecurity())) {
                     return null;
                 }
 
-                User u = User.get(descriptor.getHudsonUserName());
-
-                return u.impersonate();
+                try {
+                    User u = User.get(descriptor.getHudsonUserName());
+                    return u.impersonate();
+                } catch (UsernameNotFoundException ue) {
+                    if (descriptor.getHudsonUserName().isBlank()) {
+                        throw new UsernameNotFoundException(
+                            "No local Jenkins user name is configured for instant messaging to act as");
+                    }
+                    throw ue;
+                }
             }
         };
     }
