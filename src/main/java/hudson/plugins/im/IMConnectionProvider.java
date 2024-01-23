@@ -8,7 +8,10 @@ import java.util.concurrent.TimeUnit;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
+import jenkins.model.Jenkins;
 import org.acegisecurity.Authentication;
+import org.acegisecurity.userdetails.UsernameNotFoundException;
+//import org.springframework.security.core.userdetails.UsernameNotFoundException;
 
 /**
  * Abstract implementation of a provider of {@link IMConnection}s.
@@ -132,9 +135,20 @@ public abstract class IMConnectionProvider implements IMConnectionListener {
                     return null;
                 }
 
-                User u = User.get(descriptor.getHudsonUserName());
+                if (descriptor.getHudsonUserName().isBlank() && !(Jenkins.getInstance().isUseSecurity())) {
+                    return null;
+                }
 
-                return u.impersonate();
+                try {
+                    User u = User.get(descriptor.getHudsonUserName());
+                    return u.impersonate();
+                } catch (UsernameNotFoundException ue) {
+                    if (descriptor.getHudsonUserName().isBlank()) {
+                        throw new UsernameNotFoundException(
+                            "No local Jenkins user name is configured for instant messaging to act as");
+                    }
+                    throw ue;
+                }
             }
         };
     }
