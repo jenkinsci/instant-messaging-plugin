@@ -26,6 +26,7 @@ import java.util.logging.Logger;
 
 import jenkins.model.Jenkins;
 import jenkins.security.NotReallyRoleSensitiveCallable;
+import org.acegisecurity.userdetails.UsernameNotFoundException;
 
 /**
  * Instant messaging bot.
@@ -162,15 +163,20 @@ public class Bot implements IMMessageListener {
                     final BotCommand command = this.cmdsAndAliases.get(cmd);
                     if (command != null) {
                         if (isAuthenticationNeeded()) {
-                            ACL.impersonate(this.authentication.getAuthentication(), new NotReallyRoleSensitiveCallable<Void, IMException>() {
-                                private static final long serialVersionUID = 1L;
+                            try {
+                                ACL.impersonate(this.authentication.getAuthentication(), new NotReallyRoleSensitiveCallable<Void, IMException>() {
+                                    private static final long serialVersionUID = 1L;
 
-                                @Override
-                                public Void call() throws IMException {
-                                    command.executeCommand(Bot.this, chat, msg, s, args);
-                                    return null;
-                                }
-                            });
+                                    @Override
+                                    public Void call() throws IMException {
+                                        command.executeCommand(Bot.this, chat, msg, s, args);
+                                        return null;
+                                    }
+                                });
+                            } catch (UsernameNotFoundException ue) {
+                                this.chat.sendMessage(s.getNickname() + " This bot is not authorized to execute commands at this time, sorry!");
+                                throw ue;
+                            }
                         } else {
                             command.executeCommand(Bot.this, chat, msg, s, args);
                         }
