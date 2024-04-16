@@ -5,8 +5,8 @@ import hudson.model.View;
 
 import java.util.List;
 
-import javax.annotation.CheckForNull;
-import javax.annotation.Nonnull;
+import edu.umd.cs.findbugs.annotations.CheckForNull;
+import edu.umd.cs.findbugs.annotations.NonNull;
 
 public interface JobProvider {
     /**
@@ -36,7 +36,7 @@ public interface JobProvider {
      *
      * @return a list with all Jenkins jobs. Never null.
      */
-    @Nonnull
+    @NonNull
     List<AbstractProject<?,?>> getAllJobs();
 
     /**
@@ -44,7 +44,7 @@ public interface JobProvider {
      *
      * @return a list with the top-level jobs. Never null.
      */
-    @Nonnull
+    @NonNull
     List<AbstractProject<?,?>> getTopLevelJobs();
 
     boolean isTopLevelJob(AbstractProject<?, ?> job);

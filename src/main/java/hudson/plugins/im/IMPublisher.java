@@ -42,7 +42,7 @@ import java.util.Map;
 import java.util.Set;
 import java.util.logging.Logger;
 
-import javax.annotation.Nonnull;
+import edu.umd.cs.findbugs.annotations.NonNull;
 
 import org.jenkinsci.plugins.workflow.job.WorkflowJob;
 
@@ -343,7 +343,7 @@ public abstract class IMPublisher extends Notifier implements /* BuildStep, */ M
         return true;
     }
 
-    private void internalPerform(@Nonnull Run<?, ?> run, @Nonnull Launcher launcher, @Nonnull TaskListener taskListener) throws InterruptedException, IOException {
+    private void internalPerform(@NonNull Run<?, ?> run, @NonNull Launcher launcher, @NonNull TaskListener taskListener) throws InterruptedException, IOException {
         if (customMessage == null || customMessage.isEmpty()) {
             // Do the normal notification routine
             Assert.notNull(run, "Parameter 'build' must not be null.");
@@ -397,7 +397,7 @@ public abstract class IMPublisher extends Notifier implements /* BuildStep, */ M
      * @throws InterruptedException
      * @throws IOException
      */
-    public void perform(@Nonnull Run<?, ?> run, @Nonnull FilePath workspace, @Nonnull Launcher launcher, @Nonnull TaskListener taskListener) throws InterruptedException, IOException {
+    public void perform(@NonNull Run<?, ?> run, @NonNull FilePath workspace, @NonNull Launcher launcher, @NonNull TaskListener taskListener) throws InterruptedException, IOException {
         log(taskListener, "IMPublisher: sending chat message, strategy " + strategy + ", targets: " + this.getTargets());
         internalPerform(run, launcher, taskListener);
     }
@@ -688,7 +688,7 @@ public abstract class IMPublisher extends Notifier implements /* BuildStep, */ M
         this.notifyChatsOnBuildStart( (Run<?, ?>)build, (TaskListener) buildListener );
     }
 
-    /* package for testing */ void notifyChatsOnBuildStart(@Nonnull Run<?, ?> build, @Nonnull TaskListener buildListener) throws IOException, InterruptedException {
+    /* package for testing */ void notifyChatsOnBuildStart(@NonNull Run<?, ?> build, @NonNull TaskListener buildListener) throws IOException, InterruptedException {
         final String msg = getBuildToChatNotifier().buildStartMessage(this, build, buildListener);
         if (Util.fixEmpty(msg) == null) {
             return;
