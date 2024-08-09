@@ -6,7 +6,7 @@ Jenkins Instant-Messaging plugin
 [![Jenkins Plugin Installs](https://img.shields.io/jenkins/plugin/i/instant-messaging.svg?color=blue)](https://plugins.jenkins.io/instant-messaging)
 [![Build Status](https://ci.jenkins.io/job/Plugins/job/instant-messaging-plugin/job/master/badge/icon)](https://ci.jenkins.io/job/Plugins/job/instant-messaging-plugin/job/master/)
 [![GitHub license](https://img.shields.io/github/license/jenkinsci/instant-messaging-plugin.svg)](https://github.com/jenkinsci/instant-messaging-plugin/blob/master/LICENSE.txt)
-[![Maintenance](https://img.shields.io/maintenance/yes/2023.svg)](https://github.com/jenkinsci/instant-messaging-plugin)
+[![Maintenance](https://img.shields.io/maintenance/yes/2024.svg)](https://github.com/jenkinsci/instant-messaging-plugin)
 
 Introduction
 ------------
