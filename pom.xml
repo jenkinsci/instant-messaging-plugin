@@ -71,6 +71,7 @@
             <artifactId>maven-plugin</artifactId>
             <!-- needs version of hudson.model.User with getById() -->
             <version>3.23</version>
+            <optional>true</optional>
             <exclusions>
                 <!-- TODO bump in maven plugin, conflict with junit plugin dependencies -->
                 <exclusion>
