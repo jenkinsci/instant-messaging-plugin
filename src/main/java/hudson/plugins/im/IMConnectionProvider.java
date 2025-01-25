@@ -9,9 +9,8 @@ import java.util.logging.Level;
 import java.util.logging.Logger;
 
 import jenkins.model.Jenkins;
-import org.acegisecurity.Authentication;
-import org.acegisecurity.userdetails.UsernameNotFoundException;
-//import org.springframework.security.core.userdetails.UsernameNotFoundException;
+import org.springframework.security.core.Authentication;
+import org.springframework.security.core.userdetails.UsernameNotFoundException;
 
 /**
  * Abstract implementation of a provider of {@link IMConnection}s.
@@ -141,7 +140,7 @@ public abstract class IMConnectionProvider implements IMConnectionListener {
 
                 try {
                     User u = User.get(descriptor.getHudsonUserName());
-                    return u.impersonate();
+                    return u.impersonate2();
                 } catch (UsernameNotFoundException ue) {
                     if (descriptor.getHudsonUserName().isBlank()) {
                         throw new UsernameNotFoundException(

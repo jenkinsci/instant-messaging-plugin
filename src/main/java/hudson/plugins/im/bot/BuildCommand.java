@@ -247,7 +247,7 @@ public class BuildCommand extends AbstractTextSendingCommand {
         if ( senderUser != null ) {
             // This check is hopefully equivalent to legacy one defined above,
             // project.hasPermission(Item.BUILD), but for an arbitrary username
-            if (Jenkins.getInstance().getAuthorizationStrategy().getACL(project).hasPermission(senderUser.impersonate(), Item.BUILD)) {
+            if (Jenkins.getInstance().getAuthorizationStrategy().getACL(project).hasPermission2(senderUser.impersonate2(), Item.BUILD)) {
                 System.err.println("IM BuildCommand authorized Jenkins user '" +
                         senderUser.getId() + "' (IM ID '" + sender.getNickname() +
                         "' / '" + sender.getId() + "') to build '" + project.getName() +
