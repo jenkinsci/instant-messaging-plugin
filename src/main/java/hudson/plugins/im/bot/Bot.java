@@ -26,7 +26,7 @@ import java.util.logging.Logger;
 
 import jenkins.model.Jenkins;
 import jenkins.security.NotReallyRoleSensitiveCallable;
-import org.acegisecurity.userdetails.UsernameNotFoundException;
+import org.springframework.security.core.userdetails.UsernameNotFoundException;
 
 /**
  * Instant messaging bot.
@@ -164,7 +164,7 @@ public class Bot implements IMMessageListener {
                     if (command != null) {
                         if (isAuthenticationNeeded()) {
                             try {
-                                ACL.impersonate(this.authentication.getAuthentication(), new NotReallyRoleSensitiveCallable<Void, IMException>() {
+                                ACL.impersonate2(this.authentication.getAuthentication(), new NotReallyRoleSensitiveCallable<Void, IMException>() {
                                     private static final long serialVersionUID = 1L;
 
                                     @Override
