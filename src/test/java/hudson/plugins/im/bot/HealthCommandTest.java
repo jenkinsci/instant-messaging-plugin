@@ -5,16 +5,12 @@ import hudson.model.FreeStyleBuild;
 import hudson.model.HealthReport;
 import hudson.model.ItemGroup;
 import hudson.plugins.im.Sender;
+import org.junit.jupiter.api.Test;
 
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
-import org.junit.Test;
-
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertFalse;
-import static org.junit.Assert.assertTrue;
-
+import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 
@@ -23,12 +19,12 @@ import static org.mockito.Mockito.when;
  *
  * @author kutzi
  */
-public class HealthCommandTest {
+class HealthCommandTest {
 
     private final Pattern percentagePattern = Pattern.compile("\\D(\\d+)[%]");
 
     @Test
-    public void testNoJobFound() {
+    void testNoJobFound() {
         JobProvider jobProvider = mock(JobProvider.class);
         HealthCommand cmd = new HealthCommand();
         cmd.setJobProvider(jobProvider);
@@ -42,8 +38,7 @@ public class HealthCommandTest {
 
     @SuppressWarnings("rawtypes")
     @Test
-    public void testHealth() throws Exception {
-
+    void testHealth() {
         FreeStyleBuild build = mock(FreeStyleBuild.class);
         when(build.getUrl()).thenReturn("job/foo/32/");
 
@@ -71,7 +66,7 @@ public class HealthCommandTest {
 
     @SuppressWarnings("rawtypes")
     @Test
-    public void testFailure() throws Exception {
+    void testFailure() {
         FreeStyleBuild build = mock(FreeStyleBuild.class);
         when(build.getUrl()).thenReturn("job/foo/32/");
 
@@ -87,15 +82,13 @@ public class HealthCommandTest {
         when(job.getBuildHealth()).thenReturn(healthMock);
 
         HealthCommand cmd = new HealthCommand();
-        {
-            String reply = cmd.getMessageForJob(job).toString();
+        String reply = cmd.getMessageForJob(job).toString();
 
-            assertFalse(reply.contains(AbstractMultipleJobCommand.UNKNOWN_JOB_STR));
-            assertTrue(reply.contains("fsProject"));
-            Matcher m = percentagePattern.matcher(reply);
-            assertTrue(m.find());
-            String match = m.group(1);
-            assertEquals("0", match);
-        }
+        assertFalse(reply.contains(AbstractMultipleJobCommand.UNKNOWN_JOB_STR));
+        assertTrue(reply.contains("fsProject"));
+        Matcher m = percentagePattern.matcher(reply);
+        assertTrue(m.find());
+        String match = m.group(1);
+        assertEquals("0", match);
     }
 }

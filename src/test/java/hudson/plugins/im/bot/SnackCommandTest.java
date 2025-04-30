@@ -6,24 +6,23 @@
 package hudson.plugins.im.bot;
 
 import hudson.plugins.im.Sender;
+import org.junit.jupiter.api.Test;
 
-import org.junit.Test;
-
-import static org.junit.Assert.assertNotNull;
-import static org.junit.Assert.assertTrue;
+import static org.junit.jupiter.api.Assertions.assertNotNull;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 
 /**
  * Test for the botsnack command.
  *
  * @author kutzi
  */
-public class SnackCommandTest {
+class SnackCommandTest {
 
     /**
      * Test of executeCommand method, of class SnackCommand.
      */
     @Test
-    public void testExecuteCommand() throws Exception {
+    void testExecuteCommand() {
         SnackCommand cmd = new SnackCommand();
         Sender sender = new Sender("tester");
         String[] args = { "!botsnack", "peanuts" };

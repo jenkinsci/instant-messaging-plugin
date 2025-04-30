@@ -4,19 +4,18 @@ import hudson.model.AbstractBuild;
 import hudson.plugins.im.tools.MessageHelper;
 import hudson.tasks.test.AbstractTestResultAction;
 import hudson.tasks.test.TestResult;
+import org.junit.jupiter.api.Test;
+import org.jvnet.hudson.test.Issue;
 
-import org.junit.Assert;
-import org.junit.Test;
-import org.jvnet.hudson.test.Bug;
-
-import static org.junit.Assert.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertArrayEquals;
+import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 
-public class MessageHelperTest {
+class MessageHelperTest {
 
     @Test
-    public void testExtractCommandLine() {
+    void testExtractCommandLine() {
         assertEquals(1, MessageHelper.extractCommandLine("test").length);
         assertEquals(1, MessageHelper.extractCommandLine("test  ").length);
         assertEquals(3,
@@ -41,8 +40,8 @@ public class MessageHelperTest {
     }
 
     @Test
-    @Bug(3215)
-    public void testSingleQuote() {
+    @Issue("JENKINS-3215")
+    void testSingleQuote() {
         String cmdLine = "\"";
         assertEquals(1, MessageHelper.extractCommandLine(cmdLine).length);
         assertEquals("\"", MessageHelper.extractCommandLine(cmdLine)[0]);
@@ -57,21 +56,21 @@ public class MessageHelperTest {
     }
 
     @Test
-    public void testConcat() {
+    void testConcat() {
         String[] a = {"a"};
         String[] b = {"b"};
         String[] c = {"c"};
 
         String[] concat = MessageHelper.concat(a, b, c);
-        Assert.assertArrayEquals(new String[] {"a", "b", "c"}, concat);
+        assertArrayEquals(new String[] {"a", "b", "c"}, concat);
 
         concat = MessageHelper.concat(a);
-        Assert.assertArrayEquals(a, concat);
+        assertArrayEquals(a, concat);
     }
 
-    @SuppressWarnings({ "rawtypes", "unchecked" })
+    @SuppressWarnings({"rawtypes", "unchecked"})
     @Test
-    public void testUrlShouldBeUrlEncoded() {
+    void testUrlShouldBeUrlEncoded() {
         TestResult result = mock(TestResult.class);
         AbstractBuild build = mock(AbstractBuild.class);
         when(build.getUrl()).thenReturn("/a build");

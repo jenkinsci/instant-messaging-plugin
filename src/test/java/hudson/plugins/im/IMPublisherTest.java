@@ -1,6 +1,5 @@
 package hudson.plugins.im;
 
-import com.google.common.base.Function;
 import com.google.common.collect.Iterables;
 import com.google.common.collect.Iterators;
 import com.google.common.collect.Maps;
@@ -14,29 +13,24 @@ import hudson.model.Result;
 import hudson.model.User;
 import hudson.plugins.im.build_notify.DefaultBuildToChatNotifier;
 import hudson.scm.ChangeLogSet;
-import hudson.scm.NullSCM;
 import hudson.tasks.BuildStepDescriptor;
 import hudson.tasks.Publisher;
+import org.junit.jupiter.api.BeforeEach;
 
-import java.io.IOException;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.Iterator;
 import java.util.Map;
 import java.util.Set;
 
-import org.junit.Before;
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertFalse;
-import static org.junit.Assert.assertTrue;
-
+import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 
 @SuppressWarnings("rawtypes")
-public class IMPublisherTest {
+class IMPublisherTest {
 
     private IMPublisher imPublisher;
 
@@ -53,10 +47,10 @@ public class IMPublisherTest {
     private BuildListener listener;
     private RangeSet rangeset;
 
-    @SuppressWarnings("unchecked")
-    @Before
     // lot of ugly mocking going on here ...
-    public void before() throws IOException {
+    @SuppressWarnings("unchecked")
+    @BeforeEach
+    void setUp() {
 
         this.imPublisher = new IMTestPublisher();
 
@@ -140,18 +134,13 @@ public class IMPublisherTest {
      * list.
      */
     @Test
-    public void testIncludeUpstreamCulprits() throws Exception {
+    void testIncludeUpstreamCulprits() {
         /* Anticipating javax.mail.MessagingException and InterruptedException */
         Set<User> recipients = this.imPublisher.getNearestUpstreamCommitters(this.build, listener).keySet();
 
-        assertEquals(recipients.toString(), 2, recipients.size());
+        assertEquals(2, recipients.size(), recipients.toString());
 
-        Iterable<String> userNamesIter = Iterables.transform(recipients, new Function<User, String>() {
-            @Override
-            public String apply(User from) {
-                return from.toString();
-            }
-        });
+        Iterable<String> userNamesIter = Iterables.transform(recipients, User::toString);
 
         Set<String> userNames = Sets.newHashSet(userNamesIter);
 
@@ -162,7 +151,7 @@ public class IMPublisherTest {
 
     private static class IMTestPublisher extends IMPublisher {
         public IMTestPublisher() {
-            super(Collections.<IMMessageTarget>emptyList(), NotificationStrategy.FAILURE_AND_FIXED.getDisplayName(),
+            super(Collections.emptyList(), NotificationStrategy.FAILURE_AND_FIXED.getDisplayName(),
                     true, true, true, true, true, new DefaultBuildToChatNotifier(), MatrixJobMultiplier.ALL);
         }
 
@@ -172,7 +161,7 @@ public class IMPublisherTest {
         }
 
         @Override
-        protected IMConnection getIMConnection() throws IMException {
+        protected IMConnection getIMConnection() {
             return null;
         }
 

@@ -1,17 +1,16 @@
 package hudson.plugins.im;
 
-import hudson.Launcher;
 import hudson.matrix.MatrixAggregator;
 import hudson.matrix.MatrixBuild;
 import hudson.matrix.MatrixConfiguration;
 import hudson.model.AbstractBuild;
 import hudson.model.AbstractProject;
 import hudson.model.BuildListener;
+import org.junit.jupiter.api.BeforeEach;
 
 import java.io.IOException;
 
-import org.junit.Before;
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 import org.mockito.Mockito;
 
 import static org.mockito.ArgumentMatchers.any;
@@ -26,15 +25,15 @@ import static org.mockito.Mockito.when;
  * @author kutzi
  */
 @SuppressWarnings("rawtypes")
-public class MatrixNotificationTest {
+class MatrixNotificationTest {
 
     private IMPublisher publisher;
     private BuildListener listener;
     private AbstractBuild configurationBuild;
     private MatrixBuild parentBuild;
 
-    @Before
-    public void before() throws InterruptedException, IOException {
+    @BeforeEach
+    void setUp() throws InterruptedException, IOException {
         this.publisher = mock(IMPublisher.class);
         when(publisher.prebuild(any(AbstractBuild.class), any(BuildListener.class))).thenCallRealMethod();
         when(publisher.perform(any(AbstractBuild.class), any(), any(BuildListener.class))).thenCallRealMethod();
@@ -55,7 +54,7 @@ public class MatrixNotificationTest {
     }
 
     @Test
-    public void testOnlyParent() throws InterruptedException, IOException {
+    void testOnlyParent() throws InterruptedException, IOException {
         when(publisher.getMatrixNotifier()).thenReturn(MatrixJobMultiplier.ONLY_PARENT);
 
         publisher.prebuild(configurationBuild, listener);
@@ -71,7 +70,7 @@ public class MatrixNotificationTest {
     }
 
     @Test
-    public void testOnlyConfigurations() throws InterruptedException, IOException {
+    void testOnlyConfigurations() throws InterruptedException, IOException {
         when(publisher.getMatrixNotifier()).thenReturn(MatrixJobMultiplier.ONLY_CONFIGURATIONS);
 
         MatrixAggregator aggregator = publisher.createAggregator(parentBuild, null, listener);
@@ -87,7 +86,7 @@ public class MatrixNotificationTest {
     }
 
     @Test
-    public void testOnlyBoth() throws InterruptedException, IOException {
+    void testOnlyBoth() throws InterruptedException, IOException {
         when(publisher.getMatrixNotifier()).thenReturn(MatrixJobMultiplier.ALL);
 
         MatrixAggregator aggregator = publisher.createAggregator(parentBuild, null, listener);
