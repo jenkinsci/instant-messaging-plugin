@@ -19,24 +19,21 @@ import hudson.plugins.im.Sender;
 
 import java.util.List;
 
-import org.junit.Assert;
-import org.junit.Test;
-
+import org.junit.jupiter.api.Test;
 import org.mockito.ArgumentCaptor;
 import org.mockito.Mockito;
 
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertTrue;
-
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertInstanceOf;
 import static org.mockito.Mockito.*;
 
-public class BuildCommandTest {
+class BuildCommandTest {
 
     private FreeStyleProject project;
     private List<ParameterValue> parsedParameters;
 
     @Test
-    public void testDelay() {
+    void testDelay() {
         Bot bot = mock(Bot.class);
         when(bot.getImId()).thenReturn("hudsonbot");
 
@@ -90,7 +87,7 @@ public class BuildCommandTest {
     }
 
     @Test
-    public void parametersFromCommandShouldBePassedToBuild() {
+    void parametersFromCommandShouldBePassedToBuild() {
         Bot bot = mock(Bot.class);
         when(bot.getImId()).thenReturn("hudsonbot");
 
@@ -113,15 +110,15 @@ public class BuildCommandTest {
         verify(project).scheduleBuild(anyInt(), any(Cause.class),
                 captor.capture());
 
-        Assert.assertEquals(2, captor.getValue().getParameters().size());
-        Assert.assertEquals(new StringParameterValue("key", "value"),
+        assertEquals(2, captor.getValue().getParameters().size());
+        assertEquals(new StringParameterValue("key", "value"),
                 captor.getValue().getParameters().get(0));
-        Assert.assertEquals(new BooleanParameterValue("key2", true),
+        assertEquals(new BooleanParameterValue("key2", true),
                 captor.getValue().getParameters().get(1));
     }
 
     @Test
-    public void unknownParametersShouldBeIgnored() {
+    void unknownParametersShouldBeIgnored() {
         // TODO: really? Shouldn't we better raise an error?
         Bot bot = mock(Bot.class);
         when(bot.getImId()).thenReturn("hudsonbot");
@@ -148,7 +145,7 @@ public class BuildCommandTest {
     }
 
     @Test
-    public void shouldParseRunParameter() {
+    void shouldParseRunParameter() {
         givenAParametrizedProject().withParameterDefinitions(
                 new RunParameterDefinition("run", "projectName", "description")
         );
@@ -157,14 +154,14 @@ public class BuildCommandTest {
 
         assertEquals(1, parsedParameters.size());
         ParameterValue parameter = parsedParameters.get(0);
-        assertTrue(parameter instanceof RunParameterValue);
+        assertInstanceOf(RunParameterValue.class, parameter);
         RunParameterValue passwordParameter = (RunParameterValue) parameter;
         assertEquals("123", passwordParameter.getNumber());
         assertEquals("job", passwordParameter.getJobName());
     }
 
     @Test
-    public void shouldTakeDefaultValueOfParameter() {
+    void shouldTakeDefaultValueOfParameter() {
         givenAParametrizedProject().withParameterDefinitions(
                 new StringParameterDefinition("stringParam", "defaultValue", "description")
         );
@@ -192,7 +189,7 @@ public class BuildCommandTest {
     }
 
     @Test
-    public void disabledProjectShouldNotBeScheduled() {
+    void disabledProjectShouldNotBeScheduled() {
         Bot bot = mock(Bot.class);
         BuildCommand cmd = new BuildCommand();
         JobProvider jobProvider = mock(JobProvider.class);

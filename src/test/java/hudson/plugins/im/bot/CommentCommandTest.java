@@ -4,21 +4,20 @@ import hudson.model.AbstractBuild;
 import hudson.model.AbstractProject;
 
 import hudson.plugins.im.Sender;
+import org.junit.jupiter.api.Test;
 
 import java.io.IOException;
 
-import org.junit.Test;
-
-import static org.junit.Assert.assertEquals;
-
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
-public class CommentCommandTest {
+class CommentCommandTest {
 
     @Test
-    public void testSetComment() throws IOException, CommandException {
+    void testSetComment() throws IOException, CommandException {
         @SuppressWarnings({ "rawtypes" })
         AbstractProject project = mock(AbstractProject.class);
         AbstractBuild<?, ?> build = mock(AbstractBuild.class);
@@ -32,22 +31,23 @@ public class CommentCommandTest {
         verify(build).setDescription("my comment");
     }
 
-    @Test(expected = CommandException.class)
-    public void testMalformedBuildNumber() throws CommandException {
+    @Test
+    void testMalformedBuildNumber() {
         AbstractProject<?, ?> project = mock(AbstractProject.class);
-
         CommentCommand command = new CommentCommand();
-        command.getMessageForJob(project, new Sender("kutzi"),
-                new String[] { "abc", "my comment"}).toString();
+        assertThrows(CommandException.class, () ->
+            command.getMessageForJob(project, new Sender("kutzi"),
+                    new String[]{"abc", "my comment"}).toString());
     }
 
-    @Test(expected = CommandException.class)
-    public void testUnknownBuildNumber() throws CommandException {
+    @Test
+    void testUnknownBuildNumber() {
         @SuppressWarnings("rawtypes")
         AbstractProject project = mock(AbstractProject.class);
         AbstractBuild<?, ?> build = mock(AbstractBuild.class);
         CommentCommand command = new CommentCommand();
-        command.getMessageForJob(project, new Sender("kutzi"),
-                new String[] { "4712", "my comment"}).toString();
+        assertThrows(CommandException.class, () ->
+            command.getMessageForJob(project, new Sender("kutzi"),
+                    new String[]{"4712", "my comment"}).toString());
     }
 }

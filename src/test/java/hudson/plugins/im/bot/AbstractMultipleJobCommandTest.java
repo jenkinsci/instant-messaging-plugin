@@ -15,20 +15,17 @@ import java.util.HashSet;
 import java.util.List;
 
 import org.apache.commons.lang.StringUtils;
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertNull;
-import static org.junit.Assert.assertSame;
-
+import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 
-public class AbstractMultipleJobCommandTest {
+class AbstractMultipleJobCommandTest {
 
     @Test
-    @SuppressWarnings({ "unchecked", "rawtypes" })
-    public void testGetJobByName() throws CommandException {
+    @SuppressWarnings({"unchecked", "rawtypes"})
+    void testGetJobByName() throws CommandException {
         String projectName = "project name with spaces";
 
         AbstractProject project = mock(AbstractProject.class);
@@ -39,14 +36,12 @@ public class AbstractMultipleJobCommandTest {
         String[] projArgs = StringUtils.split(projectName);
         String[] args = new String[1 + projArgs.length];
         args[0] = "health";
-        for(int i=0; i < projArgs.length; i++) {
-            args[i+1] = projArgs[i];
-        }
+        System.arraycopy(projArgs, 0, args, 1, projArgs.length);
 
         HealthCommand cmd = new HealthCommand();
         cmd.setJobProvider(jobProvider);
 
-        List<AbstractProject<?, ?>> projects = new ArrayList<AbstractProject<?,?>>();
+        List<AbstractProject<?, ?>> projects = new ArrayList<>();
         Pair<Mode, String> pair = cmd.getProjects(new Sender("sender"), args, projects);
 
         assertEquals(Mode.SINGLE, pair.getHead());
@@ -56,25 +51,23 @@ public class AbstractMultipleJobCommandTest {
         assertSame(project, projects.get(0));
     }
 
-    @Test(expected=CommandException.class)
-    public void testUnknownJobName() throws CommandException {
+    @Test
+    void testUnknownJobName() {
         JobProvider jobProvider = mock(JobProvider.class);
-
         String[] args = {"health", "doesnt-matter-jobname"};
-
         HealthCommand cmd = new HealthCommand();
         cmd.setJobProvider(jobProvider);
-
-        List<AbstractProject<?, ?>> projects = new ArrayList<AbstractProject<?,?>>();
-        cmd.getProjects(new Sender("sender"), args, projects);
+        List<AbstractProject<?, ?>> projects = new ArrayList<>();
+        assertThrows(CommandException.class, () ->
+            cmd.getProjects(new Sender("sender"), args, projects));
     }
 
     @Test
-    public void testGetByView() throws Exception {
+    void testGetByView() throws Exception {
         FreeStyleProject project = mock(FreeStyleProject.class);
 
         View mockView = mock(View.class);
-        Collection<TopLevelItem> projectsForView = new HashSet<TopLevelItem>();
+        Collection<TopLevelItem> projectsForView = new HashSet<>();
         projectsForView.add(project);
         when(mockView.getItems()).thenReturn(projectsForView);
 
@@ -87,7 +80,7 @@ public class AbstractMultipleJobCommandTest {
         HealthCommand cmd = new HealthCommand();
         cmd.setJobProvider(jobProvider);
 
-        List<AbstractProject<?, ?>> projects = new ArrayList<AbstractProject<?,?>>();
+        List<AbstractProject<?, ?>> projects = new ArrayList<>();
         Pair<Mode,String> pair = cmd.getProjects(new Sender("sender"), args, projects);
 
         assertEquals(Mode.VIEW, pair.getHead());
