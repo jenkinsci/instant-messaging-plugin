@@ -73,7 +73,6 @@
         <dependency>
             <groupId>org.jenkins-ci.main</groupId>
             <artifactId>maven-plugin</artifactId>
-            <!-- needs version of hudson.model.User with getById() -->
             <optional>true</optional>
         </dependency>
 
