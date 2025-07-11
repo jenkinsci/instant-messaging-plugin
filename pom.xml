@@ -74,28 +74,7 @@
             <groupId>org.jenkins-ci.main</groupId>
             <artifactId>maven-plugin</artifactId>
             <!-- needs version of hudson.model.User with getById() -->
-            <version>3.26</version>
             <optional>true</optional>
-            <exclusions>
-                <!-- TODO bump in maven plugin, conflict with junit plugin dependencies -->
-                <exclusion>
-                    <groupId>org.apache.commons</groupId>
-                    <artifactId>commons-lang3</artifactId>
-                </exclusion>
-                <!-- TODO conflict with jenkins-test-harness that wants a newer
-                     version currently, see comments in
-                     https://github.com/jenkinsci/instant-messaging-plugin/pull/50
-                -->
-                <exclusion>
-                    <groupId>commons-net</groupId>
-                    <artifactId>commons-net</artifactId>
-                </exclusion>
-                <!-- Provided by Jenkins core -->
-                <exclusion>
-                    <groupId>org.jenkins-ci</groupId>
-                    <artifactId>symbol-annotation</artifactId>
-                </exclusion>
-            </exclusions>
         </dependency>
 
         <!-- Jenkins pipeline support below -->
