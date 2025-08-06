@@ -3,7 +3,6 @@
  */
 package hudson.plugins.im.bot;
 
-import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 import hudson.Extension;
 import hudson.plugins.im.AuthenticationHolder;
 import hudson.plugins.im.IMChat;
@@ -81,8 +80,6 @@ public class Bot implements IMMessageListener {
 
     private final AuthenticationHolder authentication;
 
-    @SuppressFBWarnings(value = "MC_OVERRIDABLE_METHOD_CALL_IN_CONSTRUCTOR",
-        justification = "Need ecosystem change to separate Bot construction from IMChat connection")
     public Bot(IMChat chat, String nick, String imServer,
                String commandPrefix, AuthenticationHolder authentication,
                boolean commandPrefixRequired
@@ -100,10 +97,6 @@ public class Bot implements IMMessageListener {
                 this.cmdsAndAliases.put(name, cmd);
         }
 
-        // MC_OVERRIDABLE_METHOD_CALL_IN_CONSTRUCTOR
-        // https://spotbugs.readthedocs.io/en/stable/bugDescriptions.html
-        // Overridable method addMessageListener is called from constructor
-        // It may also leak the "this" reference of the partially constructed object.
         chat.addMessageListener(this);
     }
 
@@ -118,8 +111,6 @@ public class Bot implements IMMessageListener {
      * @param commandPrefix
      * @param authentication
      */
-    @SuppressFBWarnings(value = "MC_OVERRIDABLE_METHOD_CALL_IN_CONSTRUCTOR",
-        justification = "Need ecosystem change to separate Bot construction from IMChat connection")
     public Bot(IMChat chat, String nick, String imServer,
                String commandPrefix, AuthenticationHolder authentication
     ) {
