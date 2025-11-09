@@ -39,6 +39,7 @@
         <!-- Note: keep in sync with io.jenkins.tools.bom version below -->
         <spotbugs.effort>Max</spotbugs.effort>
         <spotbugs.threshold>Low</spotbugs.threshold>
+        <ban-junit4-imports.skip>false</ban-junit4-imports.skip>
     </properties>
 
     <dependencyManagement>
