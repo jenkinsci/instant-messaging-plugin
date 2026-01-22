@@ -92,3 +92,7 @@ jenkins> (notice) - ui-builder-1#0: UIbuild #25190
   @ https://jenkins.some.org/job/UIbuild/25190/console
   (Elapsed time: 2 min 31 sec, Estimated remaining time: 4 min 35 sec)
 ````
+
+## LICENSE
+
+Provided under the terms of MIT License, see [LICENSE](LICENSE.txt)
