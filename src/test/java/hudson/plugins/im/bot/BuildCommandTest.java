@@ -17,6 +17,7 @@ import hudson.model.StringParameterValue;
 
 import hudson.plugins.im.Sender;
 
+import java.lang.reflect.Field;
 import java.util.List;
 
 import org.junit.jupiter.api.Test;
@@ -144,13 +145,32 @@ class BuildCommandTest {
                 captor.getValue().getParameters().get(0));
     }
 
+    private void skipExistenceCheck(boolean value) {
+        // RunParameterValue.SKIP_EXISTENCE_CHECK = value; // SKIP_EXISTENCE_CHECK is private
+        try {
+            Field skipExistenceCheck = RunParameterValue.class.getDeclaredField("SKIP_EXISTENCE_CHECK");
+            skipExistenceCheck.setAccessible(true);
+            skipExistenceCheck.set(RunParameterValue.class, value);
+            skipExistenceCheck.setAccessible(false);
+        } catch (IllegalAccessException | NoSuchFieldException e) {
+            // Nothing to do
+        }
+    }
+
     @Test
     void shouldParseRunParameter() {
         givenAParametrizedProject().withParameterDefinitions(
                 new RunParameterDefinition("run", "projectName", "description")
         );
 
-        whenParametersAreParsed("run=job#123");
+        try {
+            // Jenkins 2.551 and later require the job must exist
+            // Skip the existence check because this is already using mock objects
+            skipExistenceCheck(true);
+            whenParametersAreParsed("run=job#123");
+        } finally {
+            skipExistenceCheck(false);
+        }
 
         assertEquals(1, parsedParameters.size());
         ParameterValue parameter = parsedParameters.get(0);
