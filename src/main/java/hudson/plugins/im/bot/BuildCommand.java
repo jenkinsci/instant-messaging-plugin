@@ -69,7 +69,7 @@ public class BuildCommand extends AbstractTextSendingCommand {
     }
 
     @Override
-    public String getReply(Bot bot, Sender sender, String args[]) {
+    protected String getReply(Bot bot, Sender sender, String args[]) {
         if (args.length >= 2) {
             String jobName = args[1];
             jobName = jobName.replaceAll("\"", "");
