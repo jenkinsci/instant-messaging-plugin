@@ -30,7 +30,7 @@ import java.util.regex.Pattern;
 
 import jenkins.model.Jenkins;
 
-import org.apache.commons.lang.ArrayUtils;
+import org.apache.commons.lang3.ArrayUtils;
 
 /**
  * Build command for the instant messaging bot.
