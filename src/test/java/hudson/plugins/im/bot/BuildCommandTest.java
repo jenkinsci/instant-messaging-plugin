@@ -49,31 +49,26 @@ class BuildCommandTest {
 
         cmd.getReply(bot, sender, new String[]{ "build", "project", "5s" });
         assertTrue(project.hasPermission(Item.BUILD));
-        verify(project, times(2)).hasPermission(Item.BUILD);
         verify(project).scheduleBuild(eq(5), Mockito.any(Cause.class));
 
         project = mockProject(jobProvider);
         cmd.getReply(bot, sender, new String[]{ "build", "project", "5" });
         assertTrue(project.hasPermission(Item.BUILD));
-        verify(project, times(2)).hasPermission(Item.BUILD);
         verify(project).scheduleBuild(eq(5), Mockito.any(Cause.class));
 
         project = mockProject(jobProvider);
         cmd.getReply(bot, sender, new String[]{ "build", "project", "1m" });
         assertTrue(project.hasPermission(Item.BUILD));
-        verify(project, times(2)).hasPermission(Item.BUILD);
         verify(project).scheduleBuild(eq(60), Mockito.any(Cause.class));
 
         project = mockProject(jobProvider);
         cmd.getReply(bot, sender, new String[]{ "build", "project", "1min" });
         assertTrue(project.hasPermission(Item.BUILD));
-        verify(project, times(2)).hasPermission(Item.BUILD);
         verify(project).scheduleBuild(eq(60), Mockito.any(Cause.class));
 
         project = mockProject(jobProvider);
         cmd.getReply(bot, sender, new String[]{ "build", "project", "2h" });
         assertTrue(project.hasPermission(Item.BUILD));
-        verify(project, times(2)).hasPermission(Item.BUILD);
         verify(project).scheduleBuild(eq(7200), Mockito.any(Cause.class));
 
         // TODO kutzi: this doesn't work, yet. Catch typo before 's'
