@@ -26,6 +26,7 @@ import org.mockito.Mockito;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertInstanceOf;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.mockito.Mockito.*;
 
 class BuildCommandTest {
@@ -47,27 +48,27 @@ class BuildCommandTest {
         Sender sender = new Sender("sender");
 
         cmd.getReply(bot, sender, new String[]{ "build", "project", "5s" });
-        verify(project).hasPermission(Item.BUILD);
+        assertTrue(project.hasPermission(Item.BUILD));
         verify(project).scheduleBuild(eq(5), Mockito.any(Cause.class));
 
         project = mockProject(jobProvider);
         cmd.getReply(bot, sender, new String[]{ "build", "project", "5" });
-        verify(project).hasPermission(Item.BUILD);
+        assertTrue(project.hasPermission(Item.BUILD));
         verify(project).scheduleBuild(eq(5), Mockito.any(Cause.class));
 
         project = mockProject(jobProvider);
         cmd.getReply(bot, sender, new String[]{ "build", "project", "1m" });
-        verify(project).hasPermission(Item.BUILD);
+        assertTrue(project.hasPermission(Item.BUILD));
         verify(project).scheduleBuild(eq(60), Mockito.any(Cause.class));
 
         project = mockProject(jobProvider);
         cmd.getReply(bot, sender, new String[]{ "build", "project", "1min" });
-        verify(project).hasPermission(Item.BUILD);
+        assertTrue(project.hasPermission(Item.BUILD));
         verify(project).scheduleBuild(eq(60), Mockito.any(Cause.class));
 
         project = mockProject(jobProvider);
         cmd.getReply(bot, sender, new String[]{ "build", "project", "2h" });
-        verify(project).hasPermission(Item.BUILD);
+        assertTrue(project.hasPermission(Item.BUILD));
         verify(project).scheduleBuild(eq(7200), Mockito.any(Cause.class));
 
         // TODO kutzi: this doesn't work, yet. Catch typo before 's'
