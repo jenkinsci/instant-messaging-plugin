@@ -14,7 +14,7 @@ import java.util.List;
 import java.util.regex.Pattern;
 
 import jenkins.model.Jenkins;
-import org.apache.commons.lang.StringUtils;
+import org.apache.commons.lang3.StringUtils;
 
 /**
  * Utility class to help message creation
