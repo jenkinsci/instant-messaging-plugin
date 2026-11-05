@@ -37,7 +37,7 @@ class BuildCommandTest {
     @Test
     void testDelay() {
         Bot bot = mock(Bot.class);
-        when(bot.getImId()).thenReturn("hudsonbot");
+        setupBotGetImIdStubs(bot);
 
         BuildCommand cmd = new BuildCommand();
         JobProvider jobProvider = mock(JobProvider.class);
@@ -91,7 +91,7 @@ class BuildCommandTest {
     @Test
     void parametersFromCommandShouldBePassedToBuild() {
         Bot bot = mock(Bot.class);
-        when(bot.getImId()).thenReturn("hudsonbot");
+        setupBotGetImIdStubs(bot);
 
         BuildCommand cmd = new BuildCommand();
         JobProvider jobProvider = mock(JobProvider.class);
@@ -99,8 +99,7 @@ class BuildCommandTest {
 
         AbstractProject<?, ?> project = mockProject2(jobProvider);
         project = mockProject(jobProvider);
-        when(project.isParameterized()).thenReturn(Boolean.TRUE);
-        when(project.getProperty(ParametersDefinitionProperty.class)).thenReturn(
+        setupJobGetPropertyAndIsParameterizedStubs(project,
                 new ParametersDefinitionProperty(
                         new StringParameterDefinition("key", "default value", ""),
                         new BooleanParameterDefinition("key2", false, "")));
@@ -123,15 +122,14 @@ class BuildCommandTest {
     void unknownParametersShouldBeIgnored() {
         // TODO: really? Shouldn't we better raise an error?
         Bot bot = mock(Bot.class);
-        when(bot.getImId()).thenReturn("hudsonbot");
+        setupBotGetImIdStubs(bot);
 
         BuildCommand cmd = new BuildCommand();
         JobProvider jobProvider = mock(JobProvider.class);
         cmd.setJobProvider(jobProvider);
 
         AbstractProject<?, ?> project = mockProject(jobProvider);
-        when(project.isParameterized()).thenReturn(Boolean.TRUE);
-        when(project.getProperty(ParametersDefinitionProperty.class)).thenReturn(
+        setupJobGetPropertyAndIsParameterizedStubs(project,
                 new ParametersDefinitionProperty(new StringParameterDefinition("key", "default value", "")));
 
         Sender sender = new Sender("sender");
@@ -237,5 +235,14 @@ class BuildCommandTest {
         when(jobProvider.getJobByNameOrDisplayName(Mockito.anyString())).thenReturn(project);
         when(project.hasPermission(Item.BUILD)).thenReturn(Boolean.TRUE);
         return project;
+    }
+
+    private void setupJobGetPropertyAndIsParameterizedStubs(AbstractProject<?, ?> project, ParametersDefinitionProperty getPropertyReturnValue) {
+        when(project.isParameterized()).thenReturn(Boolean.TRUE);
+        when(project.getProperty(ParametersDefinitionProperty.class)).thenReturn(getPropertyReturnValue);
+    }
+
+    private void setupBotGetImIdStubs(Bot bot) {
+        when(bot.getImId()).thenReturn("hudsonbot");
     }
 }
