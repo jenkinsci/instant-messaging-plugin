@@ -55,7 +55,7 @@ class MatrixNotificationTest {
 
     @Test
     void testOnlyParent() throws InterruptedException, IOException {
-        when(publisher.getMatrixNotifier()).thenReturn(MatrixJobMultiplier.ONLY_PARENT);
+        setupIMPublisherGetMatrixNotifierStubs(MatrixJobMultiplier.ONLY_PARENT);
 
         publisher.prebuild(configurationBuild, listener);
         publisher.perform(configurationBuild, null, listener);
@@ -71,7 +71,7 @@ class MatrixNotificationTest {
 
     @Test
     void testOnlyConfigurations() throws InterruptedException, IOException {
-        when(publisher.getMatrixNotifier()).thenReturn(MatrixJobMultiplier.ONLY_CONFIGURATIONS);
+        setupIMPublisherGetMatrixNotifierStubs(MatrixJobMultiplier.ONLY_CONFIGURATIONS);
 
         MatrixAggregator aggregator = publisher.createAggregator(parentBuild, null, listener);
         aggregator.startBuild();
@@ -87,7 +87,7 @@ class MatrixNotificationTest {
 
     @Test
     void testOnlyBoth() throws InterruptedException, IOException {
-        when(publisher.getMatrixNotifier()).thenReturn(MatrixJobMultiplier.ALL);
+        setupIMPublisherGetMatrixNotifierStubs(MatrixJobMultiplier.ALL);
 
         MatrixAggregator aggregator = publisher.createAggregator(parentBuild, null, listener);
         aggregator.startBuild();
@@ -99,5 +99,9 @@ class MatrixNotificationTest {
         publisher.perform(configurationBuild, null, listener);
         verify(publisher).notifyChatsOnBuildStart(configurationBuild, listener);
         verify(publisher).notifyOnBuildEnd(configurationBuild, listener);
+    }
+
+    private void setupIMPublisherGetMatrixNotifierStubs(MatrixJobMultiplier getMatrixNotifierReturnValue) {
+        when(publisher.getMatrixNotifier()).thenReturn(getMatrixNotifierReturnValue);
     }
 }
